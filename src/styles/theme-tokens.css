@@ -1,0 +1,621 @@
+/* ============================================================================
+   Encore Representation — Theme Token System
+   11 WCAG AA compliant themes. All colors use CSS custom properties.
+   No hardcoded colors anywhere in the app — everything references these tokens.
+   ============================================================================ */
+
+/* ============================================================================
+   Theme 1: Black & Gold (Default)
+   Premium black and gold — talent representation aesthetic
+   ============================================================================ */
+[data-theme="black-gold"],
+:root {
+  /* Backgrounds */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-card: #1a1a1a;
+  --bg-card-hover: #222222;
+  --bg-elevated: #2a2a2a;
+
+  /* Text */
+  --text-primary: #f5f0e8;
+  --text-secondary: #c8b89a;
+  --text-muted: #8a7d6a;
+  --text-on-accent: #0a0a0a;
+
+  /* Accent */
+  --accent: #d4af37;
+  --accent-hover: #f5d060;
+  --accent-muted: #a08520;
+
+  /* Borders */
+  --border: #2a2520;
+  --border-hover: #4a4030;
+
+  /* Navigation */
+  --nav-bg: rgba(10, 10, 10, 0.96);
+  --nav-text: #f5f0e8;
+  --nav-text-hover: #f5d060;
+  --nav-border: #2a2520;
+
+  /* Header/Hero gradients */
+  --header-gradient-start: #1a1508;
+  --header-gradient-end: #0a0a0a;
+  --hero-overlay: rgba(10, 10, 10, 0.6);
+
+  /* Buttons */
+  --button-bg: #d4af37;
+  --button-hover: #f5d060;
+  --button-text: #0a0a0a;
+  --button-outline: #d4af37;
+  --button-outline-hover: rgba(212, 175, 55, 0.15);
+
+  /* Forms */
+  --input-bg: #111111;
+  --input-border: #2a2520;
+  --input-focus: #d4af37;
+  --input-text: #f5f0e8;
+  --input-placeholder: #8a7d6a;
+
+  /* Badges/Tags */
+  --badge-bg: rgba(212, 175, 55, 0.12);
+  --badge-text: #f5d060;
+  --badge-border: #d4af37;
+
+  /* Footer */
+  --footer-bg: #050505;
+  --footer-text: #c8b89a;
+  --footer-border: #2a2520;
+
+  /* Misc */
+  --shadow: rgba(212, 175, 55, 0.08);
+  --glow: rgba(212, 175, 55, 0.25);
+  --scrollbar-track: #111111;
+  --scrollbar-thumb: #2a2520;
+  --skeleton: #1a1a1a;
+  --skeleton-shine: #222222;
+  --success: #4caf50;
+  --warning: #ff9800;
+  --error: #f44336;
+  --info: #29b6f6;
+}
+
+/* ============================================================================
+   Theme 2: Cyber Night
+   Dark purple/pink cyberpunk aesthetic
+   ============================================================================ */
+[data-theme="cyber-night"] {
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #12122a;
+  --bg-card: #1a1a3e;
+  --bg-card-hover: #222255;
+  --bg-elevated: #252550;
+  --text-primary: #f0e6ff;
+  --text-secondary: #c4b5d9;
+  --text-muted: #8b7ea8;
+  --text-on-accent: #ffffff;
+  --accent: #e040fb;
+  --accent-hover: #ea80fc;
+  --accent-muted: #9c27b0;
+  --border: #2d2d5e;
+  --border-hover: #4a4a8a;
+  --nav-bg: rgba(10, 10, 26, 0.95);
+  --nav-text: #f0e6ff;
+  --nav-text-hover: #e040fb;
+  --nav-border: #2d2d5e;
+  --header-gradient-start: #1a0033;
+  --header-gradient-end: #0a0a1a;
+  --hero-overlay: rgba(10, 10, 26, 0.6);
+  --button-bg: #e040fb;
+  --button-hover: #ea80fc;
+  --button-text: #ffffff;
+  --button-outline: #e040fb;
+  --button-outline-hover: rgba(224, 64, 251, 0.15);
+  --input-bg: #12122a;
+  --input-border: #2d2d5e;
+  --input-focus: #e040fb;
+  --input-text: #f0e6ff;
+  --input-placeholder: #8b7ea8;
+  --badge-bg: rgba(224, 64, 251, 0.15);
+  --badge-text: #ea80fc;
+  --badge-border: #e040fb;
+  --footer-bg: #080818;
+  --footer-text: #c4b5d9;
+  --footer-border: #2d2d5e;
+  --shadow: rgba(224, 64, 251, 0.1);
+  --glow: rgba(224, 64, 251, 0.3);
+  --scrollbar-track: #12122a;
+  --scrollbar-thumb: #2d2d5e;
+  --skeleton: #1a1a3e;
+  --skeleton-shine: #252550;
+  --success: #4caf50;
+  --warning: #ff9800;
+  --error: #f44336;
+  --info: #29b6f6;
+}
+
+/* ============================================================================
+   Theme 2: Sakura Blossom
+   Soft pink and white, Japanese spring aesthetic
+   ============================================================================ */
+[data-theme="sakura-blossom"] {
+  --bg-primary: #fff5f7;
+  --bg-secondary: #ffe4ec;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fff0f5;
+  --bg-elevated: #ffffff;
+  --text-primary: #2d1b2e;
+  --text-secondary: #5c3d5e;
+  --text-muted: #997a9c;
+  --text-on-accent: #ffffff;
+  --accent: #d81b60;
+  --accent-hover: #c2185b;
+  --accent-muted: #f48fb1;
+  --border: #f3d1dc;
+  --border-hover: #e8a4b8;
+  --nav-bg: rgba(255, 245, 247, 0.97);
+  --nav-text: #2d1b2e;
+  --nav-text-hover: #d81b60;
+  --nav-border: #f3d1dc;
+  --header-gradient-start: #fce4ec;
+  --header-gradient-end: #fff5f7;
+  --hero-overlay: rgba(255, 245, 247, 0.5);
+  --button-bg: #d81b60;
+  --button-hover: #c2185b;
+  --button-text: #ffffff;
+  --button-outline: #d81b60;
+  --button-outline-hover: rgba(216, 27, 96, 0.1);
+  --input-bg: #ffffff;
+  --input-border: #f3d1dc;
+  --input-focus: #d81b60;
+  --input-text: #2d1b2e;
+  --input-placeholder: #997a9c;
+  --badge-bg: rgba(216, 27, 96, 0.1);
+  --badge-text: #c2185b;
+  --badge-border: #d81b60;
+  --footer-bg: #f8e8ee;
+  --footer-text: #5c3d5e;
+  --footer-border: #f3d1dc;
+  --shadow: rgba(216, 27, 96, 0.08);
+  --glow: rgba(216, 27, 96, 0.15);
+  --scrollbar-track: #ffe4ec;
+  --scrollbar-thumb: #f3d1dc;
+  --skeleton: #ffe4ec;
+  --skeleton-shine: #fff0f5;
+  --success: #2e7d32;
+  --warning: #e65100;
+  --error: #c62828;
+  --info: #0277bd;
+}
+
+/* ============================================================================
+   Theme 3: Neon Arcade
+   Bright neons on black — classic arcade/retro gaming
+   ============================================================================ */
+[data-theme="neon-arcade"] {
+  --bg-primary: #050510;
+  --bg-secondary: #0c0c20;
+  --bg-card: #111130;
+  --bg-card-hover: #1a1a40;
+  --bg-elevated: #1e1e48;
+  --text-primary: #e0ffe0;
+  --text-secondary: #a0d4a0;
+  --text-muted: #608860;
+  --text-on-accent: #050510;
+  --accent: #00ff88;
+  --accent-hover: #33ffaa;
+  --accent-muted: #00994d;
+  --border: #1a3a2a;
+  --border-hover: #2a5a3a;
+  --nav-bg: rgba(5, 5, 16, 0.95);
+  --nav-text: #e0ffe0;
+  --nav-text-hover: #00ff88;
+  --nav-border: #1a3a2a;
+  --header-gradient-start: #001a0d;
+  --header-gradient-end: #050510;
+  --hero-overlay: rgba(5, 5, 16, 0.65);
+  --button-bg: #00ff88;
+  --button-hover: #33ffaa;
+  --button-text: #050510;
+  --button-outline: #00ff88;
+  --button-outline-hover: rgba(0, 255, 136, 0.15);
+  --input-bg: #0c0c20;
+  --input-border: #1a3a2a;
+  --input-focus: #00ff88;
+  --input-text: #e0ffe0;
+  --input-placeholder: #608860;
+  --badge-bg: rgba(0, 255, 136, 0.1);
+  --badge-text: #00ff88;
+  --badge-border: #00994d;
+  --footer-bg: #030308;
+  --footer-text: #a0d4a0;
+  --footer-border: #1a3a2a;
+  --shadow: rgba(0, 255, 136, 0.08);
+  --glow: rgba(0, 255, 136, 0.25);
+  --scrollbar-track: #0c0c20;
+  --scrollbar-thumb: #1a3a2a;
+  --skeleton: #111130;
+  --skeleton-shine: #1a1a40;
+  --success: #69f0ae;
+  --warning: #ffd740;
+  --error: #ff5252;
+  --info: #40c4ff;
+}
+
+/* ============================================================================
+   Theme 4: Ocean Depths
+   Deep blues and teals — underwater calm
+   ============================================================================ */
+[data-theme="ocean-depths"] {
+  --bg-primary: #05101a;
+  --bg-secondary: #0a1929;
+  --bg-card: #0d2137;
+  --bg-card-hover: #122d47;
+  --bg-elevated: #163a57;
+  --text-primary: #e0f2ff;
+  --text-secondary: #90caf9;
+  --text-muted: #5a8ab5;
+  --text-on-accent: #ffffff;
+  --accent: #00bcd4;
+  --accent-hover: #26c6da;
+  --accent-muted: #00838f;
+  --border: #1a3d5c;
+  --border-hover: #2a5a80;
+  --nav-bg: rgba(5, 16, 26, 0.96);
+  --nav-text: #e0f2ff;
+  --nav-text-hover: #00bcd4;
+  --nav-border: #1a3d5c;
+  --header-gradient-start: #001f33;
+  --header-gradient-end: #05101a;
+  --hero-overlay: rgba(5, 16, 26, 0.6);
+  --button-bg: #00bcd4;
+  --button-hover: #26c6da;
+  --button-text: #ffffff;
+  --button-outline: #00bcd4;
+  --button-outline-hover: rgba(0, 188, 212, 0.15);
+  --input-bg: #0a1929;
+  --input-border: #1a3d5c;
+  --input-focus: #00bcd4;
+  --input-text: #e0f2ff;
+  --input-placeholder: #5a8ab5;
+  --badge-bg: rgba(0, 188, 212, 0.12);
+  --badge-text: #26c6da;
+  --badge-border: #00bcd4;
+  --footer-bg: #030d15;
+  --footer-text: #90caf9;
+  --footer-border: #1a3d5c;
+  --shadow: rgba(0, 188, 212, 0.08);
+  --glow: rgba(0, 188, 212, 0.2);
+  --scrollbar-track: #0a1929;
+  --scrollbar-thumb: #1a3d5c;
+  --skeleton: #0d2137;
+  --skeleton-shine: #122d47;
+  --success: #4caf50;
+  --warning: #ffb74d;
+  --error: #ef5350;
+  --info: #29b6f6;
+}
+
+/* ============================================================================
+   Theme 5: Sunset Blaze
+   Warm oranges, reds, and golds
+   ============================================================================ */
+[data-theme="sunset-blaze"] {
+  --bg-primary: #1a0a00;
+  --bg-secondary: #2a1200;
+  --bg-card: #361800;
+  --bg-card-hover: #452200;
+  --bg-elevated: #502800;
+  --text-primary: #fff3e0;
+  --text-secondary: #ffcc80;
+  --text-muted: #b38a50;
+  --text-on-accent: #ffffff;
+  --accent: #ff6d00;
+  --accent-hover: #ff9100;
+  --accent-muted: #bf5600;
+  --border: #4a2800;
+  --border-hover: #6a3a00;
+  --nav-bg: rgba(26, 10, 0, 0.95);
+  --nav-text: #fff3e0;
+  --nav-text-hover: #ff6d00;
+  --nav-border: #4a2800;
+  --header-gradient-start: #331100;
+  --header-gradient-end: #1a0a00;
+  --hero-overlay: rgba(26, 10, 0, 0.6);
+  --button-bg: #ff6d00;
+  --button-hover: #ff9100;
+  --button-text: #ffffff;
+  --button-outline: #ff6d00;
+  --button-outline-hover: rgba(255, 109, 0, 0.15);
+  --input-bg: #2a1200;
+  --input-border: #4a2800;
+  --input-focus: #ff6d00;
+  --input-text: #fff3e0;
+  --input-placeholder: #b38a50;
+  --badge-bg: rgba(255, 109, 0, 0.12);
+  --badge-text: #ff9100;
+  --badge-border: #ff6d00;
+  --footer-bg: #120800;
+  --footer-text: #ffcc80;
+  --footer-border: #4a2800;
+  --shadow: rgba(255, 109, 0, 0.08);
+  --glow: rgba(255, 109, 0, 0.2);
+  --scrollbar-track: #2a1200;
+  --scrollbar-thumb: #4a2800;
+  --skeleton: #361800;
+  --skeleton-shine: #452200;
+  --success: #66bb6a;
+  --warning: #ffa726;
+  --error: #ef5350;
+  --info: #42a5f5;
+}
+
+/* ============================================================================
+   Theme 6: Mecha Steel
+   Industrial grays and electric blue — mech anime vibes
+   ============================================================================ */
+[data-theme="mecha-steel"] {
+  --bg-primary: #0e1114;
+  --bg-secondary: #171c22;
+  --bg-card: #1e252e;
+  --bg-card-hover: #272f3a;
+  --bg-elevated: #2e3846;
+  --text-primary: #e8edf4;
+  --text-secondary: #a8b8cc;
+  --text-muted: #6a7d94;
+  --text-on-accent: #ffffff;
+  --accent: #2196f3;
+  --accent-hover: #42a5f5;
+  --accent-muted: #1565c0;
+  --border: #2a3442;
+  --border-hover: #3a4a5e;
+  --nav-bg: rgba(14, 17, 20, 0.96);
+  --nav-text: #e8edf4;
+  --nav-text-hover: #42a5f5;
+  --nav-border: #2a3442;
+  --header-gradient-start: #121820;
+  --header-gradient-end: #0e1114;
+  --hero-overlay: rgba(14, 17, 20, 0.65);
+  --button-bg: #2196f3;
+  --button-hover: #42a5f5;
+  --button-text: #ffffff;
+  --button-outline: #2196f3;
+  --button-outline-hover: rgba(33, 150, 243, 0.12);
+  --input-bg: #171c22;
+  --input-border: #2a3442;
+  --input-focus: #2196f3;
+  --input-text: #e8edf4;
+  --input-placeholder: #6a7d94;
+  --badge-bg: rgba(33, 150, 243, 0.12);
+  --badge-text: #42a5f5;
+  --badge-border: #2196f3;
+  --footer-bg: #0a0d10;
+  --footer-text: #a8b8cc;
+  --footer-border: #2a3442;
+  --shadow: rgba(33, 150, 243, 0.06);
+  --glow: rgba(33, 150, 243, 0.15);
+  --scrollbar-track: #171c22;
+  --scrollbar-thumb: #2a3442;
+  --skeleton: #1e252e;
+  --skeleton-shine: #272f3a;
+  --success: #4caf50;
+  --warning: #ff9800;
+  --error: #f44336;
+  --info: #29b6f6;
+}
+
+/* ============================================================================
+   Theme 7: Dragon Festival
+   Rich reds and golds — traditional Asian festival
+   ============================================================================ */
+[data-theme="dragon-festival"] {
+  --bg-primary: #1a0505;
+  --bg-secondary: #2a0a0a;
+  --bg-card: #380e0e;
+  --bg-card-hover: #481414;
+  --bg-elevated: #551a1a;
+  --text-primary: #fff0e0;
+  --text-secondary: #f0c8a0;
+  --text-muted: #b08860;
+  --text-on-accent: #ffffff;
+  --accent: #d4001a;
+  --accent-hover: #f02020;
+  --accent-muted: #8b0012;
+  --border: #4a1a1a;
+  --border-hover: #6a2a2a;
+  --nav-bg: rgba(26, 5, 5, 0.96);
+  --nav-text: #fff0e0;
+  --nav-text-hover: #ffd700;
+  --nav-border: #4a1a1a;
+  --header-gradient-start: #330808;
+  --header-gradient-end: #1a0505;
+  --hero-overlay: rgba(26, 5, 5, 0.6);
+  --button-bg: #d4001a;
+  --button-hover: #f02020;
+  --button-text: #ffffff;
+  --button-outline: #ffd700;
+  --button-outline-hover: rgba(255, 215, 0, 0.15);
+  --input-bg: #2a0a0a;
+  --input-border: #4a1a1a;
+  --input-focus: #ffd700;
+  --input-text: #fff0e0;
+  --input-placeholder: #b08860;
+  --badge-bg: rgba(255, 215, 0, 0.12);
+  --badge-text: #ffd700;
+  --badge-border: #d4001a;
+  --footer-bg: #120404;
+  --footer-text: #f0c8a0;
+  --footer-border: #4a1a1a;
+  --shadow: rgba(212, 0, 26, 0.08);
+  --glow: rgba(255, 215, 0, 0.2);
+  --scrollbar-track: #2a0a0a;
+  --scrollbar-thumb: #4a1a1a;
+  --skeleton: #380e0e;
+  --skeleton-shine: #481414;
+  --success: #66bb6a;
+  --warning: #ffa726;
+  --error: #ef5350;
+  --info: #29b6f6;
+}
+
+/* ============================================================================
+   Theme 8: Spirit Garden
+   Soft greens and earth tones — Ghibli-inspired nature
+   ============================================================================ */
+[data-theme="spirit-garden"] {
+  --bg-primary: #f5f8f0;
+  --bg-secondary: #e8f0e0;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f8e8;
+  --bg-elevated: #ffffff;
+  --text-primary: #1b2e1b;
+  --text-secondary: #3d5c3d;
+  --text-muted: #7a9a7a;
+  --text-on-accent: #ffffff;
+  --accent: #2e7d32;
+  --accent-hover: #388e3c;
+  --accent-muted: #81c784;
+  --border: #c8e0c0;
+  --border-hover: #a0c898;
+  --nav-bg: rgba(245, 248, 240, 0.97);
+  --nav-text: #1b2e1b;
+  --nav-text-hover: #2e7d32;
+  --nav-border: #c8e0c0;
+  --header-gradient-start: #e0f0d8;
+  --header-gradient-end: #f5f8f0;
+  --hero-overlay: rgba(245, 248, 240, 0.45);
+  --button-bg: #2e7d32;
+  --button-hover: #388e3c;
+  --button-text: #ffffff;
+  --button-outline: #2e7d32;
+  --button-outline-hover: rgba(46, 125, 50, 0.1);
+  --input-bg: #ffffff;
+  --input-border: #c8e0c0;
+  --input-focus: #2e7d32;
+  --input-text: #1b2e1b;
+  --input-placeholder: #7a9a7a;
+  --badge-bg: rgba(46, 125, 50, 0.1);
+  --badge-text: #2e7d32;
+  --badge-border: #81c784;
+  --footer-bg: #e0ead8;
+  --footer-text: #3d5c3d;
+  --footer-border: #c8e0c0;
+  --shadow: rgba(46, 125, 50, 0.06);
+  --glow: rgba(46, 125, 50, 0.12);
+  --scrollbar-track: #e8f0e0;
+  --scrollbar-thumb: #c8e0c0;
+  --skeleton: #e8f0e0;
+  --skeleton-shine: #f0f8e8;
+  --success: #2e7d32;
+  --warning: #e65100;
+  --error: #c62828;
+  --info: #0277bd;
+}
+
+/* ============================================================================
+   Theme 9: Midnight Galaxy
+   Deep space purples and blues with star-like accents
+   ============================================================================ */
+[data-theme="midnight-galaxy"] {
+  --bg-primary: #080012;
+  --bg-secondary: #100020;
+  --bg-card: #180030;
+  --bg-card-hover: #20003e;
+  --bg-elevated: #28004e;
+  --text-primary: #e8d8ff;
+  --text-secondary: #b8a0e0;
+  --text-muted: #7860a8;
+  --text-on-accent: #ffffff;
+  --accent: #7c4dff;
+  --accent-hover: #b388ff;
+  --accent-muted: #5e35b1;
+  --border: #2a1050;
+  --border-hover: #3e1a70;
+  --nav-bg: rgba(8, 0, 18, 0.96);
+  --nav-text: #e8d8ff;
+  --nav-text-hover: #b388ff;
+  --nav-border: #2a1050;
+  --header-gradient-start: #10001a;
+  --header-gradient-end: #080012;
+  --hero-overlay: rgba(8, 0, 18, 0.6);
+  --button-bg: #7c4dff;
+  --button-hover: #b388ff;
+  --button-text: #ffffff;
+  --button-outline: #7c4dff;
+  --button-outline-hover: rgba(124, 77, 255, 0.15);
+  --input-bg: #100020;
+  --input-border: #2a1050;
+  --input-focus: #7c4dff;
+  --input-text: #e8d8ff;
+  --input-placeholder: #7860a8;
+  --badge-bg: rgba(124, 77, 255, 0.12);
+  --badge-text: #b388ff;
+  --badge-border: #7c4dff;
+  --footer-bg: #05000d;
+  --footer-text: #b8a0e0;
+  --footer-border: #2a1050;
+  --shadow: rgba(124, 77, 255, 0.08);
+  --glow: rgba(124, 77, 255, 0.25);
+  --scrollbar-track: #100020;
+  --scrollbar-thumb: #2a1050;
+  --skeleton: #180030;
+  --skeleton-shine: #20003e;
+  --success: #69f0ae;
+  --warning: #ffd740;
+  --error: #ff5252;
+  --info: #448aff;
+}
+
+/* ============================================================================
+   Theme 10: Snow Kingdom
+   Clean whites, icy blues — winter/ice theme
+   ============================================================================ */
+[data-theme="snow-kingdom"] {
+  --bg-primary: #f0f4f8;
+  --bg-secondary: #e1e8f0;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f5f8fc;
+  --bg-elevated: #ffffff;
+  --text-primary: #1a2332;
+  --text-secondary: #3d5068;
+  --text-muted: #7a8fa8;
+  --text-on-accent: #ffffff;
+  --accent: #0288d1;
+  --accent-hover: #0277bd;
+  --accent-muted: #4fc3f7;
+  --border: #d0dce8;
+  --border-hover: #b0c4d8;
+  --nav-bg: rgba(240, 244, 248, 0.97);
+  --nav-text: #1a2332;
+  --nav-text-hover: #0288d1;
+  --nav-border: #d0dce8;
+  --header-gradient-start: #dce8f4;
+  --header-gradient-end: #f0f4f8;
+  --hero-overlay: rgba(240, 244, 248, 0.4);
+  --button-bg: #0288d1;
+  --button-hover: #0277bd;
+  --button-text: #ffffff;
+  --button-outline: #0288d1;
+  --button-outline-hover: rgba(2, 136, 209, 0.1);
+  --input-bg: #ffffff;
+  --input-border: #d0dce8;
+  --input-focus: #0288d1;
+  --input-text: #1a2332;
+  --input-placeholder: #7a8fa8;
+  --badge-bg: rgba(2, 136, 209, 0.08);
+  --badge-text: #0277bd;
+  --badge-border: #0288d1;
+  --footer-bg: #dce4ec;
+  --footer-text: #3d5068;
+  --footer-border: #d0dce8;
+  --shadow: rgba(2, 136, 209, 0.06);
+  --glow: rgba(2, 136, 209, 0.1);
+  --scrollbar-track: #e1e8f0;
+  --scrollbar-thumb: #d0dce8;
+  --skeleton: #e1e8f0;
+  --skeleton-shine: #f0f4f8;
+  --success: #2e7d32;
+  --warning: #e65100;
+  --error: #c62828;
+  --info: #0288d1;
+}

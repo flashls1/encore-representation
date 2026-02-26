@@ -1,0 +1,510 @@
+@import './styles/theme-tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   SillCon 2026 Design System
+   Bridge: theme tokens → shadcn CSS variables
+   All shadcn components automatically inherit from the active theme.
+   ============================================================================ */
+
+@layer base {
+  :root {
+    /* Map theme tokens to shadcn's expected HSL variables */
+    /* These are overridden per-theme by the bridge below */
+    --radius: 0.75rem;
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ============================================================================
+   Typography — Google Fonts
+   ============================================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+.font-bangers {
+  font-family: 'Bangers', cursive;
+}
+
+.font-orbitron {
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* ============================================================================
+   Utility Classes — Theme-aware
+   ============================================================================ */
+@layer utilities {
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--border-hover);
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--accent);
+    color: var(--text-on-accent);
+  }
+
+  /* Focus ring */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================================================
+   shadcn Bridge — Map our tokens to shadcn's expected format
+   shadcn components use hsl(var(--primary)) pattern.
+   We override their elements directly with our theme tokens.
+   ============================================================================ */
+@layer base {
+
+  /* Button overrides */
+  .btn-primary {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--button-hover);
+  }
+
+  .btn-outline {
+    border: 1px solid var(--button-outline);
+    color: var(--button-outline);
+    background: transparent;
+  }
+
+  .btn-outline:hover {
+    background-color: var(--button-outline-hover);
+  }
+}
+
+/* ============================================================================
+   Card Component — Theme-aware
+   ============================================================================ */
+.theme-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+}
+
+.theme-card:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+/* ============================================================================
+   Badge — Theme-aware
+   ============================================================================ */
+.theme-badge {
+  background-color: var(--badge-bg);
+  color: var(--badge-text);
+  border: 1px solid var(--badge-border);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+}
+
+/* ============================================================================
+   Input — Theme-aware
+   ============================================================================ */
+.theme-input {
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--input-text);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.theme-input::placeholder {
+  color: var(--input-placeholder);
+}
+
+.theme-input:focus {
+  border-color: var(--input-focus);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--shadow);
+}
+
+/* ============================================================================
+   Section Headers — Theme-aware gradients
+   ============================================================================ */
+.section-header {
+  background: linear-gradient(135deg,
+      var(--header-gradient-start),
+      var(--header-gradient-end));
+}
+
+/* ============================================================================
+   Glow Effects
+   ============================================================================ */
+.glow-accent {
+  box-shadow: 0 0 20px var(--glow);
+}
+
+.glow-accent-sm {
+  box-shadow: 0 0 10px var(--glow);
+}
+
+/* ============================================================================
+   Skeleton Loading — Theme-aware
+   ============================================================================ */
+@keyframes skeleton-pulse {
+
+  0%,
+  100% {
+    background-color: var(--skeleton);
+  }
+
+  50% {
+    background-color: var(--skeleton-shine);
+  }
+}
+
+.skeleton {
+  animation: skeleton-pulse 2s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+
+/* ============================================================================
+   Page wrapper — Ensures content below fixed nav
+   ============================================================================ */
+.page-wrapper {
+  padding-top: 4rem;
+  /* h-16 nav height */
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+}
+
+/* ============================================================================
+   Animations
+   ============================================================================ */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cyber-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-cyber-pulse {
+  animation: cyber-pulse 2s ease-in-out infinite;
+}
+
+/* Staggered fade-in for child elements */
+.stagger-children>*:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.stagger-children>*:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.stagger-children>*:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.stagger-children>*:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.stagger-children>*:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+.stagger-children>*:nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+/* Countdown timer digit styling */
+.countdown-digit {
+  font-family: 'Orbitron', sans-serif;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  min-width: 3.5rem;
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+/* ============================================================================
+   Admin CMS — Hardcoded dark theme (INDEPENDENT of site theme)
+   All colors fixed. Never references CSS variables.
+   ============================================================================ */
+
+/* ── Admin page background ── */
+.admin-dark-theme {
+  color: #e2e8f0;
+}
+
+.admin-dark-theme main {
+  background-color: #0d0d14 !important;
+  color: #e2e8f0 !important;
+}
+
+/* ── Cards in admin content area ── */
+.admin-dark-theme .bg-card\/50,
+.admin-dark-theme .bg-card {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+/* ── Text ── */
+.admin-dark-theme h1,
+.admin-dark-theme h2,
+.admin-dark-theme h3,
+.admin-dark-theme h4 {
+  color: #f1f5f9 !important;
+}
+
+.admin-dark-theme .text-foreground,
+.admin-dark-theme .text-card-foreground {
+  color: #e2e8f0 !important;
+}
+
+.admin-dark-theme .text-muted-foreground {
+  color: #94a3b8 !important;
+}
+
+.admin-dark-theme label {
+  color: #cbd5e1 !important;
+  margin-bottom: 6px !important;
+  display: inline-block;
+}
+
+/* ── Inputs (in admin content area) ── */
+.admin-dark-theme input,
+.admin-dark-theme textarea,
+.admin-dark-theme select,
+.admin-dark-theme [role="combobox"],
+.admin-dark-theme button[aria-haspopup="listbox"] {
+  background-color: #0f172a !important;
+  color: #e2e8f0 !important;
+  border: 1px solid #475569 !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+  margin-bottom: 4px !important;
+}
+
+.admin-dark-theme input:focus,
+.admin-dark-theme textarea:focus {
+  border-color: #60a5fa !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) !important;
+}
+
+.admin-dark-theme input::placeholder,
+.admin-dark-theme textarea::placeholder {
+  color: #64748b !important;
+}
+
+.admin-dark-theme input[type="file"] {
+  background-color: #1e293b !important;
+  padding: 8px !important;
+}
+
+/* ── Buttons ── */
+.admin-dark-theme button[class*="outline"] {
+  border-color: #475569 !important;
+  color: #e2e8f0 !important;
+}
+
+.admin-dark-theme [role="switch"] {
+  border-color: #475569 !important;
+}
+
+/* ── Scrollbar ── */
+.admin-dark-theme ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-dark-theme ::-webkit-scrollbar-track {
+  background: #0d0d14;
+}
+
+.admin-dark-theme ::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+
+
+/* ============================================================================
+   Dialogs / Modals — Portaled outside admin-dark-theme
+   Uses SLATE palette: clearly visible against #0d0d14 page background
+   ============================================================================ */
+
+/* Dialog overlay — darken page behind */
+[role="dialog"]::before {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Dialog container — slate-800, clearly pops off black page */
+[role="dialog"]>div,
+[role="alertdialog"]>div {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  border: 1px solid #475569 !important;
+  border-radius: 12px !important;
+  padding: 24px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Dialog text */
+[role="dialog"] h2,
+[role="dialog"] h3 {
+  color: #f1f5f9 !important;
+  margin-bottom: 4px !important;
+}
+
+[role="dialog"] label {
+  color: #cbd5e1 !important;
+  margin-bottom: 6px !important;
+  display: inline-block;
+}
+
+[role="dialog"] p {
+  color: #94a3b8 !important;
+  margin-bottom: 16px !important;
+}
+
+/* Dialog inputs — darker than dialog bg for clear contrast */
+[role="dialog"] input,
+[role="dialog"] textarea,
+[role="dialog"] select,
+[role="dialog"] [role="combobox"],
+[role="dialog"] button[aria-haspopup="listbox"] {
+  background-color: #0f172a !important;
+  color: #e2e8f0 !important;
+  border: 1px solid #475569 !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+  margin-bottom: 4px !important;
+  width: 100%;
+}
+
+[role="dialog"] input:focus,
+[role="dialog"] textarea:focus {
+  border-color: #60a5fa !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) !important;
+}
+
+[role="dialog"] input::placeholder,
+[role="dialog"] textarea::placeholder {
+  color: #64748b !important;
+}
+
+[role="dialog"] input[type="file"] {
+  background-color: #1e293b !important;
+  padding: 8px !important;
+}
+
+/* Dialog form field spacing */
+[role="dialog"] .space-y-4>* {
+  margin-bottom: 12px !important;
+}
+
+[role="dialog"] .grid {
+  gap: 16px !important;
+}
+
+/* Dialog buttons */
+[role="dialog"] button[class*="outline"] {
+  border-color: #475569 !important;
+  color: #e2e8f0 !important;
+}
+
+[role="dialog"] [role="switch"] {
+  border-color: #475569 !important;
+}
+
+
+/* ============================================================================
+   Dropdowns / Select menus (portaled)
+   ============================================================================ */
+[role="listbox"],
+[data-radix-popper-content-wrapper] .bg-popover {
+  background-color: #1e293b !important;
+  border: 1px solid #475569 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+}
+
+[role="option"] {
+  color: #e2e8f0 !important;
+  padding: 8px 12px !important;
+}
+
+[role="option"]:hover,
+[role="option"][data-highlighted] {
+  background-color: #334155 !important;
+}
