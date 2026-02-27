@@ -162,7 +162,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-start md:items-center justify-center overflow-hidden pt-16 md:pt-0">
       <HeroBackground videoUrl={effectiveVideoUrl} imageUrl={effectiveImageUrl} />
       <KineticFlares />
 

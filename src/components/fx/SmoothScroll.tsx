@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -8,9 +9,11 @@ gsap.registerPlugin(ScrollTrigger);
 /**
  * Global smooth-scroll wrapper.
  * Initializes Lenis and syncs its RAF loop with GSAP's ticker.
+ * Scrolls to top on every route change.
  */
 const SmoothScroll = ({ children }: { children: React.ReactNode }) => {
     const lenisRef = useRef<Lenis | null>(null);
+    const { pathname } = useLocation();
 
     useEffect(() => {
         const lenis = new Lenis({
@@ -40,6 +43,15 @@ const SmoothScroll = ({ children }: { children: React.ReactNode }) => {
             lenisRef.current = null;
         };
     }, []);
+
+    // Scroll to top on route change
+    useEffect(() => {
+        if (lenisRef.current) {
+            lenisRef.current.scrollTo(0, { immediate: true });
+        } else {
+            window.scrollTo(0, 0);
+        }
+    }, [pathname]);
 
     return <>{children}</>;
 };
