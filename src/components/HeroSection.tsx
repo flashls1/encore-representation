@@ -163,11 +163,129 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen flex items-start md:items-center justify-center overflow-hidden pt-16 md:pt-0">
-      <HeroBackground videoUrl={effectiveVideoUrl} imageUrl={effectiveImageUrl} />
-      <KineticFlares />
+      {/* Desktop: full bleed background */}
+      <div className="hidden md:block">
+        <HeroBackground videoUrl={effectiveVideoUrl} imageUrl={effectiveImageUrl} />
+        <KineticFlares />
+      </div>
 
-      {/* Content */}
-      <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* Mobile: bordered hero container */}
+      <div className="md:hidden w-full px-3 pt-2">
+        <div
+          className="relative w-full overflow-hidden rounded-xl"
+          style={{ border: '1.5px solid #D4AF37', aspectRatio: '16/9' }}
+        >
+          {effectiveVideoUrl ? (
+            <video
+              src={effectiveVideoUrl}
+              autoPlay muted loop playsInline
+              className="w-full h-full object-contain"
+              style={{ backgroundColor: '#0A0A0A' }}
+              onError={(e) => { (e.currentTarget as HTMLVideoElement).style.display = 'none'; }}
+            />
+          ) : effectiveImageUrl ? (
+            <img
+              src={effectiveImageUrl}
+              alt="Encore Representation"
+              className="w-full h-full object-contain"
+              style={{ backgroundColor: '#0A0A0A' }}
+              loading="eager"
+            />
+          ) : null}
+          {/* Dark overlay */}
+          <div className="absolute inset-0" style={{ background: 'rgba(0, 0, 0, 0.45)' }} />
+          {/* Bottom gradient */}
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 40%, rgba(10,10,10,0.9))' }} />
+
+          {/* Mobile text overlay — positioned at bottom of video */}
+          {heroTextVisible && (
+            <div className="absolute bottom-3 left-0 right-0 px-3 text-center z-10">
+              <h1
+                className="text-xl font-bold uppercase mb-1"
+                style={{
+                  fontFamily: "'Cinzel', Georgia, serif",
+                  color: '#D4AF37',
+                  letterSpacing: '0.06em',
+                  textShadow: '0 0 20px rgba(212,175,55,0.4), 1px 1px 0 rgba(0,0,0,0.8)',
+                }}
+              >
+                {heroTitle}
+              </h1>
+              <p
+                className="text-xs font-medium leading-snug"
+                style={{
+                  color: 'rgba(255, 255, 255, 0.85)',
+                  textShadow: '0 1px 4px rgba(0,0,0,0.9)',
+                }}
+              >
+                {heroSubtitle}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile CTA buttons — side by side below video */}
+        <motion.div
+          className="flex flex-row justify-center items-center gap-3 mt-4 px-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {ctaPrimaryText && ctaPrimaryUrl && (
+            isInternalUrl(ctaPrimaryUrl) ? (
+              <Link
+                to={ctaPrimaryUrl}
+                className="px-5 py-2.5 text-sm font-bold rounded-lg glow-accent inline-block"
+                style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
+              >
+                {ctaPrimaryText}
+              </Link>
+            ) : (
+              <a
+                href={ctaPrimaryUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 text-sm font-bold rounded-lg glow-accent inline-block"
+                style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
+              >
+                {ctaPrimaryText}
+              </a>
+            )
+          )}
+          {ctaSecondaryText && ctaSecondaryUrl && (
+            isInternalUrl(ctaSecondaryUrl) ? (
+              <Link
+                to={ctaSecondaryUrl}
+                className="px-5 py-2.5 text-sm font-bold rounded-lg inline-block"
+                style={{
+                  border: '2px solid var(--accent)',
+                  color: 'var(--accent)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                }}
+              >
+                {ctaSecondaryText}
+              </Link>
+            ) : (
+              <a
+                href={ctaSecondaryUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 text-sm font-bold rounded-lg inline-block"
+                style={{
+                  border: '2px solid var(--accent)',
+                  color: 'var(--accent)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                }}
+              >
+                {ctaSecondaryText}
+              </a>
+            )
+          )}
+        </motion.div>
+      </div>
+
+      {/* Desktop content overlay — unchanged */}
+      <div className="hidden md:block relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Title — GSAP staggered reveal */}
         {heroTextVisible && (
           <RevealText
@@ -204,7 +322,7 @@ const HeroSection = () => {
 
         {/* CTA Buttons — Framer Motion spring hover */}
         <motion.div
-          className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4"
+          className="flex flex-row justify-center items-center gap-4"
           style={ctaOffsetTop > 0 ? { marginTop: `${ctaOffsetTop}px` } : undefined}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
