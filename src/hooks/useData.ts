@@ -47,7 +47,7 @@ export const useHomeContent = () => {
 };
 
 // ============================================================================
-// Talents
+// Talents — matches actual DB schema (name, slug, role_name, character_name)
 // ============================================================================
 export const useTalents = (featuredOnly: boolean = false) => {
   return useQuery({
@@ -58,11 +58,11 @@ export const useTalents = (featuredOnly: boolean = false) => {
         .select(`
           *,
           talent_roles (
-            id, talent_id, character_name, show_name, sort_order, created_at
+            id, talent_id, role_name, character_name
           )
         `)
         .order('sort_order', { ascending: true })
-        .order('last_name', { ascending: true });
+        .order('name', { ascending: true });
 
       if (featuredOnly) {
         query = query.eq('featured', true);
@@ -85,10 +85,10 @@ export const useTalent = (id: string) => {
         .select(`
           *,
           talent_roles (
-            id, talent_id, character_name, show_name, sort_order, created_at
+            id, talent_id, role_name, character_name
           ),
           talent_images (
-            id, talent_id, image_url, caption, sort_order, created_at
+            id, talent_id, image_url, caption, sort_order
           )
         `)
         .eq('id', id)

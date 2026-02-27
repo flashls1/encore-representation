@@ -6,7 +6,7 @@ interface TalentCardProps {
 }
 
 const TalentCard = ({ talent }: TalentCardProps) => {
-    const displayName = `${talent.first_name} ${talent.last_name}`;
+    const displayName = talent.name;
     const topRoles = talent.talent_roles?.slice(0, 2) || [];
 
     return (
@@ -36,7 +36,7 @@ const TalentCard = ({ talent }: TalentCardProps) => {
                             className="text-4xl font-bold opacity-30"
                             style={{ color: 'var(--accent)' }}
                         >
-                            {talent.first_name[0]}{talent.last_name[0]}
+                            {talent.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
                         </span>
                     </div>
                 )}

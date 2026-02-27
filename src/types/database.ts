@@ -69,13 +69,13 @@ export interface MediaLibraryItem {
 }
 
 // ============================================================================
-// Talent System
+// Talent System — Matches actual DB schema
 // ============================================================================
 
 export interface Talent {
   id: string;
-  first_name: string;
-  last_name: string;
+  name: string;
+  slug: string;
   headshot_url: string | null;
   bio: string | null;
   featured: boolean;
@@ -89,10 +89,8 @@ export interface Talent {
 export interface TalentRole {
   id: string;
   talent_id: string;
+  role_name: string;
   character_name: string;
-  show_name: string | null;
-  sort_order: number;
-  created_at: string;
 }
 
 export interface TalentImage {
@@ -101,7 +99,6 @@ export interface TalentImage {
   image_url: string;
   caption: string | null;
   sort_order: number;
-  created_at: string;
 }
 
 export interface NavigationItem {

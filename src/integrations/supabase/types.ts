@@ -245,10 +245,10 @@ export type Database = {
           bio: string | null
           created_at: string
           featured: boolean
-          first_name: string
           headshot_url: string | null
           id: string
-          last_name: string
+          name: string
+          slug: string
           sort_order: number
           updated_at: string
         }
@@ -256,10 +256,10 @@ export type Database = {
           bio?: string | null
           created_at?: string
           featured?: boolean
-          first_name: string
           headshot_url?: string | null
           id?: string
-          last_name: string
+          name: string
+          slug: string
           sort_order?: number
           updated_at?: string
         }
@@ -267,10 +267,10 @@ export type Database = {
           bio?: string | null
           created_at?: string
           featured?: boolean
-          first_name?: string
           headshot_url?: string | null
           id?: string
-          last_name?: string
+          name?: string
+          slug?: string
           sort_order?: number
           updated_at?: string
         }
@@ -279,7 +279,6 @@ export type Database = {
       talent_images: {
         Row: {
           caption: string | null
-          created_at: string
           id: string
           image_url: string
           sort_order: number
@@ -287,7 +286,6 @@ export type Database = {
         }
         Insert: {
           caption?: string | null
-          created_at?: string
           id?: string
           image_url: string
           sort_order?: number
@@ -295,7 +293,6 @@ export type Database = {
         }
         Update: {
           caption?: string | null
-          created_at?: string
           id?: string
           image_url?: string
           sort_order?: number
@@ -314,26 +311,20 @@ export type Database = {
       talent_roles: {
         Row: {
           character_name: string
-          created_at: string
           id: string
-          show_name: string | null
-          sort_order: number
+          role_name: string
           talent_id: string
         }
         Insert: {
           character_name: string
-          created_at?: string
           id?: string
-          show_name?: string | null
-          sort_order?: number
+          role_name: string
           talent_id: string
         }
         Update: {
           character_name?: string
-          created_at?: string
           id?: string
-          show_name?: string | null
-          sort_order?: number
+          role_name?: string
           talent_id?: string
         }
         Relationships: [

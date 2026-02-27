@@ -42,43 +42,16 @@ const RichTextEditor = ({
                     borderColor: 'var(--input-border)',
                 }}
             >
-                <button
-                    type="button"
-                    onClick={() => exec('bold')}
-                    className="p-1.5 rounded hover:opacity-80"
-                    style={{ color: 'var(--text-primary)' }}
-                    title="Bold"
-                >
+                <button type="button" onClick={() => exec('bold')} className="p-1.5 rounded hover:opacity-80" style={{ color: 'var(--text-primary)' }} title="Bold">
                     <Bold className="h-4 w-4" />
                 </button>
-                <button
-                    type="button"
-                    onClick={() => exec('italic')}
-                    className="p-1.5 rounded hover:opacity-80"
-                    style={{ color: 'var(--text-primary)' }}
-                    title="Italic"
-                >
+                <button type="button" onClick={() => exec('italic')} className="p-1.5 rounded hover:opacity-80" style={{ color: 'var(--text-primary)' }} title="Italic">
                     <Italic className="h-4 w-4" />
                 </button>
-                <button
-                    type="button"
-                    onClick={() => exec('insertUnorderedList')}
-                    className="p-1.5 rounded hover:opacity-80"
-                    style={{ color: 'var(--text-primary)' }}
-                    title="Bullet List"
-                >
+                <button type="button" onClick={() => exec('insertUnorderedList')} className="p-1.5 rounded hover:opacity-80" style={{ color: 'var(--text-primary)' }} title="Bullet List">
                     <List className="h-4 w-4" />
                 </button>
-                <button
-                    type="button"
-                    onClick={() => {
-                        const url = prompt('Enter URL:');
-                        if (url) exec('createLink', url);
-                    }}
-                    className="p-1.5 rounded hover:opacity-80"
-                    style={{ color: 'var(--text-primary)' }}
-                    title="Insert Link"
-                >
+                <button type="button" onClick={() => { const url = prompt('Enter URL:'); if (url) exec('createLink', url); }} className="p-1.5 rounded hover:opacity-80" style={{ color: 'var(--text-primary)' }} title="Insert Link">
                     <LinkIcon className="h-4 w-4" />
                 </button>
             </div>
@@ -88,22 +61,13 @@ const RichTextEditor = ({
                 ref={editorRef}
                 contentEditable
                 className="min-h-[200px] p-4 outline-none prose prose-sm max-w-none"
-                style={{
-                    backgroundColor: 'var(--input-bg)',
-                    color: 'var(--input-text)',
-                }}
-                onInput={() => {
-                    if (editorRef.current) {
-                        onChange(editorRef.current.innerHTML);
-                    }
-                }}
+                style={{ backgroundColor: 'var(--input-bg)', color: 'var(--input-text)' }}
+                onInput={() => { if (editorRef.current) onChange(editorRef.current.innerHTML); }}
                 onPaste={(e) => {
                     e.preventDefault();
                     const text = e.clipboardData.getData('text/html') || e.clipboardData.getData('text/plain');
                     document.execCommand('insertHTML', false, text);
-                    if (editorRef.current) {
-                        onChange(editorRef.current.innerHTML);
-                    }
+                    if (editorRef.current) onChange(editorRef.current.innerHTML);
                 }}
             />
         </div>
@@ -117,17 +81,17 @@ const RolesManager = ({
     onRemove,
 }: {
     roles: TalentRole[];
-    onAdd: (characterName: string, showName: string) => void;
+    onAdd: (roleName: string, characterName: string) => void;
     onRemove: (roleId: string) => void;
 }) => {
+    const [newRole, setNewRole] = useState('');
     const [newChar, setNewChar] = useState('');
-    const [newShow, setNewShow] = useState('');
 
     const handleAdd = () => {
         if (!newChar.trim()) return;
-        onAdd(newChar.trim(), newShow.trim());
+        onAdd(newRole.trim(), newChar.trim());
+        setNewRole('');
         setNewChar('');
-        setNewShow('');
     };
 
     return (
@@ -140,23 +104,15 @@ const RolesManager = ({
                 <div
                     key={role.id}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm"
-                    style={{
-                        backgroundColor: 'var(--badge-bg)',
-                        border: '1px solid var(--badge-border)',
-                    }}
+                    style={{ backgroundColor: 'var(--badge-bg)', border: '1px solid var(--badge-border)' }}
                 >
                     <span className="flex-1 font-medium" style={{ color: 'var(--badge-text)' }}>
                         {role.character_name}
-                        {role.show_name && (
-                            <span style={{ color: 'var(--text-muted)' }}> — {role.show_name}</span>
+                        {role.role_name && (
+                            <span style={{ color: 'var(--text-muted)' }}> — {role.role_name}</span>
                         )}
                     </span>
-                    <button
-                        type="button"
-                        onClick={() => onRemove(role.id)}
-                        className="p-0.5 rounded hover:opacity-80"
-                        style={{ color: 'var(--error)' }}
-                    >
+                    <button type="button" onClick={() => onRemove(role.id)} className="p-0.5 rounded hover:opacity-80" style={{ color: 'var(--error)' }}>
                         <X className="h-3.5 w-3.5" />
                     </button>
                 </div>
@@ -173,27 +129,23 @@ const RolesManager = ({
                 />
                 <input
                     type="text"
-                    placeholder="Show (optional)"
-                    value={newShow}
-                    onChange={(e) => setNewShow(e.target.value)}
+                    placeholder="Role/Show (optional)"
+                    value={newRole}
+                    onChange={(e) => setNewRole(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAdd())}
                     className="theme-input flex-1 text-sm"
                 />
-                <button
-                    type="button"
-                    onClick={handleAdd}
-                    className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
-                    style={{
-                        backgroundColor: 'var(--button-bg)',
-                        color: 'var(--button-text)',
-                    }}
-                >
+                <button type="button" onClick={handleAdd} className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors" style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}>
                     <Plus className="h-4 w-4" />
                 </button>
             </div>
         </div>
     );
 };
+
+// ─── Slug helper ────────────────────────────────────────────────────────────────
+const slugify = (text: string) =>
+    text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
 // ─── Main AdminTalents Component ────────────────────────────────────────────────
 const AdminTalents = () => {
@@ -204,9 +156,8 @@ const AdminTalents = () => {
     const [editingTalent, setEditingTalent] = useState<Talent | null>(null);
     const [isCreating, setIsCreating] = useState(false);
 
-    // Form state
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
+    // Form state — uses single "name" field matching DB schema
+    const [talentName, setTalentName] = useState('');
     const [bio, setBio] = useState('');
     const [headshotUrl, setHeadshotUrl] = useState('');
     const [featured, setFeatured] = useState(false);
@@ -215,8 +166,7 @@ const AdminTalents = () => {
     const [saving, setSaving] = useState(false);
 
     const resetForm = () => {
-        setFirstName('');
-        setLastName('');
+        setTalentName('');
         setBio('');
         setHeadshotUrl('');
         setFeatured(false);
@@ -235,8 +185,7 @@ const AdminTalents = () => {
     const startEdit = (talent: Talent) => {
         setEditingTalent(talent);
         setIsCreating(false);
-        setFirstName(talent.first_name);
-        setLastName(talent.last_name);
+        setTalentName(talent.name);
         setBio(talent.bio || '');
         setHeadshotUrl(talent.headshot_url || '');
         setFeatured(talent.featured);
@@ -245,20 +194,22 @@ const AdminTalents = () => {
     };
 
     const handleSave = async () => {
-        if (!firstName.trim() || !lastName.trim()) {
-            toast({ title: 'First and last name are required', variant: 'destructive' });
+        if (!talentName.trim()) {
+            toast({ title: 'Name is required', variant: 'destructive' });
             return;
         }
 
         setSaving(true);
         try {
+            const slug = slugify(talentName.trim());
+
             if (editingTalent) {
                 // Update talent
                 const { error } = await supabase
                     .from('talents')
                     .update({
-                        first_name: firstName.trim(),
-                        last_name: lastName.trim(),
+                        name: talentName.trim(),
+                        slug,
                         bio: bio || null,
                         headshot_url: headshotUrl || null,
                         featured,
@@ -274,24 +225,23 @@ const AdminTalents = () => {
                     const { error: rolesError } = await supabase
                         .from('talent_roles')
                         .insert(
-                            roles.map((r, i) => ({
+                            roles.map((r) => ({
                                 talent_id: editingTalent.id,
                                 character_name: r.character_name,
-                                show_name: r.show_name || null,
-                                sort_order: i,
+                                role_name: r.role_name || '',
                             }))
                         );
                     if (rolesError) throw rolesError;
                 }
 
-                toast({ title: `${firstName} ${lastName} updated` });
+                toast({ title: `${talentName} updated` });
             } else {
                 // Create talent
                 const { data, error } = await supabase
                     .from('talents')
                     .insert({
-                        first_name: firstName.trim(),
-                        last_name: lastName.trim(),
+                        name: talentName.trim(),
+                        slug,
                         bio: bio || null,
                         headshot_url: headshotUrl || null,
                         featured,
@@ -307,17 +257,16 @@ const AdminTalents = () => {
                     const { error: rolesError } = await supabase
                         .from('talent_roles')
                         .insert(
-                            roles.map((r, i) => ({
+                            roles.map((r) => ({
                                 talent_id: data.id,
                                 character_name: r.character_name,
-                                show_name: r.show_name || null,
-                                sort_order: i,
+                                role_name: r.role_name || '',
                             }))
                         );
                     if (rolesError) throw rolesError;
                 }
 
-                toast({ title: `${firstName} ${lastName} added` });
+                toast({ title: `${talentName} added` });
             }
 
             queryClient.invalidateQueries({ queryKey: ['talents'] });
@@ -330,7 +279,7 @@ const AdminTalents = () => {
     };
 
     const handleDelete = async (talent: Talent) => {
-        if (!confirm(`Delete ${talent.first_name} ${talent.last_name}? This cannot be undone.`)) return;
+        if (!confirm(`Delete ${talent.name}? This cannot be undone.`)) return;
 
         try {
             await supabase.from('talent_roles').delete().eq('talent_id', talent.id);
@@ -338,7 +287,7 @@ const AdminTalents = () => {
             const { error } = await supabase.from('talents').delete().eq('id', talent.id);
             if (error) throw error;
 
-            toast({ title: `${talent.first_name} ${talent.last_name} deleted` });
+            toast({ title: `${talent.name} deleted` });
             queryClient.invalidateQueries({ queryKey: ['talents'] });
 
             if (editingTalent?.id === talent.id) resetForm();
@@ -367,16 +316,14 @@ const AdminTalents = () => {
         toast({ title: 'Headshot uploaded' });
     };
 
-    const addRole = (characterName: string, showName: string) => {
+    const addRole = (roleName: string, characterName: string) => {
         setRoles(prev => [
             ...prev,
             {
                 id: `temp-${Date.now()}`,
                 talent_id: editingTalent?.id || '',
+                role_name: roleName,
                 character_name: characterName,
-                show_name: showName || null,
-                sort_order: prev.length,
-                created_at: new Date().toISOString(),
             },
         ]);
     };
@@ -390,20 +337,14 @@ const AdminTalents = () => {
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h2
-                    className="font-orbitron text-xl font-bold tracking-wider"
-                    style={{ color: 'var(--accent)' }}
-                >
+                <h2 className="font-orbitron text-xl font-bold tracking-wider" style={{ color: 'var(--accent)' }}>
                     Talent Management
                 </h2>
                 {!isEditing && (
                     <button
                         onClick={startCreate}
                         className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold transition-colors"
-                        style={{
-                            backgroundColor: 'var(--button-bg)',
-                            color: 'var(--button-text)',
-                        }}
+                        style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
                     >
                         <Plus className="h-4 w-4" />
                         Add Talent
@@ -413,54 +354,28 @@ const AdminTalents = () => {
 
             {/* Edit / Create Form */}
             {isEditing && (
-                <div
-                    className="rounded-xl p-6 mb-6"
-                    style={{
-                        backgroundColor: 'var(--bg-card)',
-                        border: '1px solid var(--border)',
-                    }}
-                >
+                <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)' }}>
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
-                            {editingTalent ? `Editing: ${editingTalent.first_name} ${editingTalent.last_name}` : 'Add New Talent'}
+                            {editingTalent ? `Editing: ${editingTalent.name}` : 'Add New Talent'}
                         </h3>
-                        <button
-                            onClick={resetForm}
-                            className="p-1.5 rounded hover:opacity-80"
-                            style={{ color: 'var(--text-muted)' }}
-                        >
+                        <button onClick={resetForm} className="p-1.5 rounded hover:opacity-80" style={{ color: 'var(--text-muted)' }}>
                             <X className="h-5 w-5" />
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        {/* First Name */}
-                        <div>
-                            <label className="text-sm font-medium mb-1 block" style={{ color: 'var(--text-primary)' }}>
-                                First Name *
-                            </label>
-                            <input
-                                type="text"
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                className="theme-input w-full"
-                                placeholder="First name"
-                            />
-                        </div>
-
-                        {/* Last Name */}
-                        <div>
-                            <label className="text-sm font-medium mb-1 block" style={{ color: 'var(--text-primary)' }}>
-                                Last Name *
-                            </label>
-                            <input
-                                type="text"
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                                className="theme-input w-full"
-                                placeholder="Last name"
-                            />
-                        </div>
+                    {/* Name */}
+                    <div className="mb-4">
+                        <label className="text-sm font-medium mb-1 block" style={{ color: 'var(--text-primary)' }}>
+                            Full Name *
+                        </label>
+                        <input
+                            type="text"
+                            value={talentName}
+                            onChange={(e) => setTalentName(e.target.value)}
+                            className="theme-input w-full"
+                            placeholder="Full name (e.g. John Smith)"
+                        />
                     </div>
 
                     {/* Headshot */}
@@ -470,10 +385,7 @@ const AdminTalents = () => {
                         </label>
                         <div className="flex items-center gap-4">
                             {headshotUrl && (
-                                <div
-                                    className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0"
-                                    style={{ border: '1px solid var(--border)' }}
-                                >
+                                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0" style={{ border: '1px solid var(--border)' }}>
                                     <img src={headshotUrl} alt="Headshot" className="w-full h-full object-cover" />
                                 </div>
                             )}
@@ -487,19 +399,11 @@ const AdminTalents = () => {
                                 />
                                 <label
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors"
-                                    style={{
-                                        border: '1px solid var(--accent)',
-                                        color: 'var(--accent)',
-                                    }}
+                                    style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
                                 >
                                     <Upload className="h-3.5 w-3.5" />
                                     Upload Image
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={handleHeadshotUpload}
-                                    />
+                                    <input type="file" accept="image/*" className="hidden" onChange={handleHeadshotUpload} />
                                 </label>
                             </div>
                         </div>
@@ -508,22 +412,12 @@ const AdminTalents = () => {
                     {/* Featured + Sort Order */}
                     <div className="flex items-center gap-6 mb-4">
                         <label className="flex items-center gap-2 text-sm cursor-pointer" style={{ color: 'var(--text-primary)' }}>
-                            <input
-                                type="checkbox"
-                                checked={featured}
-                                onChange={(e) => setFeatured(e.target.checked)}
-                                className="rounded"
-                            />
+                            <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="rounded" />
                             Featured
                         </label>
                         <div className="flex items-center gap-2">
                             <label className="text-sm" style={{ color: 'var(--text-muted)' }}>Sort Order:</label>
-                            <input
-                                type="number"
-                                value={sortOrder}
-                                onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)}
-                                className="theme-input w-20 text-sm text-center"
-                            />
+                            <input type="number" value={sortOrder} onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)} className="theme-input w-20 text-sm text-center" />
                         </div>
                     </div>
 
@@ -534,9 +428,7 @@ const AdminTalents = () => {
 
                     {/* Bio (Rich Text) */}
                     <div className="mb-6">
-                        <label className="text-sm font-medium mb-1 block" style={{ color: 'var(--text-primary)' }}>
-                            Bio
-                        </label>
+                        <label className="text-sm font-medium mb-1 block" style={{ color: 'var(--text-primary)' }}>Bio</label>
                         <RichTextEditor value={bio} onChange={setBio} />
                     </div>
 
@@ -546,10 +438,7 @@ const AdminTalents = () => {
                             onClick={handleSave}
                             disabled={saving}
                             className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-bold transition-colors disabled:opacity-50"
-                            style={{
-                                backgroundColor: 'var(--button-bg)',
-                                color: 'var(--button-text)',
-                            }}
+                            style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
                         >
                             <Save className="h-4 w-4" />
                             {saving ? 'Saving...' : (editingTalent ? 'Update Talent' : 'Add Talent')}
@@ -557,10 +446,7 @@ const AdminTalents = () => {
                         <button
                             onClick={resetForm}
                             className="px-5 py-2 rounded-lg text-sm font-medium transition-colors"
-                            style={{
-                                border: '1px solid var(--border)',
-                                color: 'var(--text-secondary)',
-                            }}
+                            style={{ border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
                         >
                             Cancel
                         </button>
@@ -572,11 +458,7 @@ const AdminTalents = () => {
             {isLoading ? (
                 <div className="space-y-2">
                     {Array.from({ length: 4 }).map((_, i) => (
-                        <div
-                            key={i}
-                            className="h-16 rounded-lg animate-pulse"
-                            style={{ backgroundColor: 'var(--skeleton)' }}
-                        />
+                        <div key={i} className="h-16 rounded-lg animate-pulse" style={{ backgroundColor: 'var(--skeleton)' }} />
                     ))}
                 </div>
             ) : talents && talents.length > 0 ? (
@@ -592,18 +474,12 @@ const AdminTalents = () => {
                             onClick={() => startEdit(talent)}
                         >
                             {/* Headshot thumbnail */}
-                            <div
-                                className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0"
-                                style={{ border: '1px solid var(--border)' }}
-                            >
+                            <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0" style={{ border: '1px solid var(--border)' }}>
                                 {talent.headshot_url ? (
                                     <img src={talent.headshot_url} alt="" className="w-full h-full object-cover" />
                                 ) : (
-                                    <div
-                                        className="w-full h-full flex items-center justify-center text-xs font-bold"
-                                        style={{ backgroundColor: 'var(--bg-elevated)', color: 'var(--accent)' }}
-                                    >
-                                        {talent.first_name[0]}{talent.last_name[0]}
+                                    <div className="w-full h-full flex items-center justify-center text-xs font-bold" style={{ backgroundColor: 'var(--bg-elevated)', color: 'var(--accent)' }}>
+                                        {talent.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
                                     </div>
                                 )}
                             </div>
@@ -611,7 +487,7 @@ const AdminTalents = () => {
                             {/* Name */}
                             <div className="flex-1 min-w-0">
                                 <p className="font-medium text-sm truncate" style={{ color: 'var(--text-primary)' }}>
-                                    {talent.first_name} {talent.last_name}
+                                    {talent.name}
                                 </p>
                                 <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>
                                     {talent.talent_roles?.map(r => r.character_name).join(', ') || 'No roles yet'}
@@ -620,13 +496,7 @@ const AdminTalents = () => {
 
                             {/* Featured badge */}
                             {talent.featured && (
-                                <span
-                                    className="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                                    style={{
-                                        backgroundColor: 'var(--badge-bg)',
-                                        color: 'var(--badge-text)',
-                                    }}
-                                >
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: 'var(--badge-bg)', color: 'var(--badge-text)' }}>
                                     Featured
                                 </span>
                             )}

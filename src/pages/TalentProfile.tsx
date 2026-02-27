@@ -58,9 +58,10 @@ const TalentProfile = () => {
         );
     }
 
-    const displayName = `${talent.first_name} ${talent.last_name}`;
     const roles = talent.talent_roles || [];
     const images = talent.talent_images || [];
+    const initials = talent.name.split(' ').map(w => w[0]).join('').slice(0, 2);
+    const firstName = talent.name.split(' ')[0] || talent.name;
 
     return (
         <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
@@ -69,11 +70,7 @@ const TalentProfile = () => {
             <main className="pt-24 pb-16 px-4">
                 <div className="max-w-5xl mx-auto">
                     {/* Back link */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.4 }}
-                    >
+                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
                         <Link
                             to="/"
                             className="inline-flex items-center gap-1.5 text-sm font-medium mb-6 transition-colors"
@@ -89,32 +86,13 @@ const TalentProfile = () => {
                     {/* Profile Layout */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
                         {/* Headshot */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                        >
-                            <div
-                                className="relative w-full pb-[100%] rounded-xl overflow-hidden"
-                                style={{
-                                    border: '2px solid var(--border)',
-                                    boxShadow: '0 8px 32px var(--shadow)',
-                                }}
-                            >
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}>
+                            <div className="relative w-full pb-[100%] rounded-xl overflow-hidden" style={{ border: '2px solid var(--border)', boxShadow: '0 8px 32px var(--shadow)' }}>
                                 {talent.headshot_url ? (
-                                    <img
-                                        src={talent.headshot_url}
-                                        alt={displayName}
-                                        className="absolute inset-0 w-full h-full object-cover"
-                                    />
+                                    <img src={talent.headshot_url} alt={talent.name} className="absolute inset-0 w-full h-full object-cover" />
                                 ) : (
-                                    <div
-                                        className="absolute inset-0 flex items-center justify-center"
-                                        style={{ backgroundColor: 'var(--bg-elevated)' }}
-                                    >
-                                        <span className="text-6xl font-bold opacity-30" style={{ color: 'var(--accent)' }}>
-                                            {talent.first_name[0]}{talent.last_name[0]}
-                                        </span>
+                                    <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'var(--bg-elevated)' }}>
+                                        <span className="text-6xl font-bold opacity-30" style={{ color: 'var(--accent)' }}>{initials}</span>
                                     </div>
                                 )}
                             </div>
@@ -127,17 +105,12 @@ const TalentProfile = () => {
                                 className="font-orbitron text-2xl sm:text-3xl md:text-4xl font-bold tracking-wider mb-2"
                                 style={{ color: 'var(--accent)', opacity: 0 }}
                             >
-                                {displayName}
+                                {talent.name}
                             </h1>
 
                             {/* Roles */}
                             {roles.length > 0 && (
-                                <motion.div
-                                    className="mb-6"
-                                    initial={{ opacity: 0, y: 15 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.4, duration: 0.5 }}
-                                >
+                                <motion.div className="mb-6" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}>
                                     <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>
                                         Characters / Roles
                                     </h2>
@@ -146,19 +119,15 @@ const TalentProfile = () => {
                                             <motion.div
                                                 key={role.id}
                                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm"
-                                                style={{
-                                                    backgroundColor: 'var(--badge-bg)',
-                                                    border: '1px solid var(--badge-border)',
-                                                    color: 'var(--badge-text)',
-                                                }}
+                                                style={{ backgroundColor: 'var(--badge-bg)', border: '1px solid var(--badge-border)', color: 'var(--badge-text)' }}
                                                 initial={{ opacity: 0, scale: 0.8 }}
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 transition={{ delay: 0.5 + i * 0.05, duration: 0.3 }}
                                             >
                                                 <Star className="h-3 w-3" />
                                                 <span className="font-medium">{role.character_name}</span>
-                                                {role.show_name && (
-                                                    <span style={{ color: 'var(--text-muted)' }}>— {role.show_name}</span>
+                                                {role.role_name && (
+                                                    <span style={{ color: 'var(--text-muted)' }}>— {role.role_name}</span>
                                                 )}
                                             </motion.div>
                                         ))}
@@ -168,38 +137,17 @@ const TalentProfile = () => {
 
                             {/* Bio */}
                             {talent.bio && (
-                                <motion.div
-                                    className="mb-6"
-                                    initial={{ opacity: 0, y: 15 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.6, duration: 0.5 }}
-                                >
+                                <motion.div className="mb-6" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }}>
                                     <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>Biography</h2>
-                                    <div
-                                        className="prose prose-sm max-w-none leading-relaxed"
-                                        style={{ color: 'var(--text-secondary)' }}
-                                        dangerouslySetInnerHTML={{ __html: talent.bio }}
-                                    />
+                                    <div className="prose prose-sm max-w-none leading-relaxed" style={{ color: 'var(--text-secondary)' }} dangerouslySetInnerHTML={{ __html: talent.bio }} />
                                 </motion.div>
                             )}
 
                             {/* Book CTA */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 15 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.8, duration: 0.5 }}
-                            >
-                                <motion.div
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.97 }}
-                                    className="inline-block"
-                                >
-                                    <Link
-                                        to="/book"
-                                        className="inline-block px-8 py-3 text-sm font-bold rounded-lg mt-2"
-                                        style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
-                                    >
-                                        Book {talent.first_name} →
+                            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.5 }}>
+                                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} className="inline-block">
+                                    <Link to="/book" className="inline-block px-8 py-3 text-sm font-bold rounded-lg mt-2" style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}>
+                                        Book {firstName} →
                                     </Link>
                                 </motion.div>
                             </motion.div>
@@ -208,19 +156,8 @@ const TalentProfile = () => {
 
                     {/* Photo Gallery */}
                     {images.length > 0 && (
-                        <motion.section
-                            className="mt-12"
-                            initial={{ opacity: 0 }}
-                            whileInView={{ opacity: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5 }}
-                        >
-                            <h2
-                                className="font-orbitron text-xl sm:text-2xl font-bold tracking-wider mb-6"
-                                style={{ color: 'var(--accent)' }}
-                            >
-                                Gallery
-                            </h2>
+                        <motion.section className="mt-12" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+                            <h2 className="font-orbitron text-xl sm:text-2xl font-bold tracking-wider mb-6" style={{ color: 'var(--accent)' }}>Gallery</h2>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
                                 {images.map((img, i) => (
                                     <motion.div
@@ -233,12 +170,7 @@ const TalentProfile = () => {
                                         transition={{ delay: i * 0.05, duration: 0.4 }}
                                         whileHover={{ scale: 1.03 }}
                                     >
-                                        <img
-                                            src={img.image_url}
-                                            alt={img.caption || displayName}
-                                            className="absolute inset-0 w-full h-full object-cover"
-                                            loading="lazy"
-                                        />
+                                        <img src={img.image_url} alt={img.caption || talent.name} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
                                     </motion.div>
                                 ))}
                             </div>
