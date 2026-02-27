@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import About from "./pages/About";
 import TalentProfile from "./pages/TalentProfile";
 import BookNow from "./pages/BookNow";
+import UpcomingEvents from "./pages/UpcomingEvents";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/about" element={<About />} />
               <Route path="/talent/:id" element={<TalentProfile />} />
               <Route path="/book" element={<BookNow />} />
+              <Route path="/events" element={<UpcomingEvents />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
               <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
