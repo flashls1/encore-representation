@@ -72,15 +72,6 @@ const Navigation = () => {
                   data-magnetic
                 >
                   {item.name}
-                  {/* Gold underline indicator */}
-                  {isActive(item.path) && (
-                    <motion.div
-                      className="absolute bottom-0 left-1/2 h-[2px] rounded-full"
-                      style={{ backgroundColor: '#D4AF37', width: '60%', x: '-50%' }}
-                      layoutId="nav-underline"
-                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                    />
-                  )}
                 </Link>
               ))}
 

@@ -7,7 +7,6 @@ import { AnimatePresence } from "framer-motion";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import SmoothScroll from "@/components/fx/SmoothScroll";
-import MagneticCursor from "@/components/fx/MagneticCursor";
 import PageTransition from "@/components/fx/PageTransition";
 import Index from "./pages/Index";
 import About from "./pages/About";
@@ -54,7 +53,6 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <SmoothScroll>
-              <MagneticCursor />
               <AnimatedRoutes />
             </SmoothScroll>
           </BrowserRouter>
