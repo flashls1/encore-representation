@@ -162,7 +162,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-start md:items-center justify-center overflow-hidden pt-16 md:pt-0">
+    <section className="relative md:min-h-screen flex items-start md:items-center justify-center overflow-hidden pt-16 md:pt-0">
       {/* Desktop: full bleed background */}
       <div className="hidden md:block">
         <HeroBackground videoUrl={effectiveVideoUrl} imageUrl={effectiveImageUrl} />
