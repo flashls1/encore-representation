@@ -7,10 +7,10 @@ import { useAuth } from "@/hooks/useAuth";
 
 const NAV_LINKS = [
   { name: "Home", path: "/" },
+  { name: "Talent Roster", path: "/roster" },
   { name: "About", path: "/about" },
   { name: "Events", path: "/events" },
-  { name: "Book Now", path: "/book" },
-  { name: "Contact", path: "/contact" },
+  { name: "Booking & Contact", path: "/booking" },
 ];
 
 const Navigation = () => {
@@ -58,7 +58,7 @@ const Navigation = () => {
           {/* CENTER: Desktop Navigation Links */}
           <div className="hidden lg:flex items-center justify-center flex-1 mx-4">
             <div className="flex items-center gap-1 relative">
-              {NAV_LINKS.map((item, i) => (
+              {NAV_LINKS.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
@@ -95,36 +95,38 @@ const Navigation = () => {
                   Admin
                 </Link>
               )}
-
-              {/* Auth */}
-              {user ? (
-                <button
-                  onClick={handleSignOut}
-                  className="px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 whitespace-nowrap flex items-center gap-1"
-                  style={{ color: 'var(--text-muted)' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--error)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
-                  data-magnetic
-                >
-                  <LogOut className="h-3 w-3" />
-                  Sign Out
-                </button>
-              ) : (
-                <Link
-                  to="/login"
-                  className="px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 whitespace-nowrap flex items-center gap-1"
-                  style={{ color: 'var(--nav-text)' }}
-                  data-magnetic
-                >
-                  <User className="h-3 w-3" />
-                  Sign In
-                </Link>
-              )}
             </div>
           </div>
 
-          {/* RIGHT: empty spacer */}
-          <div className="hidden lg:flex flex-shrink-0 w-20" />
+          {/* RIGHT: Sign In / Sign Out — pushed to far right */}
+          <div className="hidden lg:flex items-center flex-shrink-0">
+            {user ? (
+              <button
+                onClick={handleSignOut}
+                className="px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 whitespace-nowrap flex items-center gap-1.5"
+                style={{ color: 'var(--text-muted)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--error)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
+                data-magnetic
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Sign Out
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className="px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-300 whitespace-nowrap flex items-center gap-1.5"
+                style={{
+                  color: 'var(--accent)',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                }}
+                data-magnetic
+              >
+                <User className="h-3.5 w-3.5" />
+                Sign In
+              </Link>
+            )}
+          </div>
 
           {/* MOBILE: Hamburger */}
           <div className="flex lg:hidden items-center gap-2 ml-auto">

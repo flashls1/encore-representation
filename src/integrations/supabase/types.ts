@@ -69,6 +69,66 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_requests: {
+        Row: {
+          id: string
+          client_name: string
+          client_email: string
+          client_phone: string | null
+          company_organization: string | null
+          event_type: string
+          event_date: string | null
+          event_location: string | null
+          event_duration: string | null
+          estimated_audience_size: string | null
+          talent_requested: string | null
+          budget_range: string | null
+          additional_details: string | null
+          status: string
+          admin_notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          client_name: string
+          client_email: string
+          client_phone?: string | null
+          company_organization?: string | null
+          event_type: string
+          event_date?: string | null
+          event_location?: string | null
+          event_duration?: string | null
+          estimated_audience_size?: string | null
+          talent_requested?: string | null
+          budget_range?: string | null
+          additional_details?: string | null
+          status?: string
+          admin_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          client_name?: string
+          client_email?: string
+          client_phone?: string | null
+          company_organization?: string | null
+          event_type?: string
+          event_date?: string | null
+          event_location?: string | null
+          event_duration?: string | null
+          estimated_audience_size?: string | null
+          talent_requested?: string | null
+          budget_range?: string | null
+          additional_details?: string | null
+          status?: string
+          admin_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       home_content: {
         Row: {
           about_description: string | null

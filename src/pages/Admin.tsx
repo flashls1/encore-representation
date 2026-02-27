@@ -2,7 +2,7 @@ import Navigation from "@/components/Navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
-  ExternalLink, LogOut, LayoutDashboard, Users, Mail, Image, Settings, ShieldCheck,
+  ExternalLink, LogOut, LayoutDashboard, Users, Mail, Image, Settings, ShieldCheck, CalendarCheck,
 } from "lucide-react";
 
 import AdminSiteContent from "@/components/admin/AdminSiteContent";
@@ -11,12 +11,14 @@ import AdminContact from "@/components/admin/AdminContact";
 import AdminMediaLibrary from "@/components/admin/AdminMediaLibrary";
 import AdminSiteSettings from "@/components/admin/AdminSiteSettings";
 import AdminUsers from "@/components/admin/AdminUsers";
+import AdminBookings from "@/components/admin/AdminBookings";
 import { useState } from "react";
 
 // ─── Sidebar sections ──────────────────────────────────────────────────────────
 const ADMIN_SECTIONS = [
   { id: "home", label: "Site Content", icon: LayoutDashboard, color: "#f5d060", component: AdminSiteContent },
   { id: "talents", label: "Talent", icon: Users, color: "#d4af37", component: AdminTalents },
+  { id: "bookings", label: "Bookings", icon: CalendarCheck, color: "#22c55e", component: AdminBookings },
   { id: "contact", label: "Contact", icon: Mail, color: "#38bdf8", component: AdminContact },
   { id: "media", label: "Media", icon: Image, color: "#c084fc", component: AdminMediaLibrary },
   { id: "settings", label: "Settings", icon: Settings, color: "#94a3b8", component: AdminSiteSettings },
