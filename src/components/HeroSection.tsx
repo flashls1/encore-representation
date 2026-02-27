@@ -170,10 +170,12 @@ const HeroSection = () => {
         {heroTextVisible && (
           <RevealText
             text={heroTitle}
-            className="font-orbitron text-4xl sm:text-6xl md:text-7xl lg:text-8xl mb-4 tracking-wider font-bold"
+            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl mb-4 font-bold italic"
             style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
               color: 'var(--accent)',
-              textShadow: '0 0 40px var(--glow), 3px 3px 0 rgba(0,0,0,0.8), -1px -1px 0 rgba(0,0,0,0.8)',
+              letterSpacing: '0.04em',
+              textShadow: '0 0 60px var(--glow), 2px 2px 0 rgba(0,0,0,0.7)',
             }}
           />
         )}
