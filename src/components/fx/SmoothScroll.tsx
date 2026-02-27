@@ -17,6 +17,12 @@ const SmoothScroll = ({ children }: { children: React.ReactNode }) => {
             duration: 1.2,
             easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             smoothWheel: true,
+            autoRaf: false,
+            syncTouch: false, // Crucial for native scrollbar to remain grabbable
+            prevent: (node: HTMLElement) => {
+                // Don't hijack scrollbar or admin areas
+                return node.closest('.admin-dark-theme') !== null;
+            },
         });
 
         lenisRef.current = lenis;
