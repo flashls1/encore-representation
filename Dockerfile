@@ -10,8 +10,8 @@ RUN npm ci
 COPY . .
 
 # Set env vars at build time (Vite inlines them)
-ENV VITE_SUPABASE_URL=https://api.talentmanagementpro.com
-ENV VITE_SUPABASE_PUBLISHABLE_KEY=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc3MDM5NTQwMCwiZXhwIjo0OTI2MDY5MDAwLCJyb2xlIjoiYW5vbiJ9.mql5XiNqb1NkT8CuJ4hondQzeXt1w8cuBxqkSpAORvE
+ENV VITE_SUPABASE_URL=https://api.encorerepresentation.com
+ENV VITE_SUPABASE_PUBLISHABLE_KEY=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc3MTY1MjI4MCwiZXhwIjo0OTI3MzI1ODgwLCJyb2xlIjoiYW5vbiJ9.--2EG7_4nH4OT3MNaE7dvYff8UKqkEzI9JEzUnpG4i4
 
 # Build production bundle
 RUN npm run build
