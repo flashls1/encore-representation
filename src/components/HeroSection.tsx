@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useHomeContent, useSiteSettings } from "@/hooks/useData";
 import { supabase } from "@/integrations/supabase/client";
-import heroBanner from "@/assets/hero-banner.jpg";
 
 // ─── Hero background: video (if set) or image fallback ────────────────────────
 const HeroBackground = ({
@@ -25,14 +24,14 @@ const HeroBackground = ({
           (e.currentTarget as HTMLVideoElement).style.display = 'none';
         }}
       />
-    ) : (
+    ) : imageUrl ? (
       <img
         src={imageUrl}
         alt="Encore Representation"
         className="w-full h-full object-cover"
         loading="eager"
       />
-    )}
+    ) : null}
     {/* Dark overlay */}
     <div
       className="absolute inset-0"
@@ -65,14 +64,15 @@ const HeroSection = () => {
     return () => { supabase.removeChannel(channel); };
   }, [refetch]);
 
-  // Don't render the bundled fallback image while loading
-  const heroImage = homeLoading ? '' : (homeContent?.hero_image_url || heroBanner);
+  // Don't render while loading
+  const heroImage = homeLoading ? '' : (homeContent?.hero_image_url || '');
   const heroVideoUrl = homeLoading ? null : (homeContent?.hero_video_url || null);
 
   // Auto-detect: if hero_image_url is actually a video, treat it as video
-  const isImageAVideo = heroImage && heroImage !== heroBanner && /\.(mp4|webm|mov)(\?|$)/i.test(heroImage);
+  const isImageAVideo = heroImage && /\.(mp4|webm|mov)(\?|$)/i.test(heroImage);
   const effectiveVideoUrl = heroVideoUrl || (isImageAVideo ? heroImage : null);
-  const effectiveImageUrl = isImageAVideo ? heroBanner : heroImage;
+  const effectiveImageUrl = isImageAVideo ? '' : heroImage;
+
 
   const heroTitle = homeContent?.hero_title || "ENCORE REPRESENTATION";
   const heroSubtitle = homeContent?.hero_subtitle || "Premier Talent Representation";

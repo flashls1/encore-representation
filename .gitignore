@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Secrets & credentials
+.env
+.env.*
+SERVER_REFERENCE.md
+
+# Agent workspace
+.agent/

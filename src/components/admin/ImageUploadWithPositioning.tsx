@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { useAdminDebugger } from "@/hooks/useAdminDebugger";
 import { Upload, X, Move, RotateCcw } from "lucide-react";
 
 interface ImagePosition {
@@ -19,15 +18,15 @@ interface ImageUploadWithPositioningProps {
   className?: string;
 }
 
-const ImageUploadWithPositioning = ({ 
-  currentImageUrl, 
-  onImageChange, 
-  className = "" 
+const ImageUploadWithPositioning = ({
+  currentImageUrl,
+  onImageChange,
+  className = ""
 }: ImageUploadWithPositioningProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const adminDebugger = useAdminDebugger();
-  
+
+
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState<ImagePosition>({ x: 0, y: 0, scale: 1 });
@@ -35,12 +34,12 @@ const ImageUploadWithPositioning = ({
 
   const handleFileSelect = async (file: File) => {
     if (file.size > 15 * 1024 * 1024) {
-      adminDebugger.error("File too large. Please select an image under 15MB.");
+      console.error("File too large. Please select an image under 15MB.");
       return;
     }
 
     setIsUploading(true);
-    adminDebugger.log("Starting guest image upload", { fileName: file.name, size: file.size });
+    console.log("Starting guest image upload", { fileName: file.name, size: file.size });
 
     try {
       const fileExt = file.name.split('.').pop();
@@ -68,10 +67,10 @@ const ImageUploadWithPositioning = ({
       img.src = publicUrl;
 
       onImageChange(publicUrl, position);
-      adminDebugger.log("Guest image uploaded successfully", { url: publicUrl });
-      
+      console.log("Guest image uploaded successfully", { url: publicUrl });
+
     } catch (error) {
-      adminDebugger.error("Failed to upload guest image", error);
+      console.error("Failed to upload guest image", error);
     } finally {
       setIsUploading(false);
     }
@@ -95,7 +94,7 @@ const ImageUploadWithPositioning = ({
     const scale = Math.min(canvasSize / img.width, canvasSize / img.height) * position.scale;
     const width = img.width * scale;
     const height = img.height * scale;
-    
+
     const x = (canvasSize - width) / 2 + position.x;
     const y = (canvasSize - height) / 2 + position.y;
 
@@ -128,7 +127,7 @@ const ImageUploadWithPositioning = ({
 
   const handleScaleChange = (newScale: number) => {
     if (!imageElement) return;
-    
+
     const newPosition = { ...position, scale: newScale };
     setPosition(newPosition);
     drawImageOnCanvas(imageElement);
@@ -184,7 +183,7 @@ const ImageUploadWithPositioning = ({
             }}
             className="hidden"
           />
-          
+
           <Button
             type="button"
             variant="outline"
