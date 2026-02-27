@@ -73,9 +73,9 @@ const Index = () => {
       <Navigation />
       <HeroSection />
 
-      <section className="py-16 sm:py-24 px-4">
+      <section className="py-6 md:py-24 px-4">
         <div className="max-w-7xl mx-auto">
-          <div ref={headingRef} className="text-center mb-12 md:mb-16">
+          <div ref={headingRef} className="text-center mb-6 md:mb-16">
             <h2
               className="font-orbitron text-3xl sm:text-4xl md:text-5xl mb-3 tracking-wider font-bold"
               style={{ color: '#D4AF37' }}
