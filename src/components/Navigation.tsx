@@ -41,17 +41,20 @@ const Navigation = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center h-16">
-          {/* LEFT: Brand */}
+          {/* LEFT: Brand Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center group">
-              <motion.span
-                className="font-orbitron text-xl sm:text-2xl font-bold tracking-wider"
-                style={{ color: 'var(--accent)' }}
-                whileHover={{ scale: 1.05 }}
+              <motion.img
+                src="/encore-logo.png"
+                alt="Encore Representation"
+                className="h-9 sm:h-10 w-auto"
+                style={{
+                  borderRadius: '22%',
+                  border: '1.5px solid #D4AF37',
+                }}
+                whileHover={{ scale: 1.08 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-              >
-                ENCORE
-              </motion.span>
+              />
             </Link>
           </div>
 
