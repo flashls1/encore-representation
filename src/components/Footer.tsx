@@ -1,27 +1,40 @@
+import { useRef, useEffect } from "react";
+import { motion } from "framer-motion";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link } from "react-router-dom";
 import { Mail, Phone } from "lucide-react";
 import { useSiteSettings } from "@/hooks/useData";
 
+gsap.registerPlugin(ScrollTrigger);
+
 const Footer = () => {
   const { data: settings } = useSiteSettings();
+  const footerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!footerRef.current) return;
+    gsap.fromTo(footerRef.current,
+      { y: 40, opacity: 0 },
+      {
+        y: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+        scrollTrigger: { trigger: footerRef.current, start: 'top 90%', toggleActions: 'play none none reverse' }
+      }
+    );
+  }, []);
 
   return (
     <footer
+      ref={footerRef}
       className="relative"
-      style={{
-        backgroundColor: 'var(--footer-bg)',
-        borderTop: '1px solid var(--footer-border)',
-      }}
+      style={{ backgroundColor: 'var(--footer-bg)', borderTop: '1px solid var(--footer-border)' }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Brand */}
           <div className="space-y-3">
             <Link to="/" className="inline-block">
-              <span
-                className="font-orbitron text-xl font-bold tracking-wider"
-                style={{ color: 'var(--accent)' }}
-              >
+              <span className="font-orbitron text-xl font-bold tracking-wider" style={{ color: 'var(--accent)' }}>
                 ENCORE
               </span>
             </Link>
@@ -30,43 +43,41 @@ const Footer = () => {
             </p>
             <div className="flex gap-3">
               {settings?.instagram_url && (
-                <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer"
-                  style={{ color: 'var(--footer-text)' }} className="hover:opacity-80 transition-opacity">
-                  IG
-                </a>
+                <motion.a href={settings.instagram_url} target="_blank" rel="noopener noreferrer"
+                  style={{ color: 'var(--footer-text)' }} className="hover:opacity-80 transition-opacity"
+                  whileHover={{ scale: 1.1 }} data-magnetic
+                >IG</motion.a>
               )}
               {settings?.facebook_url && (
-                <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer"
-                  style={{ color: 'var(--footer-text)' }} className="hover:opacity-80 transition-opacity">
-                  FB
-                </a>
+                <motion.a href={settings.facebook_url} target="_blank" rel="noopener noreferrer"
+                  style={{ color: 'var(--footer-text)' }} className="hover:opacity-80 transition-opacity"
+                  whileHover={{ scale: 1.1 }} data-magnetic
+                >FB</motion.a>
               )}
               {settings?.twitter_url && (
-                <a href={settings.twitter_url} target="_blank" rel="noopener noreferrer"
-                  style={{ color: 'var(--footer-text)' }} className="hover:opacity-80 transition-opacity">
-                  X
-                </a>
+                <motion.a href={settings.twitter_url} target="_blank" rel="noopener noreferrer"
+                  style={{ color: 'var(--footer-text)' }} className="hover:opacity-80 transition-opacity"
+                  whileHover={{ scale: 1.1 }} data-magnetic
+                >X</motion.a>
               )}
               {settings?.tiktok_url && (
-                <a href={settings.tiktok_url} target="_blank" rel="noopener noreferrer"
-                  style={{ color: 'var(--footer-text)' }} className="hover:opacity-80 transition-opacity">
-                  TikTok
-                </a>
+                <motion.a href={settings.tiktok_url} target="_blank" rel="noopener noreferrer"
+                  style={{ color: 'var(--footer-text)' }} className="hover:opacity-80 transition-opacity"
+                  whileHover={{ scale: 1.1 }} data-magnetic
+                >TikTok</motion.a>
               )}
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>
-              Quick Links
-            </h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>Quick Links</h3>
             <nav className="flex flex-col gap-1.5">
               {[
                 { to: '/about', label: 'About Us' },
+                { to: '/events', label: 'Events' },
                 { to: '/book', label: 'Book Now' },
                 { to: '/contact', label: 'Contact' },
-                { to: '/login', label: 'Admin Login' },
               ].map(link => (
                 <Link
                   key={link.to}
@@ -82,9 +93,7 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>
-              Contact
-            </h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>Contact</h3>
             <div className="space-y-2 text-sm" style={{ color: 'var(--footer-text)' }}>
               {settings?.contact_email && (
                 <div className="flex items-center gap-2">
