@@ -11,11 +11,13 @@ import { useSiteSettings } from '@/hooks/useData';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { Settings, Globe, Mail, Calendar, Palette, MapPin, Ticket, Save, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 
 const AdminSiteSettings = () => {
   const { data: settings, isLoading } = useSiteSettings();
   const qc = useQueryClient();
+  const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     site_name: '',
@@ -81,8 +83,9 @@ const AdminSiteSettings = () => {
       const { error } = await (supabase as any).from('site_settings').upsert(payload).select().maybeSingle();
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ['site-settings'] });
+      toast({ title: 'Saved', description: 'Site settings updated successfully.' });
     } catch (err: any) {
-      alert(err.message);
+      toast({ title: 'Save failed', description: err.message, variant: 'destructive' });
     }
     setSaving(false);
   };

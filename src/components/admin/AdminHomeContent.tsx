@@ -5,12 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 
 import MediaPicker from '@/components/admin/MediaPicker';
 import { useHomeContent } from '@/hooks/useData';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
-import { Home, Image, Video, ExternalLink, Save, Loader2, X, Timer, ImagePlus } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Home, Image, Video, ExternalLink, Save, Loader2, X, Timer, ImagePlus, Eye, ArrowDown } from 'lucide-react';
 
 /** Check if a URL points to a video file by extension */
 const isVideoUrl = (url: string): boolean => {
@@ -21,6 +23,7 @@ const isVideoUrl = (url: string): boolean => {
 const AdminHomeContent = () => {
   const { data: homeContent, isLoading } = useHomeContent();
   const qc = useQueryClient();
+  const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
 
@@ -36,6 +39,8 @@ const AdminHomeContent = () => {
     cta_secondary_url: '',
     featured_content_title: '',
     featured_content_description: '',
+    hero_text_visible: true,
+    cta_offset_top: '0',
   });
 
   useEffect(() => {
@@ -52,6 +57,8 @@ const AdminHomeContent = () => {
         cta_secondary_url: homeContent.cta_secondary_url || '',
         featured_content_title: homeContent.featured_content_title || '',
         featured_content_description: homeContent.featured_content_description || '',
+        hero_text_visible: (homeContent as any).hero_text_visible ?? true,
+        cta_offset_top: (homeContent as any).cta_offset_top || '0',
       });
     }
   }, [homeContent]);
@@ -74,7 +81,6 @@ const AdminHomeContent = () => {
   const activeHeroIsVideo = !!form.hero_video_url && isVideoUrl(form.hero_video_url);
 
   const handleSave = async () => {
-    if (!form.hero_title.trim()) return;
     setSaving(true);
     try {
       const payload = {
@@ -85,8 +91,9 @@ const AdminHomeContent = () => {
       const { error } = await (supabase as any).from('home_content').upsert(payload).select().maybeSingle();
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ['home-content'] });
+      toast({ title: 'Saved', description: 'Home page content updated successfully.' });
     } catch (err: any) {
-      alert(err.message);
+      toast({ title: 'Save failed', description: err.message, variant: 'destructive' });
     }
     setSaving(false);
   };
@@ -120,14 +127,49 @@ const AdminHomeContent = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Hero text visibility toggle */}
+          <div className="flex items-center gap-4 p-3 rounded-lg border border-border bg-muted/30">
+            <Switch
+              checked={form.hero_text_visible}
+              onCheckedChange={v => set('hero_text_visible', v)}
+              id="hero-text-toggle"
+            />
+            <div>
+              <Label htmlFor="hero-text-toggle" className="flex items-center gap-2 cursor-pointer">
+                <Eye className="h-4 w-4" /> Show Hero Text Overlay
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Disable if your hero video/image already contains text.
+              </p>
+            </div>
+          </div>
+
           <div>
-            <Label>Hero Title *</Label>
+            <Label>Hero Title</Label>
             <Input value={form.hero_title} onChange={e => set('hero_title', e.target.value)} placeholder="Your Event Name" />
           </div>
 
           <div>
             <Label>Hero Subtitle</Label>
             <Textarea value={form.hero_subtitle} onChange={e => set('hero_subtitle', e.target.value)} rows={2} placeholder="Your tagline here" />
+          </div>
+
+          {/* CTA vertical offset */}
+          <div className="p-3 rounded-lg border border-border bg-muted/30">
+            <Label className="flex items-center gap-2 mb-2">
+              <ArrowDown className="h-4 w-4" /> CTA Button Vertical Offset: {form.cta_offset_top}px
+            </Label>
+            <Slider
+              value={[parseInt(form.cta_offset_top) || 0]}
+              onValueChange={([v]) => set('cta_offset_top', String(v))}
+              min={0}
+              max={200}
+              step={10}
+              className="w-full"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Push the CTA buttons down to avoid covering video/image text. 0 = default position.
+            </p>
           </div>
 
           {/* Hero Background — unified image/video picker */}

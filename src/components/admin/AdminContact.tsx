@@ -3,11 +3,13 @@ import { useContactSubmissions, useContactSettings } from '@/hooks/useData';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { Mail, Trash2, Settings, Save, MessageSquare, Eye, EyeOff } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const AdminContact = () => {
   const { data: submissions, isLoading: loadingSubs } = useContactSubmissions();
   const { data: settings, isLoading: loadingSettings } = useContactSettings();
   const qc = useQueryClient();
+  const { toast } = useToast();
   const [tab, setTab] = useState<'submissions' | 'settings'>('submissions');
   const [saving, setSaving] = useState(false);
   const [settingsForm, setSettingsForm] = useState<any>(null);
@@ -39,9 +41,9 @@ const AdminContact = () => {
         await supabase.from('contact_settings').insert(settingsForm);
       }
       qc.invalidateQueries({ queryKey: ['contact-settings'] });
-      alert('Contact settings saved!');
+      toast({ title: 'Saved', description: 'Contact settings saved successfully.' });
     } catch (err: any) {
-      alert(err.message);
+      toast({ title: 'Save failed', description: err.message, variant: 'destructive' });
     }
     setSaving(false);
   };

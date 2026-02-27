@@ -76,6 +76,8 @@ const HeroSection = () => {
 
   const heroTitle = homeContent?.hero_title || "ENCORE REPRESENTATION";
   const heroSubtitle = homeContent?.hero_subtitle || "Premier Talent Representation";
+  const heroTextVisible = (homeContent as any)?.hero_text_visible ?? true;
+  const ctaOffsetTop = parseInt((homeContent as any)?.cta_offset_top || '0') || 0;
   const ctaPrimaryText = homeContent?.cta_primary_text;
   const ctaPrimaryUrl = homeContent?.cta_primary_url;
   const ctaSecondaryText = homeContent?.cta_secondary_text;
@@ -102,35 +104,42 @@ const HeroSection = () => {
       {/* Content */}
       <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="animate-fade-in-up">
-          {/* Title */}
-          <h1
-            className="font-orbitron text-4xl sm:text-6xl md:text-7xl lg:text-8xl mb-4 tracking-wider font-bold"
-            style={{
-              color: 'var(--accent)',
-              textShadow: '0 0 40px var(--glow), 3px 3px 0 rgba(0,0,0,0.8), -1px -1px 0 rgba(0,0,0,0.8)',
-            }}
-          >
-            {heroTitle}
-          </h1>
+          {/* Title — only if hero text visible */}
+          {heroTextVisible && (
+            <h1
+              className="font-orbitron text-4xl sm:text-6xl md:text-7xl lg:text-8xl mb-4 tracking-wider font-bold"
+              style={{
+                color: 'var(--accent)',
+                textShadow: '0 0 40px var(--glow), 3px 3px 0 rgba(0,0,0,0.8), -1px -1px 0 rgba(0,0,0,0.8)',
+              }}
+            >
+              {heroTitle}
+            </h1>
+          )}
 
-          {/* Subtitle */}
+          {/* Subtitle — only if hero text visible */}
+          {heroTextVisible && (
+            <div
+              className="text-base sm:text-lg md:text-xl lg:text-2xl mb-10 max-w-3xl mx-auto leading-relaxed font-medium"
+              style={{
+                color: 'rgba(255, 255, 255, 0.92)',
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 3px rgba(0, 0, 0, 0.6)',
+              }}
+            >
+              {heroSubtitle.split('\n').map((line, i) => (
+                <span key={i}>
+                  {i > 0 && <br />}
+                  {line}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* CTA Buttons — with configurable vertical offset */}
           <div
-            className="text-base sm:text-lg md:text-xl lg:text-2xl mb-10 max-w-3xl mx-auto leading-relaxed font-medium"
-            style={{
-              color: 'rgba(255, 255, 255, 0.92)',
-              textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 3px rgba(0, 0, 0, 0.6)',
-            }}
+            className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4"
+            style={ctaOffsetTop > 0 ? { marginTop: `${ctaOffsetTop}px` } : undefined}
           >
-            {heroSubtitle.split('\n').map((line, i) => (
-              <span key={i}>
-                {i > 0 && <br />}
-                {line}
-              </span>
-            ))}
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
             {ctaPrimaryText && ctaPrimaryUrl && (
               isInternalUrl(ctaPrimaryUrl) ? (
                 <Link

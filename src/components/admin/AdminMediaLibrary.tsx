@@ -2,6 +2,7 @@ import { useRef, useCallback, useState } from 'react';
 import { useMediaLibrary, useUploadMedia, useDeleteMedia, useMediaUsage, MAX_FILE_BYTES } from '@/hooks/useMediaLibrary';
 import { convertMovToMp4, isMovFile, ConversionProgress } from '@/hooks/useVideoConverter';
 import { Upload, Trash2, Image as ImageIcon, Film, HardDrive } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const AdminMediaLibrary = () => {
     const { data: items, isLoading } = useMediaLibrary();
@@ -9,6 +10,7 @@ const AdminMediaLibrary = () => {
     const deleteMedia = useDeleteMedia();
     const { totalUsed, maxBytes, pct } = useMediaUsage();
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { toast } = useToast();
 
     // Conversion state (separate from upload.isPending)
     const [conversion, setConversion] = useState<ConversionProgress | null>(null);
@@ -49,7 +51,7 @@ const AdminMediaLibrary = () => {
                             ?? (err as any)?.toString?.()
                             ?? JSON.stringify(err)
                             ?? 'Unknown error — check the browser console for details.';
-                alert(`Failed to process ${file.name}:\n\n${msg}`);
+                toast({ title: 'Upload failed', description: `Failed to process ${file.name}: ${msg}`, variant: 'destructive' });
             }
         }
 
@@ -61,7 +63,7 @@ const AdminMediaLibrary = () => {
         try {
             await deleteMedia.mutateAsync(item);
         } catch (err: any) {
-            alert(err.message || 'Delete failed');
+            toast({ title: 'Delete failed', description: err.message || 'Delete failed', variant: 'destructive' });
         }
     };
 

@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { useMediaLibrary, useUploadMedia, useDeleteMedia, useMediaUsage, ALLOWED_TYPES, MAX_FILE_BYTES } from '@/hooks/useMediaLibrary';
 import type { MediaLibraryItem } from '@/types/database';
 import { X, Upload, Trash2, Check, Image as ImageIcon, Film } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface MediaPickerProps {
     open: boolean;
@@ -17,6 +18,7 @@ const MediaPicker = ({ open, onClose, onSelect, accept = 'all' }: MediaPickerPro
     const { totalUsed, maxBytes, pct } = useMediaUsage();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [preview, setPreview] = useState<string | null>(null);
+    const { toast } = useToast();
 
     const filteredItems = items?.filter(i => {
         if (accept === 'image') return i.file_type.startsWith('image/');
@@ -39,7 +41,7 @@ const MediaPicker = ({ open, onClose, onSelect, accept = 'all' }: MediaPickerPro
             onSelect(result.file_url);
             onClose();
         } catch (err: any) {
-            alert(err.message || 'Upload failed');
+            toast({ title: 'Upload failed', description: err.message || 'Upload failed', variant: 'destructive' });
         }
 
         if (fileInputRef.current) fileInputRef.current.value = '';
@@ -56,7 +58,7 @@ const MediaPicker = ({ open, onClose, onSelect, accept = 'all' }: MediaPickerPro
         try {
             await deleteMedia.mutateAsync(item);
         } catch (err: any) {
-            alert(err.message || 'Delete failed');
+            toast({ title: 'Delete failed', description: err.message || 'Delete failed', variant: 'destructive' });
         }
     };
 
