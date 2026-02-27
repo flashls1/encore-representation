@@ -48,7 +48,8 @@ const HeroBackground = ({
         muted
         loop
         playsInline
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain md:object-cover"
+        style={{ backgroundColor: '#0A0A0A' }}
         onError={(e) => {
           (e.currentTarget as HTMLVideoElement).style.display = 'none';
         }}
@@ -57,7 +58,8 @@ const HeroBackground = ({
       <img
         src={imageUrl}
         alt="Encore Representation"
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain md:object-cover"
+        style={{ backgroundColor: '#0A0A0A' }}
         loading="eager"
       />
     ) : null}
