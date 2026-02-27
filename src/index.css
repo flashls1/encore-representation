@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 /* ============================================================================
-   SillCon 2026 Design System
+   Encore Representation Design System
    Bridge: theme tokens → shadcn CSS variables
    All shadcn components automatically inherit from the active theme.
    ============================================================================ */

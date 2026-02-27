@@ -100,7 +100,7 @@ const AdminSiteSettings = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Site Settings</h2>
-          <p className="text-muted-foreground">Global configuration for SillCon 2026</p>
+          <p className="text-muted-foreground">Global configuration for your site</p>
         </div>
         <Button onClick={handleSave} disabled={saving}>
           {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
@@ -172,11 +172,11 @@ const AdminSiteSettings = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label>Venue Name</Label>
-              <Input value={form.venue_name} onChange={e => set('venue_name', e.target.value)} placeholder="Fort Sill Convention Center" />
+              <Input value={form.venue_name} onChange={e => set('venue_name', e.target.value)} placeholder="Venue Name" />
             </div>
             <div>
               <Label>Venue Address</Label>
-              <Input value={form.venue_address} onChange={e => set('venue_address', e.target.value)} placeholder="Lawton, OK" />
+              <Input value={form.venue_address} onChange={e => set('venue_address', e.target.value)} placeholder="City, State" />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

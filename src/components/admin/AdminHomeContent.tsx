@@ -122,12 +122,12 @@ const AdminHomeContent = () => {
         <CardContent className="space-y-4">
           <div>
             <Label>Hero Title *</Label>
-            <Input value={form.hero_title} onChange={e => set('hero_title', e.target.value)} placeholder="Sill-Con 2026" />
+            <Input value={form.hero_title} onChange={e => set('hero_title', e.target.value)} placeholder="Your Event Name" />
           </div>
 
           <div>
             <Label>Hero Subtitle</Label>
-            <Textarea value={form.hero_subtitle} onChange={e => set('hero_subtitle', e.target.value)} rows={2} placeholder="Oklahoma's Premier Anime Convention" />
+            <Textarea value={form.hero_subtitle} onChange={e => set('hero_subtitle', e.target.value)} rows={2} placeholder="Your tagline here" />
           </div>
 
           {/* Hero Background — unified image/video picker */}
