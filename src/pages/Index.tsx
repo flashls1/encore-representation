@@ -48,28 +48,7 @@ const TalentCard = ({ talent, index }: { talent: Talent; index: number }) => {
             </div>
           )}
 
-          {/* Dark gradient overlay */}
-          <div
-            className="absolute inset-0 transition-opacity duration-300"
-            style={{
-              background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.35) 40%, transparent 65%)',
-            }}
-          />
-
-          {/* Name + roles overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
-            <h3
-              className="font-bold text-sm sm:text-base leading-tight mb-0.5"
-              style={{ color: '#ffffff' }}
-            >
-              {talent.name}
-            </h3>
-            {topRoles.length > 0 && (
-              <p className="text-xs line-clamp-1" style={{ color: '#D4AF37' }}>
-                {topRoles.map(r => r.character_name).join(' • ')}
-              </p>
-            )}
-          </div>
+          {/* No overlay — images already contain talent name graphics */}
         </div>
       </motion.div>
     </Link>
