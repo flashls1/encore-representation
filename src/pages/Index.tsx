@@ -20,7 +20,7 @@ const TalentCard = ({ talent, index }: { talent: Talent; index: number }) => {
     <Link to={`/talent/${talent.id}`}>
       <motion.div
         className="group relative block overflow-hidden rounded-xl"
-        style={{ border: '1px solid rgba(212, 175, 55, 0.15)', backgroundColor: '#0A0A0A' }}
+        style={{ border: '1.5px solid #D4AF37', backgroundColor: '#0A0A0A' }}
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-30px' }}

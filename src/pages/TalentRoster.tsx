@@ -18,7 +18,7 @@ const RosterCard = ({ talent, index }: { talent: Talent; index: number }) => {
         <Link to={`/talent/${talent.id}`}>
             <motion.div
                 className="group relative block overflow-hidden rounded-lg"
-                style={{ border: '1px solid rgba(212, 175, 55, 0.12)', backgroundColor: '#0A0A0A' }}
+                style={{ border: '1.5px solid #D4AF37', backgroundColor: '#0A0A0A' }}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, delay: index * 0.03, ease: [0.22, 1, 0.36, 1] }}
