@@ -30,3 +30,6 @@ SERVER_REFERENCE.md
 
 # Agent workspace
 .agent/
+
+# Reference repos (cloned for local dev use only)
+src/ui-library/react-bits/react-bits-repo/

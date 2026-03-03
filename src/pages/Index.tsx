@@ -1,5 +1,5 @@
-import { useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useRef, useEffect, useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -8,12 +8,14 @@ import HeroSection from "@/components/HeroSection";
 import Footer from "@/components/Footer";
 import { useTalents } from "@/hooks/useData";
 import type { Talent } from "@/types/database";
+import TalentCarousel from "@/ui-library/react-bits/effects/components/talent-carousel/TalentCarousel";
+import Hyperspeed from "@/ui-library/react-bits/effects/backgrounds/hyperspeed/Hyperspeed";
+import { hyperspeedPresets } from "@/ui-library/react-bits/effects/backgrounds/hyperspeed/HyperSpeedPresets";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ─── Talent card (shared for all screen sizes) ─────────────────────────────────
+// ─── Mobile talent card (grid layout, unchanged) ────────────────────────────
 const TalentCard = ({ talent, index }: { talent: Talent; index: number }) => {
-  const topRoles = talent.talent_roles?.slice(0, 2) || [];
   const initials = talent.name.split(' ').map(w => w[0]).join('').slice(0, 2);
 
   return (
@@ -28,7 +30,6 @@ const TalentCard = ({ talent, index }: { talent: Talent; index: number }) => {
         whileHover={{ scale: 1.03, borderColor: 'rgba(212, 175, 55, 0.4)' }}
         whileTap={{ scale: 0.98 }}
       >
-        {/* 1:1 Square image */}
         <div className="relative w-full pb-[100%] overflow-hidden">
           {talent.headshot_url ? (
             <img
@@ -47,11 +48,94 @@ const TalentCard = ({ talent, index }: { talent: Talent; index: number }) => {
               </span>
             </div>
           )}
-
-          {/* No overlay — images already contain talent name graphics */}
         </div>
       </motion.div>
     </Link>
+  );
+};
+
+// ─── Desktop Talent Carousel Section ─────────────────────────────────────────
+const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
+  const navigate = useNavigate();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Build carousel items from talent data
+  const carouselItems = useMemo(() => {
+    return talents
+      .filter(t => t.headshot_url)
+      .map(t => ({
+        image: t.headshot_url!,
+        id: t.id,
+      }));
+  }, [talents]);
+
+  // GSAP entrance animation
+  useEffect(() => {
+    if (!containerRef.current) return;
+    gsap.fromTo(containerRef.current,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 90%',
+          toggleActions: 'play none none reverse',
+        },
+      }
+    );
+  }, []);
+
+  const handleItemClick = (id: string) => {
+    navigate(`/talent/${id}`);
+  };
+
+  if (!carouselItems.length) return null;
+
+  return (
+    <section className="hidden md:block px-[10px] mt-2">
+      <div
+        ref={containerRef}
+        className="relative mx-auto overflow-hidden"
+        style={{
+          width: 'calc(100vw - 20px)',
+          height: '625px',
+          borderRadius: '16px',
+          border: '2px solid #D4AF37',
+          backgroundColor: 'rgba(10, 10, 10, 0.9)',
+        }}
+      >
+        {/* Layer 0: Hyperspeed Background (highway preset) */}
+        <div className="absolute inset-0 z-0" style={{ pointerEvents: 'none' }}>
+          <Hyperspeed effectOptions={hyperspeedPresets.one as any} />
+        </div>
+
+        {/* Layer 1: Heading overlay */}
+        <div className="absolute top-0 left-0 right-0 z-20 text-center pt-6 pointer-events-none">
+          <h2
+            className="font-orbitron text-3xl md:text-4xl tracking-wider font-bold"
+            style={{
+              color: '#D4AF37',
+              textShadow: '0 0 30px rgba(212, 175, 55, 0.4), 0 2px 4px rgba(0, 0, 0, 0.8)',
+            }}
+          >
+            Talent Roster
+          </h2>
+          <div className="w-16 h-[2px] mx-auto mt-3" style={{ backgroundColor: '#D4AF37' }} />
+        </div>
+
+        {/* Layer 2: Rotating Carousel */}
+        <div className="absolute inset-0 z-10">
+          <TalentCarousel
+            items={carouselItems}
+            bend={3}
+            borderRadius={0.05}
+            autoScrollSpeed={0.8}
+            pauseOnHover={true}
+            onItemClick={handleItemClick}
+          />
+        </div>
+      </div>
+    </section>
   );
 };
 
@@ -73,11 +157,17 @@ const Index = () => {
       <Navigation />
       <HeroSection />
 
-      <section className="py-6 md:py-24 px-4">
+      {/* Desktop: Rotating Talent Carousel */}
+      {!isLoading && talents && talents.length > 0 && (
+        <TalentCarouselSection talents={talents} />
+      )}
+
+      {/* Mobile: Original grid layout (hidden on desktop) */}
+      <section className="md:hidden py-6 px-4">
         <div className="max-w-7xl mx-auto">
-          <div ref={headingRef} className="text-center mb-6 md:mb-16">
+          <div ref={headingRef} className="text-center mb-6">
             <h2
-              className="font-orbitron text-3xl sm:text-4xl md:text-5xl mb-3 tracking-wider font-bold"
+              className="font-orbitron text-3xl sm:text-4xl mb-3 tracking-wider font-bold"
               style={{ color: '#D4AF37' }}
             >
               Talent Roster
@@ -86,14 +176,13 @@ const Index = () => {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+            <div className="grid grid-cols-3 gap-3 sm:gap-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="pb-[100%] rounded-xl animate-pulse" style={{ backgroundColor: '#1a1a1a' }} />
               ))}
             </div>
           ) : talents && talents.length > 0 ? (
-            /* Grid: 3 columns on mobile, 4 on md+ */
-            <div className="grid grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+            <div className="grid grid-cols-3 gap-3 sm:gap-4">
               {talents.map((talent, i) => (
                 <TalentCard key={talent.id} talent={talent} index={i} />
               ))}
