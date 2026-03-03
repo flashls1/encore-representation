@@ -3,7 +3,7 @@
  *
  * Modifications from original:
  *   1. Continuous auto-scroll (configurable speed)
- *   2. Pause on hover, resume on leave
+ *   2. Only pauses on active click/drag (not hover)
  *   3. No text labels below cards (images only)
  *   4. onClick callback per item for navigation
  *   5. Scoped event listeners to container (not window)
@@ -267,7 +267,6 @@ interface CarouselConfig {
     bend?: number;
     borderRadius?: number;
     autoScrollSpeed?: number;
-    pauseOnHover?: boolean;
 }
 
 class CarouselApp {
@@ -290,14 +289,10 @@ class CarouselApp {
     boundOnTouchDown!: (e: MouseEvent | TouchEvent) => void;
     boundOnTouchMove!: (e: MouseEvent | TouchEvent) => void;
     boundOnTouchUp!: () => void;
-    boundOnMouseEnter!: () => void;
-    boundOnMouseLeave!: () => void;
 
     isDown: boolean = false;
     start: number = 0;
-    isPaused: boolean = false;
     autoScrollSpeed: number;
-    pauseOnHover: boolean;
     onItemClick?: (id: string) => void;
     dragVelocity: number = 0;
     lastDragX: number = 0;
@@ -311,13 +306,11 @@ class CarouselApp {
             items,
             bend = 3,
             borderRadius = 0.05,
-            autoScrollSpeed = 0.8,
-            pauseOnHover = true,
+            autoScrollSpeed = 3,
         }: CarouselConfig
     ) {
         this.container = container;
         this.autoScrollSpeed = autoScrollSpeed;
-        this.pauseOnHover = pauseOnHover;
         this.scroll = { ease: 0.05, current: 0, target: 0, last: 0 };
         this.onCheckDebounce = debounce(this.onCheck.bind(this), 200);
         this.createRenderer();
@@ -435,13 +428,7 @@ class CarouselApp {
         // no snapping — free continuous scroll
     }
 
-    onMouseEnter() {
-        if (this.pauseOnHover) this.isPaused = true;
-    }
 
-    onMouseLeave() {
-        if (this.pauseOnHover) this.isPaused = false;
-    }
 
     onResize() {
         this.screen = { width: this.container.clientWidth, height: this.container.clientHeight };
@@ -457,8 +444,8 @@ class CarouselApp {
     }
 
     update() {
-        // Auto-scroll when not paused, not dragging, and momentum has settled
-        if (!this.isPaused && !this.isDown && this.dragVelocity === 0) {
+        // Auto-scroll when not actively dragging and momentum has settled
+        if (!this.isDown && this.dragVelocity === 0) {
             this.scroll.target += this.autoScrollSpeed * 0.01;
         }
 
@@ -479,8 +466,6 @@ class CarouselApp {
         this.boundOnTouchDown = this.onTouchDown.bind(this);
         this.boundOnTouchMove = this.onTouchMove.bind(this);
         this.boundOnTouchUp = this.onTouchUp.bind(this);
-        this.boundOnMouseEnter = this.onMouseEnter.bind(this);
-        this.boundOnMouseLeave = this.onMouseLeave.bind(this);
 
         window.addEventListener('resize', this.boundOnResize);
         // Scoped to container
@@ -492,8 +477,6 @@ class CarouselApp {
         this.container.addEventListener('touchstart', this.boundOnTouchDown);
         this.container.addEventListener('touchmove', this.boundOnTouchMove);
         window.addEventListener('touchend', this.boundOnTouchUp);
-        this.container.addEventListener('mouseenter', this.boundOnMouseEnter);
-        this.container.addEventListener('mouseleave', this.boundOnMouseLeave);
     }
 
     destroy() {
@@ -506,8 +489,6 @@ class CarouselApp {
         this.container.removeEventListener('touchstart', this.boundOnTouchDown);
         this.container.removeEventListener('touchmove', this.boundOnTouchMove);
         window.removeEventListener('touchend', this.boundOnTouchUp);
-        this.container.removeEventListener('mouseenter', this.boundOnMouseEnter);
-        this.container.removeEventListener('mouseleave', this.boundOnMouseLeave);
         if (this.renderer && this.renderer.gl && this.renderer.gl.canvas.parentNode) {
             this.renderer.gl.canvas.parentNode.removeChild(this.renderer.gl.canvas as HTMLCanvasElement);
         }
@@ -521,7 +502,6 @@ export interface TalentCarouselProps {
     bend?: number;
     borderRadius?: number;
     autoScrollSpeed?: number;
-    pauseOnHover?: boolean;
     onItemClick?: (id: string) => void;
     className?: string;
 }
@@ -530,8 +510,7 @@ export default function TalentCarousel({
     items,
     bend = 3,
     borderRadius = 0.05,
-    autoScrollSpeed = 0.8,
-    pauseOnHover = true,
+    autoScrollSpeed = 3,
     onItemClick,
     className = '',
 }: TalentCarouselProps) {
@@ -569,7 +548,6 @@ export default function TalentCarousel({
             bend,
             borderRadius,
             autoScrollSpeed,
-            pauseOnHover,
         });
         appRef.current = app;
 
@@ -577,7 +555,7 @@ export default function TalentCarousel({
             app.destroy();
             appRef.current = null;
         };
-    }, [items, bend, borderRadius, autoScrollSpeed, pauseOnHover]);
+    }, [items, bend, borderRadius, autoScrollSpeed]);
 
     return (
         <div

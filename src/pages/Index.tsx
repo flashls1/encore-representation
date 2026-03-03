@@ -129,8 +129,7 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
             items={carouselItems}
             bend={3}
             borderRadius={0.05}
-            autoScrollSpeed={0.8}
-            pauseOnHover={true}
+            autoScrollSpeed={3}
             onItemClick={handleItemClick}
           />
         </div>
