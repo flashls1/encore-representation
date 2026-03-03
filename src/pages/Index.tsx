@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
@@ -138,10 +138,93 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
   );
 };
 
+// ─── Desktop snap-scroll hook ──────────────────────────────────────────────────
+const useDesktopSnapScroll = (sectionRefs: React.RefObject<HTMLElement>[]) => {
+  const isSnapping = useRef(false);
+  const cooldownTimer = useRef<number>(0);
+
+  const snapTo = useCallback((target: HTMLElement) => {
+    if (isSnapping.current) return;
+    isSnapping.current = true;
+
+    // Use GSAP ScrollTo for smooth snap — works with Lenis
+    gsap.to(window, {
+      scrollTo: { y: target, offsetY: 0 },
+      duration: 0.8,
+      ease: 'power3.inOut',
+      onComplete: () => {
+        // Cooldown prevents bounce-snapping from residual wheel events
+        cooldownTimer.current = window.setTimeout(() => {
+          isSnapping.current = false;
+        }, 400);
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+    // Only enable on desktop (md+ = 768px)
+    const mql = window.matchMedia('(min-width: 768px)');
+    if (!mql.matches) return;
+
+    // Dynamically import ScrollToPlugin (tree-shakes on mobile)
+    import('gsap/ScrollToPlugin').then(({ ScrollToPlugin }) => {
+      gsap.registerPlugin(ScrollToPlugin);
+    });
+
+    const getCurrentSectionIndex = (): number => {
+      const scrollY = window.scrollY;
+      const vh = window.innerHeight;
+      for (let i = sectionRefs.length - 1; i >= 0; i--) {
+        const el = sectionRefs[i].current;
+        if (el && scrollY >= el.offsetTop - vh * 0.4) return i;
+      }
+      return 0;
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      if (isSnapping.current) {
+        e.preventDefault();
+        return;
+      }
+
+      // Only snap on meaningful scroll (ignore tiny trackpad jitter)
+      if (Math.abs(e.deltaY) < 30) return;
+
+      const currentIdx = getCurrentSectionIndex();
+      const direction = e.deltaY > 0 ? 1 : -1;
+      const nextIdx = currentIdx + direction;
+
+      if (nextIdx >= 0 && nextIdx < sectionRefs.length) {
+        const target = sectionRefs[nextIdx].current;
+        if (target) {
+          e.preventDefault();
+          snapTo(target);
+        }
+      }
+    };
+
+    // Passive: false so we can preventDefault during snap
+    window.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.clearTimeout(cooldownTimer.current);
+    };
+  }, [sectionRefs, snapTo]);
+};
+
 // ─── Main page ─────────────────────────────────────────────────────────────────
 const Index = () => {
   const { data: talents, isLoading } = useTalents();
   const headingRef = useRef<HTMLDivElement>(null);
+
+  // Section refs for desktop snap-scroll
+  const heroRef = useRef<HTMLDivElement>(null!);
+  const talentRef = useRef<HTMLDivElement>(null!);
+  const footerRef = useRef<HTMLDivElement>(null!);
+
+  // Desktop snap scroll between sections
+  useDesktopSnapScroll([heroRef, talentRef, footerRef]);
 
   useEffect(() => {
     if (!headingRef.current) return;
@@ -154,58 +237,68 @@ const Index = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0A0A0A' }}>
       <Navigation />
-      <HeroSection />
 
-      {/* Desktop: Rotating Talent Carousel */}
-      {!isLoading && talents && talents.length > 0 && (
-        <TalentCarouselSection talents={talents} />
-      )}
+      {/* Section 0: Hero */}
+      <div ref={heroRef}>
+        <HeroSection />
+      </div>
 
-      {/* Mobile: Original grid layout (hidden on desktop) */}
-      <section className="md:hidden py-6 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div ref={headingRef} className="text-center mb-6">
-            <h2
-              className="font-orbitron text-3xl sm:text-4xl mb-3 tracking-wider font-bold"
-              style={{ color: '#D4AF37' }}
-            >
-              Talent Roster
-            </h2>
-            <div className="w-16 h-[2px] mx-auto mt-4" style={{ backgroundColor: '#D4AF37' }} />
-          </div>
+      {/* Section 1: Talent Roster */}
+      <div ref={talentRef}>
+        {/* Desktop: Rotating Talent Carousel */}
+        {!isLoading && talents && talents.length > 0 && (
+          <TalentCarouselSection talents={talents} />
+        )}
 
-          {isLoading ? (
-            <div className="grid grid-cols-3 gap-3 sm:gap-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="pb-[100%] rounded-xl animate-pulse" style={{ backgroundColor: '#1a1a1a' }} />
-              ))}
-            </div>
-          ) : talents && talents.length > 0 ? (
-            <div className="grid grid-cols-3 gap-3 sm:gap-4">
-              {talents.map((talent, i) => (
-                <TalentCard key={talent.id} talent={talent} index={i} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <div
-                className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4"
-                style={{ backgroundColor: 'rgba(212, 175, 55, 0.1)' }}
+        {/* Mobile: Original grid layout (hidden on desktop) */}
+        <section className="md:hidden py-6 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div ref={headingRef} className="text-center mb-6">
+              <h2
+                className="font-orbitron text-3xl sm:text-4xl mb-3 tracking-wider font-bold"
+                style={{ color: '#D4AF37' }}
               >
-                <span className="text-3xl" style={{ color: '#D4AF37' }}>★</span>
-              </div>
-              <h3 className="text-xl font-bold mb-2" style={{ color: '#ffffff' }}>
-                Roster Coming Soon
-              </h3>
-              <p style={{ color: '#888' }}>
-                Our talent roster is being curated. Check back soon!
-              </p>
+                Talent Roster
+              </h2>
+              <div className="w-16 h-[2px] mx-auto mt-4" style={{ backgroundColor: '#D4AF37' }} />
             </div>
-          )}
-        </div>
-      </section>
 
-      <Footer />
+            {isLoading ? (
+              <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="pb-[100%] rounded-xl animate-pulse" style={{ backgroundColor: '#1a1a1a' }} />
+                ))}
+              </div>
+            ) : talents && talents.length > 0 ? (
+              <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                {talents.map((talent, i) => (
+                  <TalentCard key={talent.id} talent={talent} index={i} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <div
+                  className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4"
+                  style={{ backgroundColor: 'rgba(212, 175, 55, 0.1)' }}
+                >
+                  <span className="text-3xl" style={{ color: '#D4AF37' }}>★</span>
+                </div>
+                <h3 className="text-xl font-bold mb-2" style={{ color: '#ffffff' }}>
+                  Roster Coming Soon
+                </h3>
+                <p style={{ color: '#888' }}>
+                  Our talent roster is being curated. Check back soon!
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+
+      {/* Section 2: Footer — 80px spacing from talent section */}
+      <div ref={footerRef} className="mt-20">
+        <Footer />
+      </div>
     </div>
   );
 };
