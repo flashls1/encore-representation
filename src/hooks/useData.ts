@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { getDefaultProps } from '@/ui-library/react-bits/effects/_registry';
 import type {
   SiteSettings,
   HomeContent,
@@ -7,6 +8,18 @@ import type {
   ContactSettings,
   ContactSubmission,
 } from '@/types/database';
+
+// ============================================================================
+// UI Effects Configuration
+// ============================================================================
+export const useUIEffect = (effectId: string) => {
+  // For now, we pull the default config directly from the registry.
+  // In the future, this can be hooked up to Supabase to fetch admin overrides.
+  return {
+    config: getDefaultProps(effectId),
+    isLoading: false,
+  };
+};
 
 // ============================================================================
 // Site Settings

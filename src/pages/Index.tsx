@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo, useCallback } from "react";
+import { useRef, useEffect, useMemo, useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
@@ -6,11 +6,13 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import Footer from "@/components/Footer";
-import { useTalents } from "@/hooks/useData";
+import { useTalents, useUIEffect } from "@/hooks/useData";
 import type { Talent } from "@/types/database";
 import TalentCarousel from "@/ui-library/react-bits/effects/components/talent-carousel/TalentCarousel";
 import Hyperspeed from "@/ui-library/react-bits/effects/backgrounds/hyperspeed/Hyperspeed";
 import { hyperspeedPresets } from "@/ui-library/react-bits/effects/backgrounds/hyperspeed/HyperSpeedPresets";
+import BlurText from "@/ui-library/react-bits/effects/text-animations/blur-text/BlurText";
+import ShinyText from "@/ui-library/react-bits/effects/text-animations/shiny-text/ShinyText";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -58,6 +60,11 @@ const TalentCard = ({ talent, index }: { talent: Talent; index: number }) => {
 const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isBlurred, setIsBlurred] = useState(true);
+
+  // Fetch admin UI settings for the two text effects
+  const { config: blurConfig } = useUIEffect('blur-text');
+  const { config: shinyConfig } = useUIEffect('shiny-text');
 
   // Build carousel items from talent data
   const carouselItems = useMemo(() => {
@@ -111,16 +118,32 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
 
         {/* Layer 1: Heading overlay */}
         <div className="absolute top-0 left-0 right-0 z-20 text-center pt-6 pointer-events-none">
-          <h2
-            className="font-orbitron text-3xl md:text-4xl tracking-wider font-bold"
-            style={{
-              color: '#D4AF37',
-              textShadow: '0 0 30px rgba(212, 175, 55, 0.4), 0 2px 4px rgba(0, 0, 0, 0.8)',
-            }}
-          >
-            Talent Roster
-          </h2>
-          <div className="w-16 h-[2px] mx-auto mt-3" style={{ backgroundColor: '#D4AF37' }} />
+          {isBlurred ? (
+            <BlurText
+              text="Talent Roster"
+              delay={blurConfig.delay}
+              animateBy={blurConfig.animateBy as 'words' | 'letters'}
+              direction={blurConfig.direction as 'top' | 'bottom'}
+              stepDuration={blurConfig.stepDuration}
+              threshold={blurConfig.threshold}
+              className="font-orbitron text-3xl md:text-4xl tracking-wider font-bold mb-3"
+              onAnimationComplete={() => setIsBlurred(false)}
+            />
+          ) : (
+            <h2 className="font-orbitron text-3xl md:text-4xl tracking-wider font-bold mb-3">
+              <ShinyText
+                text="Talent Roster"
+                disabled={shinyConfig.disabled}
+                speed={shinyConfig.speed}
+                color={shinyConfig.color}
+                shineColor={shinyConfig.shineColor}
+                spread={shinyConfig.spread}
+                yoyo={shinyConfig.yoyo}
+                direction={shinyConfig.direction as 'left' | 'right'}
+              />
+            </h2>
+          )}
+          <div className="w-16 h-[2px] mx-auto" style={{ backgroundColor: '#D4AF37' }} />
         </div>
 
         {/* Layer 2: Rotating Carousel */}
