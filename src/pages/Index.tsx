@@ -1,4 +1,5 @@
-import { useRef, useEffect, useMemo, useCallback, useState } from "react";
+import { useRef, useEffect, useMemo, useCallback, useState, Component } from "react";
+import type { ErrorInfo, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -100,9 +101,11 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
         }}
       >
-        {/* Layer 0: Silk Background (dark red pattern) */}
+        {/* Layer 0: Silk Background (dark red pattern) — wrapped for GPU safety */}
         <div className="absolute inset-0 z-0" style={{ pointerEvents: 'none' }}>
-          <Silk color="#8B0000" speed={5} scale={1} noiseIntensity={1.5} rotation={0} />
+          <SafeBackground>
+            <Silk color="#8B0000" speed={5} scale={1} noiseIntensity={1.5} rotation={0} />
+          </SafeBackground>
         </div>
 
         {/* Layer 1: Vertical Banner Carousel */}
@@ -117,6 +120,19 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
     </section>
   );
 };
+// ─── Safe Silk wrapper (WebGL may crash on some mobile GPUs) ────────────────
+
+class SafeBackground extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.warn('Background effect crashed:', error, info);
+  }
+  render() {
+    if (this.state.hasError) return <div className="absolute inset-0" style={{ backgroundColor: '#0A0A0A' }} />;
+    return this.props.children;
+  }
+}
 
 // ─── Desktop snap-scroll hook ──────────────────────────────────────────────────
 const useDesktopSnapScroll = (sectionRefs: React.RefObject<HTMLElement>[]) => {
@@ -216,12 +232,24 @@ const Index = () => {
 
       {/* Section 1: Talent Roster */}
       <div ref={talentRef}>
-        {/* Desktop: Rotating Talent Carousel */}
-        {!isLoading && talents && talents.length > 0 && (
+        {isLoading ? (
+          /* Loading skeleton — visible on mobile too */
+          <section className="px-3 md:px-[10px] mt-2">
+            <div className="text-center mb-4 md:mb-8">
+              <div className="h-8 w-48 mx-auto rounded bg-white/5 animate-pulse" />
+            </div>
+            <div
+              className="relative w-full overflow-hidden rounded-xl md:rounded-2xl animate-pulse"
+              style={{
+                height: 'clamp(380px, 65vh, 625px)',
+                border: '1.5px solid rgba(212, 175, 55, 0.3)',
+                backgroundColor: 'rgba(10, 10, 10, 0.9)',
+              }}
+            />
+          </section>
+        ) : talents && talents.length > 0 ? (
           <TalentCarouselSection talents={talents} />
-        )}
-
-
+        ) : null}
       </div>
 
       {/* Section 2: Footer — 80px spacing from talent section */}
