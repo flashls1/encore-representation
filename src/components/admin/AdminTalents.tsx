@@ -164,6 +164,7 @@ const AdminTalents = () => {
     const [sortOrder, setSortOrder] = useState(0);
     const [roles, setRoles] = useState<TalentRole[]>([]);
     const [saving, setSaving] = useState(false);
+    const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
     const resetForm = () => {
         setTalentName('');
@@ -279,16 +280,34 @@ const AdminTalents = () => {
     };
 
     const handleDelete = async (talent: Talent) => {
-        if (!confirm(`Delete ${talent.name}? This cannot be undone.`)) return;
+        setPendingDeleteId(null);
 
         try {
-            await supabase.from('talent_roles').delete().eq('talent_id', talent.id);
-            await supabase.from('talent_images').delete().eq('talent_id', talent.id);
+            // Delete child rows first (FK constraint requires this order)
+            const { error: rolesErr } = await supabase.from('talent_roles').delete().eq('talent_id', talent.id);
+            if (rolesErr) throw new Error(`Failed to delete roles: ${rolesErr.message}`);
+
+            const { error: imagesErr } = await supabase.from('talent_images').delete().eq('talent_id', talent.id);
+            if (imagesErr) throw new Error(`Failed to delete images: ${imagesErr.message}`);
+
+            // Delete the talent record itself
             const { error } = await supabase.from('talents').delete().eq('id', talent.id);
             if (error) throw error;
 
+            // Clean up storage file if headshot exists
+            if (talent.headshot_url) {
+                try {
+                    const url = new URL(talent.headshot_url);
+                    const pathParts = url.pathname.split('/object/public/talent-media/');
+                    if (pathParts.length > 1) {
+                        await supabase.storage.from('talent-media').remove([pathParts[1]]);
+                    }
+                } catch { /* best-effort storage cleanup */ }
+            }
+
             toast({ title: `${talent.name} deleted` });
             queryClient.invalidateQueries({ queryKey: ['talents'] });
+            queryClient.invalidateQueries({ queryKey: ['media-library'] });
 
             if (editingTalent?.id === talent.id) resetForm();
         } catch (err: any) {
@@ -312,8 +331,39 @@ const AdminTalents = () => {
         }
 
         const { data: urlData } = supabase.storage.from('talent-media').getPublicUrl(data.path);
-        setHeadshotUrl(urlData.publicUrl);
-        toast({ title: 'Headshot uploaded' });
+        const publicUrl = urlData.publicUrl;
+        setHeadshotUrl(publicUrl);
+
+        // Also insert into media_library as a backup copy
+        try {
+            let width: number | null = null;
+            let height: number | null = null;
+            if (file.type.startsWith('image/')) {
+                try {
+                    const dims = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+                        const img = new Image();
+                        img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+                        img.onerror = reject;
+                        img.src = URL.createObjectURL(file);
+                    });
+                    width = dims.width;
+                    height = dims.height;
+                } catch { /* ignore dimension errors */ }
+            }
+
+            await supabase.from('media_library').insert({
+                file_name: file.name,
+                file_url: publicUrl,
+                file_size: file.size,
+                file_type: file.type,
+                width,
+                height,
+            });
+
+            queryClient.invalidateQueries({ queryKey: ['media-library'] });
+        } catch { /* best-effort media library backup */ }
+
+        toast({ title: 'Headshot uploaded & saved to Media Library' });
     };
 
     const addRole = (roleName: string, characterName: string) => {
@@ -501,14 +551,34 @@ const AdminTalents = () => {
                                 </span>
                             )}
 
-                            {/* Delete */}
-                            <button
-                                onClick={(e) => { e.stopPropagation(); handleDelete(talent); }}
-                                className="p-1.5 rounded hover:opacity-80 flex-shrink-0"
-                                style={{ color: 'var(--error)' }}
-                            >
-                                <Trash2 className="h-4 w-4" />
-                            </button>
+                            {/* Delete — inline confirmation */}
+                            {pendingDeleteId === talent.id ? (
+                                <div className="flex items-center gap-1.5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                                    <span className="text-xs font-medium" style={{ color: 'var(--error)' }}>Delete?</span>
+                                    <button
+                                        onClick={() => handleDelete(talent)}
+                                        className="px-2 py-1 rounded text-xs font-bold transition-colors"
+                                        style={{ backgroundColor: 'var(--error)', color: '#fff' }}
+                                    >
+                                        Yes
+                                    </button>
+                                    <button
+                                        onClick={() => setPendingDeleteId(null)}
+                                        className="px-2 py-1 rounded text-xs font-medium transition-colors"
+                                        style={{ border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+                                    >
+                                        No
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setPendingDeleteId(talent.id); }}
+                                    className="p-1.5 rounded hover:opacity-80 flex-shrink-0"
+                                    style={{ color: 'var(--error)' }}
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </button>
+                            )}
                         </div>
                     ))}
                 </div>

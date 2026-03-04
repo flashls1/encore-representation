@@ -9,8 +9,7 @@ import Footer from "@/components/Footer";
 import { useTalents, useUIEffect } from "@/hooks/useData";
 import type { Talent } from "@/types/database";
 import TalentCarousel from "@/ui-library/react-bits/effects/components/talent-carousel/TalentCarousel";
-import Hyperspeed from "@/ui-library/react-bits/effects/backgrounds/hyperspeed/Hyperspeed";
-import { hyperspeedPresets } from "@/ui-library/react-bits/effects/backgrounds/hyperspeed/HyperSpeedPresets";
+import Silk from "@/ui-library/react-bits/effects/backgrounds/silk/Silk";
 import BlurText from "@/ui-library/react-bits/effects/text-animations/blur-text/BlurText";
 import ShinyText from "@/ui-library/react-bits/effects/text-animations/shiny-text/ShinyText";
 
@@ -100,6 +99,37 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
 
   return (
     <section className="hidden md:block px-[10px] mt-2">
+      {/* Heading — outside the container with ample spacing */}
+      <div className="text-center mb-8">
+        {isBlurred ? (
+          <BlurText
+            text="Talent Roster"
+            delay={blurConfig.delay}
+            animateBy={blurConfig.animateBy as 'words' | 'letters'}
+            direction={blurConfig.direction as 'top' | 'bottom'}
+            stepDuration={blurConfig.stepDuration}
+            threshold={blurConfig.threshold}
+            className="font-orbitron text-3xl md:text-4xl tracking-wider font-bold mb-3"
+            onAnimationComplete={() => setIsBlurred(false)}
+          />
+        ) : (
+          <h2 className="font-orbitron text-3xl md:text-4xl tracking-wider font-bold mb-3">
+            <ShinyText
+              text="Talent Roster"
+              disabled={shinyConfig.disabled}
+              speed={shinyConfig.speed}
+              color={shinyConfig.color}
+              shineColor={shinyConfig.shineColor}
+              spread={shinyConfig.spread}
+              yoyo={shinyConfig.yoyo}
+              direction={shinyConfig.direction as 'left' | 'right'}
+            />
+          </h2>
+        )}
+        <div className="w-16 h-[2px] mx-auto mt-2" style={{ backgroundColor: '#D4AF37' }} />
+      </div>
+
+      {/* Carousel container */}
       <div
         ref={containerRef}
         className="relative mx-auto overflow-hidden"
@@ -111,48 +141,16 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
         }}
       >
-        {/* Layer 0: Hyperspeed Background (highway preset) */}
+        {/* Layer 0: Silk Background (dark red pattern) */}
         <div className="absolute inset-0 z-0" style={{ pointerEvents: 'none' }}>
-          <Hyperspeed effectOptions={hyperspeedPresets.one as any} />
+          <Silk color="#8B0000" speed={5} scale={1} noiseIntensity={1.5} rotation={0} />
         </div>
 
-        {/* Layer 1: Heading overlay */}
-        <div className="absolute top-0 left-0 right-0 z-20 text-center pt-6 pointer-events-none">
-          {isBlurred ? (
-            <BlurText
-              text="Talent Roster"
-              delay={blurConfig.delay}
-              animateBy={blurConfig.animateBy as 'words' | 'letters'}
-              direction={blurConfig.direction as 'top' | 'bottom'}
-              stepDuration={blurConfig.stepDuration}
-              threshold={blurConfig.threshold}
-              className="font-orbitron text-3xl md:text-4xl tracking-wider font-bold mb-3"
-              onAnimationComplete={() => setIsBlurred(false)}
-            />
-          ) : (
-            <h2 className="font-orbitron text-3xl md:text-4xl tracking-wider font-bold mb-3">
-              <ShinyText
-                text="Talent Roster"
-                disabled={shinyConfig.disabled}
-                speed={shinyConfig.speed}
-                color={shinyConfig.color}
-                shineColor={shinyConfig.shineColor}
-                spread={shinyConfig.spread}
-                yoyo={shinyConfig.yoyo}
-                direction={shinyConfig.direction as 'left' | 'right'}
-              />
-            </h2>
-          )}
-          <div className="w-16 h-[2px] mx-auto" style={{ backgroundColor: '#D4AF37' }} />
-        </div>
-
-        {/* Layer 2: Rotating Carousel */}
+        {/* Layer 1: Vertical Banner Carousel */}
         <div className="absolute inset-0 z-10">
           <TalentCarousel
             items={carouselItems}
-            bend={3}
-            borderRadius={0.05}
-            autoScrollSpeed={3}
+            autoScrollSpeed={0.8}
             onItemClick={handleItemClick}
           />
         </div>

@@ -83,75 +83,96 @@ const TalentProfile = () => {
                         </Link>
                     </motion.div>
 
-                    {/* Profile Layout */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-                        {/* Headshot */}
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}>
-                            <div className="relative w-full pb-[100%] rounded-xl overflow-hidden" style={{ border: '2px solid var(--border)', boxShadow: '0 8px 32px var(--shadow)' }}>
-                                {talent.headshot_url ? (
-                                    <img src={talent.headshot_url} alt={talent.name} className="absolute inset-0 w-full h-full object-cover" />
-                                ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'var(--bg-elevated)' }}>
-                                        <span className="text-6xl font-bold opacity-30" style={{ color: 'var(--accent)' }}>{initials}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </motion.div>
-
-                        {/* Info */}
-                        <div>
-                            <h1
-                                ref={nameRef}
-                                className="font-orbitron text-2xl sm:text-3xl md:text-4xl font-bold tracking-wider mb-2"
-                                style={{ color: 'var(--accent)', opacity: 0 }}
+                    {/* Banner Image — natural aspect ratio, no cropping */}
+                    <motion.div
+                        className="flex justify-center mb-10"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                        {talent.headshot_url ? (
+                            <div
+                                className="inline-block rounded-xl overflow-hidden"
+                                style={{ border: '2px solid var(--accent)', boxShadow: '0 8px 32px var(--shadow)', maxWidth: '100%' }}
                             >
-                                {talent.name}
-                            </h1>
+                                <img
+                                    src={talent.headshot_url}
+                                    alt={talent.name}
+                                    className="block"
+                                    style={{ maxWidth: '100%', maxHeight: '500px', width: 'auto', height: 'auto' }}
+                                />
+                            </div>
+                        ) : (
+                            <div
+                                className="flex items-center justify-center rounded-xl"
+                                style={{
+                                    width: '500px', height: '300px',
+                                    backgroundColor: 'var(--bg-elevated)',
+                                    border: '2px solid var(--border)',
+                                }}
+                            >
+                                <span className="text-6xl font-bold opacity-30" style={{ color: 'var(--accent)' }}>{initials}</span>
+                            </div>
+                        )}
+                    </motion.div>
 
-                            {/* Roles */}
-                            {roles.length > 0 && (
-                                <motion.div className="mb-6" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}>
-                                    <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>
-                                        Characters / Roles
-                                    </h2>
-                                    <div className="flex flex-wrap gap-2">
-                                        {roles.map((role, i) => (
-                                            <motion.div
-                                                key={role.id}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm"
-                                                style={{ backgroundColor: 'var(--badge-bg)', border: '1px solid var(--badge-border)', color: 'var(--badge-text)' }}
-                                                initial={{ opacity: 0, scale: 0.8 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                transition={{ delay: 0.5 + i * 0.05, duration: 0.3 }}
-                                            >
-                                                <Star className="h-3 w-3" />
-                                                <span className="font-medium">{role.character_name}</span>
-                                                {role.role_name && (
-                                                    <span style={{ color: 'var(--text-muted)' }}>— {role.role_name}</span>
-                                                )}
-                                            </motion.div>
-                                        ))}
-                                    </div>
-                                </motion.div>
-                            )}
+                    {/* Name + Info — centered below banner */}
+                    <div className="max-w-3xl mx-auto">
+                        <h1
+                            ref={nameRef}
+                            className="font-orbitron text-2xl sm:text-3xl md:text-4xl font-bold tracking-wider mb-4 text-center"
+                            style={{ color: 'var(--accent)', opacity: 0 }}
+                        >
+                            {talent.name}
+                        </h1>
 
-                            {/* Bio */}
-                            {talent.bio && (
-                                <motion.div className="mb-6" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }}>
-                                    <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>Biography</h2>
-                                    <div className="prose prose-sm max-w-none leading-relaxed" style={{ color: 'var(--text-secondary)' }} dangerouslySetInnerHTML={{ __html: talent.bio }} />
-                                </motion.div>
-                            )}
-
-                            {/* Book CTA */}
-                            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.5 }}>
-                                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} className="inline-block">
-                                    <Link to="/book" className="inline-block px-8 py-3 text-sm font-bold rounded-lg mt-2" style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}>
-                                        Book {firstName} →
-                                    </Link>
-                                </motion.div>
+                        {/* Roles */}
+                        {roles.length > 0 && (
+                            <motion.div className="mb-8 text-center" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}>
+                                <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>
+                                    Characters / Roles
+                                </h2>
+                                <div className="flex flex-wrap justify-center gap-2">
+                                    {roles.map((role, i) => (
+                                        <motion.div
+                                            key={role.id}
+                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm"
+                                            style={{ backgroundColor: 'var(--badge-bg)', border: '1px solid var(--badge-border)', color: 'var(--badge-text)' }}
+                                            initial={{ opacity: 0, scale: 0.8 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: 0.5 + i * 0.05, duration: 0.3 }}
+                                        >
+                                            <Star className="h-3 w-3" />
+                                            <span className="font-medium">{role.character_name}</span>
+                                            {role.role_name && (
+                                                <span style={{ color: 'var(--text-muted)' }}>— {role.role_name}</span>
+                                            )}
+                                        </motion.div>
+                                    ))}
+                                </div>
                             </motion.div>
-                        </div>
+                        )}
+
+                        {/* Bio */}
+                        {talent.bio && (
+                            <motion.div className="mb-8" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }}>
+                                <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>Biography</h2>
+                                <div
+                                    className="prose prose-sm max-w-none leading-relaxed"
+                                    style={{ color: 'var(--text-secondary)' }}
+                                    dangerouslySetInnerHTML={{ __html: talent.bio }}
+                                />
+                            </motion.div>
+                        )}
+
+                        {/* Book CTA — centered */}
+                        <motion.div className="text-center" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.5 }}>
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} className="inline-block">
+                                <Link to="/book" className="inline-block px-8 py-3 text-sm font-bold rounded-lg" style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}>
+                                    Book {firstName} →
+                                </Link>
+                            </motion.div>
+                        </motion.div>
                     </div>
 
                     {/* Photo Gallery */}
