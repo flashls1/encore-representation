@@ -31,7 +31,8 @@ export interface TalentCarouselProps {
 /* ─── Constants ─────────────────────────────────────────────────────────────── */
 
 const ASPECT = 5 / 3;
-const GAP = 24;
+const GAP_DESKTOP = 24;
+const GAP_MOBILE = 16;
 const MIN_EFFECTIVE = 6; // duplicated items for seamless wrapping
 
 /* ─── Helpers ───────────────────────────────────────────────────────────────── */
@@ -91,13 +92,17 @@ export default function TalentCarousel({
         const computeLayout = () => {
             const cW = container.clientWidth;
             const cH = container.clientHeight;
+            const isMobile = cW < 768;
+            const gap = isMobile ? GAP_MOBILE : GAP_DESKTOP;
 
-            // Width-driven: banners fill ~42% of container width (proper banner proportions)
+            // Width-driven: mobile fills ~85% for prominent display, desktop ~42%
             // Capped at 620px so they don't get absurdly large on ultrawide monitors
-            layout.itemW = Math.min(Math.round(cW * 0.42), 620);
+            layout.itemW = isMobile
+                ? Math.round(cW * 0.85)
+                : Math.min(Math.round(cW * 0.42), 620);
             // Height derived from 5:3 aspect ratio
             layout.itemH = Math.round(layout.itemW / ASPECT);
-            layout.stride = layout.itemH + GAP;
+            layout.stride = layout.itemH + gap;
             layout.totalTrack = N * layout.stride;
             layout.centerSlot = cH / 2 - layout.itemH / 2;
 

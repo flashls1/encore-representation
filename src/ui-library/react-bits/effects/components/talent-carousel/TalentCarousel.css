@@ -47,3 +47,13 @@
   pointer-events: none;
   -webkit-user-drag: none;
 }
+
+/* ─── Mobile refinements ───────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .tc-v-item {
+    border-radius: 8px;
+    border-width: 1.5px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+  }
+}

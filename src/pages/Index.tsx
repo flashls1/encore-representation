@@ -1,6 +1,5 @@
 import { useRef, useEffect, useMemo, useCallback, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navigation from "@/components/Navigation";
@@ -15,45 +14,7 @@ import ShinyText from "@/ui-library/react-bits/effects/text-animations/shiny-tex
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ─── Mobile talent card (grid layout, unchanged) ────────────────────────────
-const TalentCard = ({ talent, index }: { talent: Talent; index: number }) => {
-  const initials = talent.name.split(' ').map(w => w[0]).join('').slice(0, 2);
 
-  return (
-    <Link to={`/talent/${talent.id}`}>
-      <motion.div
-        className="group relative block overflow-hidden rounded-xl"
-        style={{ border: '1.5px solid #D4AF37', backgroundColor: '#0A0A0A' }}
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-30px' }}
-        transition={{ duration: 0.5, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
-        whileHover={{ scale: 1.03, borderColor: 'rgba(212, 175, 55, 0.4)' }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <div className="relative w-full pb-[100%] overflow-hidden">
-          {talent.headshot_url ? (
-            <img
-              src={talent.headshot_url}
-              alt={talent.name}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              loading="lazy"
-            />
-          ) : (
-            <div
-              className="absolute inset-0 flex items-center justify-center"
-              style={{ backgroundColor: '#111' }}
-            >
-              <span className="text-4xl sm:text-5xl font-bold opacity-20" style={{ color: '#D4AF37' }}>
-                {initials}
-              </span>
-            </div>
-          )}
-        </div>
-      </motion.div>
-    </Link>
-  );
-};
 
 // ─── Desktop Talent Carousel Section ─────────────────────────────────────────
 const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
@@ -98,9 +59,9 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
   if (!carouselItems.length) return null;
 
   return (
-    <section className="hidden md:block px-[10px] mt-2">
-      {/* Heading — outside the container with ample spacing */}
-      <div className="text-center mb-8">
+    <section className="px-2 md:px-[10px] mt-2">
+      {/* Heading — responsive sizing */}
+      <div className="text-center mb-4 md:mb-8">
         {isBlurred ? (
           <BlurText
             text="Talent Roster"
@@ -109,11 +70,11 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
             direction={blurConfig.direction as 'top' | 'bottom'}
             stepDuration={blurConfig.stepDuration}
             threshold={blurConfig.threshold}
-            className="font-orbitron text-3xl md:text-4xl tracking-wider font-bold mb-3"
+            className="font-orbitron text-2xl md:text-4xl tracking-wider font-bold mb-2 md:mb-3"
             onAnimationComplete={() => setIsBlurred(false)}
           />
         ) : (
-          <h2 className="font-orbitron text-3xl md:text-4xl tracking-wider font-bold mb-3">
+          <h2 className="font-orbitron text-2xl md:text-4xl tracking-wider font-bold mb-2 md:mb-3">
             <ShinyText
               text="Talent Roster"
               disabled={shinyConfig.disabled}
@@ -126,18 +87,18 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
             />
           </h2>
         )}
-        <div className="w-16 h-[2px] mx-auto mt-2" style={{ backgroundColor: '#D4AF37' }} />
+        <div className="w-12 md:w-16 h-[2px] mx-auto mt-1 md:mt-2" style={{ backgroundColor: '#D4AF37' }} />
       </div>
 
-      {/* Carousel container */}
+      {/* Carousel container — responsive height */}
       <div
         ref={containerRef}
         className="relative mx-auto overflow-hidden"
         style={{
-          width: 'calc(100vw - 20px)',
-          height: '625px',
-          borderRadius: '16px',
-          border: '2px solid #D4AF37',
+          width: 'calc(100vw - 16px)',
+          height: 'clamp(380px, 65vh, 625px)',
+          borderRadius: '12px',
+          border: '1.5px solid #D4AF37',
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
         }}
       >
@@ -237,7 +198,6 @@ const useDesktopSnapScroll = (sectionRefs: React.RefObject<HTMLElement>[]) => {
 // ─── Main page ─────────────────────────────────────────────────────────────────
 const Index = () => {
   const { data: talents, isLoading } = useTalents();
-  const headingRef = useRef<HTMLDivElement>(null);
 
   // Section refs for desktop snap-scroll
   const heroRef = useRef<HTMLDivElement>(null!);
@@ -246,14 +206,6 @@ const Index = () => {
 
   // Desktop snap scroll between sections
   useDesktopSnapScroll([heroRef, talentRef, footerRef]);
-
-  useEffect(() => {
-    if (!headingRef.current) return;
-    gsap.fromTo(headingRef.current,
-      { y: 60, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: headingRef.current, start: 'top 85%', toggleActions: 'play none none reverse' } }
-    );
-  }, []);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0A0A0A' }}>
@@ -271,49 +223,7 @@ const Index = () => {
           <TalentCarouselSection talents={talents} />
         )}
 
-        {/* Mobile: Original grid layout (hidden on desktop) */}
-        <section className="md:hidden py-6 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div ref={headingRef} className="text-center mb-6">
-              <h2
-                className="font-orbitron text-3xl sm:text-4xl mb-3 tracking-wider font-bold"
-                style={{ color: '#D4AF37' }}
-              >
-                Talent Roster
-              </h2>
-              <div className="w-16 h-[2px] mx-auto mt-4" style={{ backgroundColor: '#D4AF37' }} />
-            </div>
 
-            {isLoading ? (
-              <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="pb-[100%] rounded-xl animate-pulse" style={{ backgroundColor: '#1a1a1a' }} />
-                ))}
-              </div>
-            ) : talents && talents.length > 0 ? (
-              <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                {talents.map((talent, i) => (
-                  <TalentCard key={talent.id} talent={talent} index={i} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <div
-                  className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4"
-                  style={{ backgroundColor: 'rgba(212, 175, 55, 0.1)' }}
-                >
-                  <span className="text-3xl" style={{ color: '#D4AF37' }}>★</span>
-                </div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: '#ffffff' }}>
-                  Roster Coming Soon
-                </h3>
-                <p style={{ color: '#888' }}>
-                  Our talent roster is being curated. Check back soon!
-                </p>
-              </div>
-            )}
-          </div>
-        </section>
       </div>
 
       {/* Section 2: Footer — 80px spacing from talent section */}
