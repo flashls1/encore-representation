@@ -61,36 +61,6 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
 
   return (
     <section className="px-3 md:px-[10px] mt-2">
-      {/* Heading — responsive sizing */}
-      <div className="text-center mb-4 md:mb-8">
-        {isBlurred ? (
-          <BlurText
-            text="Talent Roster"
-            delay={blurConfig.delay}
-            animateBy={blurConfig.animateBy as 'words' | 'letters'}
-            direction={blurConfig.direction as 'top' | 'bottom'}
-            stepDuration={blurConfig.stepDuration}
-            threshold={blurConfig.threshold}
-            className="font-orbitron text-2xl md:text-4xl tracking-wider font-bold mb-2 md:mb-3"
-            onAnimationComplete={() => setIsBlurred(false)}
-          />
-        ) : (
-          <h2 className="font-orbitron text-2xl md:text-4xl tracking-wider font-bold mb-2 md:mb-3">
-            <ShinyText
-              text="Talent Roster"
-              disabled={shinyConfig.disabled}
-              speed={shinyConfig.speed}
-              color={shinyConfig.color}
-              shineColor={shinyConfig.shineColor}
-              spread={shinyConfig.spread}
-              yoyo={shinyConfig.yoyo}
-              direction={shinyConfig.direction as 'left' | 'right'}
-            />
-          </h2>
-        )}
-        <div className="w-12 md:w-16 h-[2px] mx-auto mt-1 md:mt-2" style={{ backgroundColor: '#D4AF37' }} />
-      </div>
-
       {/* Carousel container — responsive, matches hero gold box on mobile */}
       <div
         ref={containerRef}
@@ -115,6 +85,36 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
             autoScrollSpeed={0.8}
             onItemClick={handleItemClick}
           />
+        </div>
+
+        {/* Layer 2: Heading overlay — inside the container at the top */}
+        <div className="absolute top-3 md:top-5 left-0 right-0 z-20 text-center pointer-events-none">
+          {isBlurred ? (
+            <BlurText
+              text="Talent Roster"
+              delay={blurConfig.delay}
+              animateBy={blurConfig.animateBy as 'words' | 'letters'}
+              direction={blurConfig.direction as 'top' | 'bottom'}
+              stepDuration={blurConfig.stepDuration}
+              threshold={blurConfig.threshold}
+              className="font-orbitron text-2xl md:text-4xl tracking-wider font-bold mb-2 md:mb-3"
+              onAnimationComplete={() => setIsBlurred(false)}
+            />
+          ) : (
+            <h2 className="font-orbitron text-2xl md:text-4xl tracking-wider font-bold mb-2 md:mb-3">
+              <ShinyText
+                text="Talent Roster"
+                disabled={shinyConfig.disabled}
+                speed={shinyConfig.speed}
+                color={shinyConfig.color}
+                shineColor={shinyConfig.shineColor}
+                spread={shinyConfig.spread}
+                yoyo={shinyConfig.yoyo}
+                direction={shinyConfig.direction as 'left' | 'right'}
+              />
+            </h2>
+          )}
+          <div className="w-12 md:w-16 h-[2px] mx-auto mt-1 md:mt-2" style={{ backgroundColor: '#D4AF37' }} />
         </div>
       </div>
     </section>
