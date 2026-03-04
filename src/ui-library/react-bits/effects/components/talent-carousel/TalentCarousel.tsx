@@ -109,6 +109,7 @@ export default function TalentCarousel({
             // Apply sizes to DOM
             itemRefs.current.forEach(el => {
                 if (!el) return;
+                el.style.width = `${layout.itemW}px`;
                 el.style.height = `${layout.itemH}px`;
             });
         };

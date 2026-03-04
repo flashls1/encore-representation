@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,8 @@ import {
     type EffectEntry,
     type PropConfig,
 } from '@/ui-library/react-bits/effects/_registry';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ─── Category display config ────────────────────────────────────────────────
 
@@ -34,23 +36,30 @@ interface EffectCardProps {
     effect: EffectEntry;
 }
 
-const UI_EFFECTS_STORAGE_KEY = 'encore_ui_effects';
-
 const EffectCard = ({ effect }: EffectCardProps) => {
+    const queryClient = useQueryClient();
     const [expanded, setExpanded] = useState(false);
-    const [props, setProps] = useState<Record<string, any>>(() => {
-        // Merge defaults with any saved overrides
-        const defaults = getDefaultProps(effect.id);
-        try {
-            const raw = localStorage.getItem(UI_EFFECTS_STORAGE_KEY);
-            const all = raw ? JSON.parse(raw) : {};
-            return { ...defaults, ...(all[effect.id] || {}) };
-        } catch {
-            return defaults;
-        }
-    });
+    const [props, setProps] = useState<Record<string, any>>(() => getDefaultProps(effect.id));
     const [copied, setCopied] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    // Load saved overrides from Supabase on mount
+    useEffect(() => {
+        (async () => {
+            try {
+                const { data } = await (supabase as any)
+                    .from('ui_effect_overrides')
+                    .select('props')
+                    .eq('effect_id', effect.id)
+                    .maybeSingle();
+                if (data?.props) {
+                    const defaults = getDefaultProps(effect.id);
+                    setProps({ ...defaults, ...data.props });
+                }
+            } catch { /* use defaults */ }
+        })();
+    }, [effect.id]);
 
     const updateProp = useCallback((key: string, value: any) => {
         setProps(prev => ({ ...prev, [key]: value }));
@@ -60,18 +69,26 @@ const EffectCard = ({ effect }: EffectCardProps) => {
         setProps(getDefaultProps(effect.id));
     }, [effect.id]);
 
-    const saveProps = useCallback(() => {
+    const saveProps = useCallback(async () => {
+        setSaving(true);
         try {
-            const raw = localStorage.getItem(UI_EFFECTS_STORAGE_KEY);
-            const all = raw ? JSON.parse(raw) : {};
-            all[effect.id] = props;
-            localStorage.setItem(UI_EFFECTS_STORAGE_KEY, JSON.stringify(all));
+            const { error } = await (supabase as any)
+                .from('ui_effect_overrides')
+                .upsert(
+                    { effect_id: effect.id, props, updated_at: new Date().toISOString() },
+                    { onConflict: 'effect_id' }
+                );
+            if (error) throw error;
+            // Invalidate the react-query cache so frontend picks up changes
+            queryClient.invalidateQueries({ queryKey: ['ui-effect-overrides'] });
             setSaved(true);
             setTimeout(() => setSaved(false), 2000);
         } catch (err) {
             console.error('Failed to save UI effect config:', err);
+        } finally {
+            setSaving(false);
         }
-    }, [effect.id, props]);
+    }, [effect.id, props, queryClient]);
 
     const copyProps = useCallback(() => {
         const code = `<${effect.name.replace(/\s/g, '')}\n${Object.entries(props)
@@ -155,10 +172,11 @@ const EffectCard = ({ effect }: EffectCardProps) => {
                             <Button
                                 size="sm"
                                 onClick={saveProps}
+                                disabled={saving}
                                 style={{ backgroundColor: saved ? '#16a34a' : 'var(--accent)', color: '#000' }}
                             >
                                 {saved ? <Check className="h-3 w-3 mr-1" /> : <Save className="h-3 w-3 mr-1" />}
-                                {saved ? 'Saved!' : 'Save'}
+                                {saving ? 'Saving...' : saved ? 'Saved!' : 'Save'}
                             </Button>
                         </div>
                     </div>

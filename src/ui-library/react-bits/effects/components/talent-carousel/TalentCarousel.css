@@ -42,8 +42,9 @@
 
 .tc-v-item img {
   display: block;
+  width: 100%;
   height: 100%;
-  width: auto;
+  object-fit: cover;
   pointer-events: none;
   -webkit-user-drag: none;
 }

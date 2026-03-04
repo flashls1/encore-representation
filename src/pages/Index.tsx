@@ -59,7 +59,7 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
   if (!carouselItems.length) return null;
 
   return (
-    <section className="px-2 md:px-[10px] mt-2">
+    <section className="px-3 md:px-[10px] mt-2">
       {/* Heading — responsive sizing */}
       <div className="text-center mb-4 md:mb-8">
         {isBlurred ? (
@@ -90,14 +90,12 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
         <div className="w-12 md:w-16 h-[2px] mx-auto mt-1 md:mt-2" style={{ backgroundColor: '#D4AF37' }} />
       </div>
 
-      {/* Carousel container — responsive height */}
+      {/* Carousel container — responsive, matches hero gold box on mobile */}
       <div
         ref={containerRef}
-        className="relative mx-auto overflow-hidden"
+        className="relative w-full overflow-hidden rounded-xl md:rounded-2xl"
         style={{
-          width: 'calc(100vw - 16px)',
           height: 'clamp(380px, 65vh, 625px)',
-          borderRadius: '12px',
           border: '1.5px solid #D4AF37',
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
         }}

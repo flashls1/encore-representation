@@ -10,26 +10,35 @@ import type {
 } from '@/types/database';
 
 // ============================================================================
-// UI Effects Configuration
+// UI Effects Configuration (persisted in Supabase ui_effect_overrides table)
 // ============================================================================
-const UI_EFFECTS_STORAGE_KEY = 'encore_ui_effects';
 
-/** Read all saved overrides from localStorage */
-const getSavedOverrides = (): Record<string, Record<string, any>> => {
-  try {
-    const raw = localStorage.getItem(UI_EFFECTS_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
+/** Fetch all effect overrides from Supabase (cached, shared across hooks) */
+const useUIEffectOverrides = () => {
+  return useQuery({
+    queryKey: ['ui-effect-overrides'],
+    queryFn: async (): Promise<Record<string, Record<string, any>>> => {
+      const { data, error } = await (supabase as any)
+        .from('ui_effect_overrides')
+        .select('effect_id, props');
+      if (error) throw error;
+      const map: Record<string, Record<string, any>> = {};
+      (data || []).forEach((row: any) => {
+        map[row.effect_id] = row.props || {};
+      });
+      return map;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 };
 
 export const useUIEffect = (effectId: string) => {
+  const { data: overridesMap, isLoading } = useUIEffectOverrides();
   const defaults = getDefaultProps(effectId);
-  const overrides = getSavedOverrides()[effectId] || {};
+  const overrides = overridesMap?.[effectId] || {};
   return {
     config: { ...defaults, ...overrides },
-    isLoading: false,
+    isLoading,
   };
 };
 
