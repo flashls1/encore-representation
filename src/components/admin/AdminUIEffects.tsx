@@ -8,7 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import {
-    Sparkles, ChevronDown, ChevronRight, ExternalLink, Package, RotateCcw, Copy, Check,
+    Sparkles, ChevronDown, ChevronRight, ExternalLink, Package, RotateCcw, Copy, Check, Save,
 } from 'lucide-react';
 import {
     UI_EFFECTS_REGISTRY,
@@ -34,10 +34,23 @@ interface EffectCardProps {
     effect: EffectEntry;
 }
 
+const UI_EFFECTS_STORAGE_KEY = 'encore_ui_effects';
+
 const EffectCard = ({ effect }: EffectCardProps) => {
     const [expanded, setExpanded] = useState(false);
-    const [props, setProps] = useState<Record<string, any>>(() => getDefaultProps(effect.id));
+    const [props, setProps] = useState<Record<string, any>>(() => {
+        // Merge defaults with any saved overrides
+        const defaults = getDefaultProps(effect.id);
+        try {
+            const raw = localStorage.getItem(UI_EFFECTS_STORAGE_KEY);
+            const all = raw ? JSON.parse(raw) : {};
+            return { ...defaults, ...(all[effect.id] || {}) };
+        } catch {
+            return defaults;
+        }
+    });
     const [copied, setCopied] = useState(false);
+    const [saved, setSaved] = useState(false);
 
     const updateProp = useCallback((key: string, value: any) => {
         setProps(prev => ({ ...prev, [key]: value }));
@@ -46,6 +59,19 @@ const EffectCard = ({ effect }: EffectCardProps) => {
     const resetAll = useCallback(() => {
         setProps(getDefaultProps(effect.id));
     }, [effect.id]);
+
+    const saveProps = useCallback(() => {
+        try {
+            const raw = localStorage.getItem(UI_EFFECTS_STORAGE_KEY);
+            const all = raw ? JSON.parse(raw) : {};
+            all[effect.id] = props;
+            localStorage.setItem(UI_EFFECTS_STORAGE_KEY, JSON.stringify(all));
+            setSaved(true);
+            setTimeout(() => setSaved(false), 2000);
+        } catch (err) {
+            console.error('Failed to save UI effect config:', err);
+        }
+    }, [effect.id, props]);
 
     const copyProps = useCallback(() => {
         const code = `<${effect.name.replace(/\s/g, '')}\n${Object.entries(props)
@@ -125,6 +151,14 @@ const EffectCard = ({ effect }: EffectCardProps) => {
                             <Button variant="outline" size="sm" onClick={copyProps}>
                                 {copied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
                                 {copied ? 'Copied!' : 'Copy JSX'}
+                            </Button>
+                            <Button
+                                size="sm"
+                                onClick={saveProps}
+                                style={{ backgroundColor: saved ? '#16a34a' : 'var(--accent)', color: '#000' }}
+                            >
+                                {saved ? <Check className="h-3 w-3 mr-1" /> : <Save className="h-3 w-3 mr-1" />}
+                                {saved ? 'Saved!' : 'Save'}
                             </Button>
                         </div>
                     </div>

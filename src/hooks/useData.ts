@@ -12,11 +12,23 @@ import type {
 // ============================================================================
 // UI Effects Configuration
 // ============================================================================
+const UI_EFFECTS_STORAGE_KEY = 'encore_ui_effects';
+
+/** Read all saved overrides from localStorage */
+const getSavedOverrides = (): Record<string, Record<string, any>> => {
+  try {
+    const raw = localStorage.getItem(UI_EFFECTS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+};
+
 export const useUIEffect = (effectId: string) => {
-  // For now, we pull the default config directly from the registry.
-  // In the future, this can be hooked up to Supabase to fetch admin overrides.
+  const defaults = getDefaultProps(effectId);
+  const overrides = getSavedOverrides()[effectId] || {};
   return {
-    config: getDefaultProps(effectId),
+    config: { ...defaults, ...overrides },
     isLoading: false,
   };
 };
