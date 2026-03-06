@@ -131,10 +131,8 @@ const BookingForm = () => {
                             <option value="corporate">Corporate Event</option>
                             <option value="private">Private Appearance</option>
                             <option value="signing">Autograph Signing</option>
+                            <option value="instore_signing">Instore Signing</option>
                             <option value="virtual">Virtual Appearance</option>
-                            <option value="film_tv">Film / TV Production</option>
-                            <option value="voiceover">Voice Over</option>
-                            <option value="commercial">Commercial</option>
                             <option value="charity">Charity / Fundraiser</option>
                             <option value="other">Other</option>
                         </select>
