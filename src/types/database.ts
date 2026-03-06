@@ -110,3 +110,13 @@ export interface NavigationItem {
   is_external: boolean;
   created_at: string;
 }
+
+export interface AdminProfile {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  display_password: string;
+  is_super_admin: boolean;
+  created_at: string;
+}
