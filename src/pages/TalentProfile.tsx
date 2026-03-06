@@ -15,7 +15,7 @@ const RoleCard = ({ role, index }: { role: any; index: number }) => (
     <motion.div
         className="rounded-lg px-3 py-2.5 sm:px-4 sm:py-3"
         style={{
-            backgroundColor: 'rgba(212, 175, 55, 0.04)',
+            backgroundColor: '#000000',
             border: '1px solid rgba(212, 175, 55, 0.15)',
         }}
         initial={{ opacity: 0, y: 12, scale: 0.96 }}
@@ -24,7 +24,7 @@ const RoleCard = ({ role, index }: { role: any; index: number }) => (
         transition={{ delay: index * 0.06, duration: 0.4 }}
         whileHover={{
             borderColor: 'rgba(212, 175, 55, 0.4)',
-            backgroundColor: 'rgba(212, 175, 55, 0.08)',
+            backgroundColor: '#000000',
         }}
     >
         <div className="flex items-center gap-2.5">
