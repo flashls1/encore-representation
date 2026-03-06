@@ -94,12 +94,19 @@ export default function TalentCarousel({
             const isMobile = cW < 768;
             const gap = isMobile ? GAP_MOBILE : GAP_DESKTOP;
 
-            // Height-driven: items fill ~45% of the container height
-            layout.itemH = Math.round(cH * 0.45);
-            // Width: mobile fills ~85%, desktop ~42%, capped at 620px
+            // Read natural aspect ratio from first loaded image
+            const firstImg = itemRefs.current[0]?.querySelector('img') as HTMLImageElement | null;
+            let naturalRatio = 3; // safe fallback until image loads
+            if (firstImg && firstImg.naturalWidth && firstImg.naturalHeight) {
+                naturalRatio = firstImg.naturalWidth / firstImg.naturalHeight;
+            }
+
+            // Width: mobile ~95%, desktop ~50%, capped at 744px  (20% larger than previous)
             layout.itemW = isMobile
-                ? Math.round(cW * 0.85)
-                : Math.min(Math.round(cW * 0.42), 620);
+                ? Math.round(cW * 0.95)
+                : Math.min(Math.round(cW * 0.50), 744);
+            // Height derived from image's natural ratio — no forced aspect
+            layout.itemH = Math.round(layout.itemW / naturalRatio);
             layout.stride = layout.itemH + gap;
             layout.totalTrack = N * layout.stride;
             layout.centerSlot = cH / 2 - layout.itemH / 2;
@@ -113,6 +120,17 @@ export default function TalentCarousel({
         };
 
         computeLayout();
+
+        // Recalculate once first image loads its natural dimensions
+        const firstImg = itemRefs.current[0]?.querySelector('img') as HTMLImageElement | null;
+        const onImgLoad = () => computeLayout();
+        if (firstImg) {
+            if (firstImg.complete && firstImg.naturalWidth) {
+                computeLayout(); // already loaded
+            } else {
+                firstImg.addEventListener('load', onImgLoad);
+            }
+        }
 
         // RAF loop
         const update = () => {
@@ -220,6 +238,7 @@ export default function TalentCarousel({
             container.removeEventListener('pointermove', onPointerMove);
             container.removeEventListener('pointerup', onPointerUp);
             container.removeEventListener('pointercancel', onPointerUp);
+            if (firstImg) firstImg.removeEventListener('load', onImgLoad);
         };
     }, [N, autoScrollSpeed]);
 

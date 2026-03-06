@@ -89,7 +89,8 @@ export interface AboutContent {
 
 export interface ContentSection {
     id: string;
-    type: 'text' | 'image' | 'video';
+    type: 'text' | 'image' | 'video' | 'image-text' | 'owner-hero';
+    title?: string;
     content: string;
     media_url: string;
 }
