@@ -105,9 +105,12 @@ const TimelineNode = ({ event, index, isLast }: { event: any; index: number; isL
                         border: '1px solid rgba(212, 175, 55, 0.1)',
                     }}
                 >
-                    {/* Image — 16:9 on desktop, 1:1 on mobile */}
+                    {/* Image — 1:1 square with gold border */}
                     {event.image_url && (
-                        <div className="relative w-full pb-[56.25%] sm:pb-[50%] overflow-hidden">
+                        <div
+                            className="relative w-full pb-[100%] overflow-hidden"
+                            style={{ border: '1.5px solid rgba(212, 175, 55, 0.35)' }}
+                        >
                             <img
                                 src={event.image_url}
                                 alt={event.title}
@@ -116,7 +119,7 @@ const TimelineNode = ({ event, index, isLast }: { event: any; index: number; isL
                             />
                             <div
                                 className="absolute inset-0"
-                                style={{ background: 'linear-gradient(to top, rgba(10,10,10,0.6) 0%, transparent 50%)' }}
+                                style={{ background: 'linear-gradient(to top, rgba(10,10,10,0.6) 0%, transparent 40%)' }}
                             />
                         </div>
                     )}
