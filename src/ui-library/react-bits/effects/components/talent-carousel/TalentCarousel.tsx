@@ -1,7 +1,7 @@
 /**
  * TalentCarousel — Vertical Banner Carousel
  *
- * CSS/DOM-based vertical carousel for talent banners (5:3 aspect ratio).
+ * CSS/DOM-based vertical carousel for talent banners.
  *   - 3 items visible: center crisp, top/bottom blurred + faded
  *   - Continuous auto-scroll (configurable speed)
  *   - Click center item to navigate
@@ -30,7 +30,6 @@ export interface TalentCarouselProps {
 
 /* ─── Constants ─────────────────────────────────────────────────────────────── */
 
-const ASPECT = 5 / 3;
 const GAP_DESKTOP = 24;
 const GAP_MOBILE = 16;
 const MIN_EFFECTIVE = 6; // duplicated items for seamless wrapping
@@ -95,13 +94,12 @@ export default function TalentCarousel({
             const isMobile = cW < 768;
             const gap = isMobile ? GAP_MOBILE : GAP_DESKTOP;
 
-            // Width-driven: mobile fills ~85% for prominent display, desktop ~42%
-            // Capped at 620px so they don't get absurdly large on ultrawide monitors
+            // Height-driven: items fill ~45% of the container height
+            layout.itemH = Math.round(cH * 0.45);
+            // Width: mobile fills ~85%, desktop ~42%, capped at 620px
             layout.itemW = isMobile
                 ? Math.round(cW * 0.85)
                 : Math.min(Math.round(cW * 0.42), 620);
-            // Height derived from 5:3 aspect ratio
-            layout.itemH = Math.round(layout.itemW / ASPECT);
             layout.stride = layout.itemH + gap;
             layout.totalTrack = N * layout.stride;
             layout.centerSlot = cH / 2 - layout.itemH / 2;
