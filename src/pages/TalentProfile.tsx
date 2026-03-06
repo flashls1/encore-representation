@@ -27,13 +27,16 @@ const RoleCard = ({ role, index }: { role: any; index: number }) => (
             backgroundColor: '#000000',
         }}
     >
-        <div className="flex items-center gap-2.5">
-            {/* Left: Mic icon */}
-            <div
-                className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: 'rgba(212, 175, 55, 0.12)' }}
-            >
-                <Mic className="h-3.5 w-3.5" style={{ color: '#D4AF37' }} />
+        <div className="flex items-center gap-4">
+            {/* Left: Mic icon + "Voice" label */}
+            <div className="flex flex-col items-center flex-shrink-0">
+                <div
+                    className="w-7 h-7 rounded-md flex items-center justify-center"
+                    style={{ backgroundColor: 'rgba(212, 175, 55, 0.12)' }}
+                >
+                    <Mic className="h-3.5 w-3.5" style={{ color: '#D4AF37' }} />
+                </div>
+                <span className="text-[9px] uppercase tracking-wider font-medium mt-1" style={{ color: 'rgba(212, 175, 55, 0.5)' }}>Voice</span>
             </div>
 
             {/* Center: Character info */}
@@ -53,7 +56,7 @@ const RoleCard = ({ role, index }: { role: any; index: number }) => (
                 <img
                     src={role.image_url}
                     alt={role.character_name}
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover flex-shrink-0"
+                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg object-cover flex-shrink-0"
                     style={{ border: '1.5px solid rgba(212, 175, 55, 0.35)' }}
                 />
             )}
