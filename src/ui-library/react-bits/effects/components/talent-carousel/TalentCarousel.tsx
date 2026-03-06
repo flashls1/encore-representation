@@ -193,7 +193,7 @@ export default function TalentCarousel({
             window.clearTimeout(resumeTimer.current);
             dragStartRef.current = { y: e.clientY, scroll: scroll.target };
             lastDragYRef.current = e.clientY;
-            container.setPointerCapture(e.pointerId);
+            try { container.setPointerCapture(e.pointerId); } catch { /* noop */ }
         };
 
         const onPointerMove = (e: PointerEvent) => {
@@ -211,22 +211,34 @@ export default function TalentCarousel({
             if (!isDownRef.current) return;
             isDownRef.current = false;
             didDragRef.current = dragDistRef.current > 5;
-            // Momentum
+            // Momentum — then resume auto-scroll
             scroll.target += dragVelocityRef.current * 60;
             resumeTimer.current = window.setTimeout(() => {
                 dragVelocityRef.current = 0;
-            }, 800);
+            }, 400);
             try { container.releasePointerCapture(e.pointerId); } catch { /* noop */ }
+        };
+
+        // Safety net: if pointer leaves the container without a proper pointerup
+        const onPointerLeave = () => {
+            if (isDownRef.current) {
+                isDownRef.current = false;
+                didDragRef.current = dragDistRef.current > 5;
+                resumeTimer.current = window.setTimeout(() => {
+                    dragVelocityRef.current = 0;
+                }, 400);
+            }
         };
 
         const onResize = () => computeLayout();
 
-        // Bind
+        // Bind — pointerup on WINDOW so it always fires, even if cursor leaves container
         window.addEventListener('resize', onResize);
         container.addEventListener('pointerdown', onPointerDown);
-        container.addEventListener('pointermove', onPointerMove);
-        container.addEventListener('pointerup', onPointerUp);
-        container.addEventListener('pointercancel', onPointerUp);
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('pointercancel', onPointerUp);
+        container.addEventListener('pointerleave', onPointerLeave);
 
         rafRef.current = requestAnimationFrame(update);
 
@@ -235,9 +247,10 @@ export default function TalentCarousel({
             window.clearTimeout(resumeTimer.current);
             window.removeEventListener('resize', onResize);
             container.removeEventListener('pointerdown', onPointerDown);
-            container.removeEventListener('pointermove', onPointerMove);
-            container.removeEventListener('pointerup', onPointerUp);
-            container.removeEventListener('pointercancel', onPointerUp);
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', onPointerUp);
+            window.removeEventListener('pointercancel', onPointerUp);
+            container.removeEventListener('pointerleave', onPointerLeave);
             if (firstImg) firstImg.removeEventListener('load', onImgLoad);
         };
     }, [N, autoScrollSpeed]);
