@@ -121,7 +121,8 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
         <div className="absolute inset-0 z-10">
           <TalentCarousel
             items={carouselItems}
-            autoScrollSpeed={0.8}
+            desktopSpeed={carouselConfig.desktopSpeed}
+            mobileSpeed={carouselConfig.mobileSpeed}
             onItemClick={handleItemClick}
           />
         </div>

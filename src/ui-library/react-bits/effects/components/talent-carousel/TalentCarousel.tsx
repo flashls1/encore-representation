@@ -23,7 +23,8 @@ interface CarouselItem {
 
 export interface TalentCarouselProps {
     items: CarouselItem[];
-    autoScrollSpeed?: number;
+    desktopSpeed?: number;
+    mobileSpeed?: number;
     onItemClick?: (id: string) => void;
     className?: string;
 }
@@ -44,7 +45,8 @@ function lerp(a: number, b: number, t: number): number {
 
 export default function TalentCarousel({
     items,
-    autoScrollSpeed = 3,
+    desktopSpeed = 1.5,
+    mobileSpeed = 1.0,
     onItemClick,
     className = '',
 }: TalentCarouselProps) {
@@ -60,6 +62,7 @@ export default function TalentCarousel({
     const resumeTimer = useRef(0);
     const centerIdxRef = useRef(0);
     const didDragRef = useRef(false);
+    const speedRef = useRef(desktopSpeed); // live speed ref for RAF loop
 
     // Mutable layout values — recalculated on resize
     const layoutRef = useRef({
@@ -93,6 +96,9 @@ export default function TalentCarousel({
             const cH = container.clientHeight;
             const isMobile = cW < 768;
             const gap = isMobile ? GAP_MOBILE : GAP_DESKTOP;
+
+            // Update speed ref based on current viewport
+            speedRef.current = isMobile ? mobileSpeed : desktopSpeed;
 
             // Read natural aspect ratio from first loaded image
             const firstImg = itemRefs.current[0]?.querySelector('img') as HTMLImageElement | null;
@@ -138,7 +144,7 @@ export default function TalentCarousel({
 
             // Auto-scroll when not dragging
             if (!isDownRef.current && dragVelocityRef.current === 0) {
-                scroll.target += autoScrollSpeed * 0.5;
+                scroll.target += speedRef.current * 0.5;
             }
 
             // Lerp towards target
@@ -253,7 +259,7 @@ export default function TalentCarousel({
             container.removeEventListener('pointerleave', onPointerLeave);
             if (firstImg) firstImg.removeEventListener('load', onImgLoad);
         };
-    }, [N, autoScrollSpeed]);
+    }, [N, desktopSpeed, mobileSpeed]);
 
     /* ─── Click handler ───────────────────────────────────────────────────────── */
 
