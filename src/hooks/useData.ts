@@ -92,7 +92,7 @@ export const useTalents = (featuredOnly: boolean = false) => {
         .select(`
           *,
           talent_roles (
-            id, talent_id, role_name, character_name, image_url
+            id, talent_id, role_name, character_name, image_url, show_color, bg_image_url
           )
         `)
         .order('sort_order', { ascending: true })
@@ -119,7 +119,7 @@ export const useTalent = (id: string) => {
         .select(`
           *,
           talent_roles (
-            id, talent_id, role_name, character_name, image_url
+            id, talent_id, role_name, character_name, image_url, show_color, bg_image_url
           ),
           talent_images (
             id, talent_id, image_url, caption, sort_order

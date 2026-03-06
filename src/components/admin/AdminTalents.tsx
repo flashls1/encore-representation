@@ -147,7 +147,7 @@ const RolesManager = ({
     talentId,
 }: {
     roles: TalentRole[];
-    onAdd: (roleName: string, characterName: string, imageUrl: string | null) => void;
+    onAdd: (roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null) => void;
     onRemove: (roleId: string) => void;
     talentId?: string;
 }) => {
@@ -155,7 +155,11 @@ const RolesManager = ({
     const [newChar, setNewChar] = useState('');
     const [newRole, setNewRole] = useState('');
     const [newImage, setNewImage] = useState<string | null>(null);
+    const [newShowColor, setNewShowColor] = useState<string | null>(null);
+    const [newBgImage, setNewBgImage] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
+    const [uploadingBg, setUploadingBg] = useState(false);
+    const [showColorPicker, setShowColorPicker] = useState(false);
     const { toast } = useToast();
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,12 +182,34 @@ const RolesManager = ({
         }
     };
 
+    const handleBgImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploadingBg(true);
+        try {
+            const ext = file.name.split('.').pop();
+            const fileName = `role-bg-${Date.now()}.${ext}`;
+            const { data, error } = await supabase.storage
+                .from('talent-media')
+                .upload(fileName, file, { upsert: true });
+            if (error) throw error;
+            const { data: urlData } = supabase.storage.from('talent-media').getPublicUrl(data.path);
+            setNewBgImage(urlData.publicUrl);
+        } catch (err: any) {
+            toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+        } finally {
+            setUploadingBg(false);
+        }
+    };
+
     const handleAdd = () => {
         if (!newChar.trim()) return;
-        onAdd(newRole.trim(), newChar.trim(), newImage);
+        onAdd(newRole.trim(), newChar.trim(), newImage, newShowColor, newBgImage);
         setNewChar('');
         setNewRole('');
         setNewImage(null);
+        setNewShowColor(null);
+        setNewBgImage(null);
         setShowPopup(false);
     };
 
@@ -228,7 +254,7 @@ const RolesManager = ({
                                     {role.character_name}
                                 </span>
                                 {role.role_name && (
-                                    <span className="ml-1.5" style={{ color: 'var(--text-muted)' }}>
+                                    <span className="ml-1.5" style={{ color: role.show_color || 'var(--text-muted)' }}>
                                         — {role.role_name}
                                     </span>
                                 )}
@@ -275,19 +301,52 @@ const RolesManager = ({
                                 />
                             </div>
 
-                            {/* Show / Series */}
+                            {/* Show / Series + Color */}
                             <div>
                                 <label className="text-xs uppercase tracking-wider font-medium block mb-1.5" style={{ color: '#999' }}>
                                     Show / Series
                                 </label>
-                                <input
-                                    type="text"
-                                    placeholder="e.g. Dragon Ball Z, Cowboy Bebop..."
-                                    value={newRole}
-                                    onChange={(e) => setNewRole(e.target.value)}
-                                    className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                                    style={{ backgroundColor: '#111', border: '1px solid #333', color: '#fff' }}
-                                />
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. Dragon Ball Z, Cowboy Bebop..."
+                                        value={newRole}
+                                        onChange={(e) => setNewRole(e.target.value)}
+                                        className="flex-1 px-3 py-2.5 rounded-lg text-sm outline-none"
+                                        style={{ backgroundColor: '#111', border: '1px solid #333', color: newShowColor || '#fff' }}
+                                    />
+                                    <div className="relative">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowColorPicker(!showColorPicker)}
+                                            className="h-full px-3 rounded-lg flex items-center gap-1.5 text-xs font-medium"
+                                            style={{ border: '1px solid #333', backgroundColor: '#111', color: newShowColor || '#888' }}
+                                            title="Show name color"
+                                        >
+                                            <Palette className="h-3.5 w-3.5" />
+                                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: newShowColor || '#888', border: '1px solid #555' }} />
+                                        </button>
+                                        {showColorPicker && (
+                                            <div className="absolute top-full right-0 mt-1 rounded-lg p-2 shadow-xl z-50 min-w-[140px]" style={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}>
+                                                <p className="text-[10px] uppercase tracking-wider font-medium mb-1.5 px-1" style={{ color: '#888' }}>Show Color</p>
+                                                <div className="grid grid-cols-4 gap-1">
+                                                    {TEXT_COLORS.map(c => (
+                                                        <button key={c.value} type="button" onClick={() => { setNewShowColor(c.value); setShowColorPicker(false); }} className="w-7 h-7 rounded-md border transition-transform hover:scale-110" style={{ backgroundColor: c.value, borderColor: '#444' }} title={c.label} />
+                                                    ))}
+                                                </div>
+                                                <div className="mt-2 pt-2 flex items-center justify-between" style={{ borderTop: '1px solid #333' }}>
+                                                    <label className="flex items-center gap-2 cursor-pointer px-1">
+                                                        <span className="text-[10px] uppercase tracking-wider" style={{ color: '#888' }}>Custom:</span>
+                                                        <input type="color" defaultValue="#D4AF37" className="w-6 h-6 rounded cursor-pointer border-0" onChange={(e) => { setNewShowColor(e.target.value); setShowColorPicker(false); }} />
+                                                    </label>
+                                                    {newShowColor && (
+                                                        <button type="button" onClick={() => { setNewShowColor(null); setShowColorPicker(false); }} className="text-[10px] px-1.5 py-0.5 rounded" style={{ color: '#888', border: '1px solid #444' }}>Reset</button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Character Image (optional) */}
@@ -297,35 +356,34 @@ const RolesManager = ({
                                 </label>
                                 {newImage ? (
                                     <div className="flex items-center gap-3">
-                                        <img
-                                            src={newImage}
-                                            alt="Preview"
-                                            className="w-14 h-14 rounded-lg object-cover"
-                                            style={{ border: '1.5px solid rgba(212,175,55,0.3)' }}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setNewImage(null)}
-                                            className="text-xs font-medium px-2 py-1 rounded"
-                                            style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }}
-                                        >
-                                            Remove
-                                        </button>
+                                        <img src={newImage} alt="Preview" className="w-14 h-14 rounded-lg object-cover" style={{ border: '1.5px solid rgba(212,175,55,0.3)' }} />
+                                        <button type="button" onClick={() => setNewImage(null)} className="text-xs font-medium px-2 py-1 rounded" style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }}>Remove</button>
                                     </div>
                                 ) : (
-                                    <label
-                                        className="flex items-center justify-center gap-2 w-full py-3 rounded-lg cursor-pointer text-xs font-medium transition-colors"
-                                        style={{ border: '1px dashed #444', color: '#888' }}
-                                    >
-                                        {uploading ? (
-                                            <span>Uploading...</span>
-                                        ) : (
-                                            <>
-                                                <ImageIcon className="h-4 w-4" />
-                                                Upload character image
-                                            </>
-                                        )}
+                                    <label className="flex items-center justify-center gap-2 w-full py-3 rounded-lg cursor-pointer text-xs font-medium transition-colors" style={{ border: '1px dashed #444', color: '#888' }}>
+                                        {uploading ? <span>Uploading...</span> : <><ImageIcon className="h-4 w-4" />Upload character image</>}
                                         <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                                    </label>
+                                )}
+                            </div>
+
+                            {/* Background Image (optional) */}
+                            <div>
+                                <label className="text-xs uppercase tracking-wider font-medium block mb-1.5" style={{ color: '#999' }}>
+                                    Card Background Image <span style={{ color: '#666' }}>(optional)</span>
+                                </label>
+                                <p className="text-[10px] mb-2" style={{ color: '#666' }}>
+                                    Recommended: 600×200px (3:1 ratio). Image will be fitted to fill the role card.
+                                </p>
+                                {newBgImage ? (
+                                    <div className="flex items-center gap-3">
+                                        <img src={newBgImage} alt="BG Preview" className="w-24 h-8 rounded object-cover" style={{ border: '1px solid rgba(212,175,55,0.3)' }} />
+                                        <button type="button" onClick={() => setNewBgImage(null)} className="text-xs font-medium px-2 py-1 rounded" style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }}>Remove</button>
+                                    </div>
+                                ) : (
+                                    <label className="flex items-center justify-center gap-2 w-full py-3 rounded-lg cursor-pointer text-xs font-medium transition-colors" style={{ border: '1px dashed #444', color: '#888' }}>
+                                        {uploadingBg ? <span>Uploading...</span> : <><ImageIcon className="h-4 w-4" />Upload background image</>}
+                                        <input type="file" accept="image/*" className="hidden" onChange={handleBgImageUpload} disabled={uploadingBg} />
                                     </label>
                                 )}
                             </div>
@@ -447,6 +505,8 @@ const AdminTalents = () => {
                                 character_name: r.character_name,
                                 role_name: r.role_name || '',
                                 image_url: r.image_url || null,
+                                show_color: r.show_color || null,
+                                bg_image_url: r.bg_image_url || null,
                             }))
                         );
                     if (rolesError) throw rolesError;
@@ -480,6 +540,8 @@ const AdminTalents = () => {
                                 character_name: r.character_name,
                                 role_name: r.role_name || '',
                                 image_url: r.image_url || null,
+                                show_color: r.show_color || null,
+                                bg_image_url: r.bg_image_url || null,
                             }))
                         );
                     if (rolesError) throw rolesError;
@@ -584,7 +646,7 @@ const AdminTalents = () => {
         toast({ title: 'Headshot uploaded & saved to Media Library' });
     };
 
-    const addRole = (roleName: string, characterName: string, imageUrl: string | null) => {
+    const addRole = (roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null) => {
         setRoles(prev => [
             ...prev,
             {
@@ -593,6 +655,8 @@ const AdminTalents = () => {
                 role_name: roleName,
                 character_name: characterName,
                 image_url: imageUrl,
+                show_color: showColor,
+                bg_image_url: bgImageUrl,
             },
         ]);
     };

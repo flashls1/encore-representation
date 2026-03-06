@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 // ─── Role Card (for voice actors) ────────────────────────────────────────────
 const RoleCard = ({ role, index }: { role: any; index: number }) => (
     <motion.div
-        className="rounded-lg px-3 py-2.5 sm:px-4 sm:py-3"
+        className="rounded-lg overflow-hidden relative"
         style={{
             backgroundColor: '#000000',
             border: '1px solid rgba(212, 175, 55, 0.15)',
@@ -24,10 +24,22 @@ const RoleCard = ({ role, index }: { role: any; index: number }) => (
         transition={{ delay: index * 0.06, duration: 0.4 }}
         whileHover={{
             borderColor: 'rgba(212, 175, 55, 0.4)',
-            backgroundColor: '#000000',
         }}
     >
-        <div className="flex items-center gap-4">
+        {/* Optional background image */}
+        {role.bg_image_url && (
+            <>
+                <img
+                    src={role.bg_image_url}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover"
+                    style={{ opacity: 0.35 }}
+                />
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.5) 100%)' }} />
+            </>
+        )}
+
+        <div className="flex items-center gap-4 px-3 py-2.5 sm:px-4 sm:py-3 relative z-10">
             {/* Left: Mic icon + "Voice" label */}
             <div className="flex flex-col items-center flex-shrink-0">
                 <div
@@ -45,7 +57,7 @@ const RoleCard = ({ role, index }: { role: any; index: number }) => (
                     {role.character_name}
                 </p>
                 {role.role_name && (
-                    <p className="text-xs mt-0.5" style={{ color: 'rgba(212, 175, 55, 0.7)' }}>
+                    <p className="text-xs mt-0.5" style={{ color: role.show_color || 'rgba(212, 175, 55, 0.7)' }}>
                         {role.role_name}
                     </p>
                 )}
