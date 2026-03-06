@@ -91,6 +91,7 @@ export interface TalentRole {
   talent_id: string;
   role_name: string;
   character_name: string;
+  image_url: string | null;
 }
 
 export interface TalentImage {

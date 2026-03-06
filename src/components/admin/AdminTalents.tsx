@@ -2,9 +2,21 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTalents } from "@/hooks/useData";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, GripVertical, X, Save, Upload, Bold, Italic, List, Link as LinkIcon } from "lucide-react";
+import { Plus, Trash2, GripVertical, X, Save, Upload, Bold, Italic, List, Link as LinkIcon, Palette, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Talent, TalentRole } from "@/types/database";
+
+// ─── Text Color Presets ──────────────────────────────────────────────────────────
+const TEXT_COLORS = [
+    { label: 'White', value: '#ffffff' },
+    { label: 'Gold', value: '#D4AF37' },
+    { label: 'Red', value: '#ef4444' },
+    { label: 'Blue', value: '#3b82f6' },
+    { label: 'Green', value: '#22c55e' },
+    { label: 'Light Gray', value: '#cccccc' },
+    { label: 'Orange', value: '#f97316' },
+    { label: 'Purple', value: '#a855f7' },
+];
 
 // ─── Rich Text Editor ────────────────────────────────────────────────────────────
 const RichTextEditor = ({
@@ -15,6 +27,7 @@ const RichTextEditor = ({
     onChange: (html: string) => void;
 }) => {
     const editorRef = useRef<HTMLDivElement>(null);
+    const [showColors, setShowColors] = useState(false);
 
     useEffect(() => {
         if (editorRef.current && editorRef.current.innerHTML !== value) {
@@ -27,6 +40,11 @@ const RichTextEditor = ({
         if (editorRef.current) {
             onChange(editorRef.current.innerHTML);
         }
+    };
+
+    const applyColor = (color: string) => {
+        exec('foreColor', color);
+        setShowColors(false);
     };
 
     return (
@@ -54,14 +72,61 @@ const RichTextEditor = ({
                 <button type="button" onClick={() => { const url = prompt('Enter URL:'); if (url) exec('createLink', url); }} className="p-1.5 rounded hover:opacity-80" style={{ color: 'var(--text-primary)' }} title="Insert Link">
                     <LinkIcon className="h-4 w-4" />
                 </button>
+
+                {/* Divider */}
+                <div className="w-px h-5 mx-1" style={{ backgroundColor: 'var(--border)' }} />
+
+                {/* Color picker */}
+                <div className="relative">
+                    <button
+                        type="button"
+                        onClick={() => setShowColors(!showColors)}
+                        className="p-1.5 rounded hover:opacity-80 flex items-center gap-1"
+                        style={{ color: 'var(--text-primary)' }}
+                        title="Text Color"
+                    >
+                        <Palette className="h-4 w-4" />
+                    </button>
+                    {showColors && (
+                        <div
+                            className="absolute top-full left-0 mt-1 rounded-lg p-2 shadow-xl z-50 min-w-[140px]"
+                            style={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
+                        >
+                            <p className="text-[10px] uppercase tracking-wider font-medium mb-1.5 px-1" style={{ color: '#888' }}>Text Color</p>
+                            <div className="grid grid-cols-4 gap-1">
+                                {TEXT_COLORS.map(c => (
+                                    <button
+                                        key={c.value}
+                                        type="button"
+                                        onClick={() => applyColor(c.value)}
+                                        className="w-7 h-7 rounded-md border transition-transform hover:scale-110"
+                                        style={{ backgroundColor: c.value, borderColor: '#444' }}
+                                        title={c.label}
+                                    />
+                                ))}
+                            </div>
+                            <div className="mt-2 pt-2" style={{ borderTop: '1px solid #333' }}>
+                                <label className="flex items-center gap-2 cursor-pointer px-1">
+                                    <span className="text-[10px] uppercase tracking-wider" style={{ color: '#888' }}>Custom:</span>
+                                    <input
+                                        type="color"
+                                        defaultValue="#ffffff"
+                                        className="w-6 h-6 rounded cursor-pointer border-0"
+                                        onChange={(e) => applyColor(e.target.value)}
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* Editable area */}
+            {/* Editable area — white text on dark background */}
             <div
                 ref={editorRef}
                 contentEditable
-                className="min-h-[200px] p-4 outline-none prose prose-sm max-w-none"
-                style={{ backgroundColor: 'var(--input-bg)', color: 'var(--input-text)' }}
+                className="min-h-[250px] p-4 outline-none prose prose-lg max-w-none"
+                style={{ backgroundColor: '#111', color: '#ffffff', fontSize: '0.95rem', lineHeight: '1.7' }}
                 onInput={() => { if (editorRef.current) onChange(editorRef.current.innerHTML); }}
                 onPaste={(e) => {
                     e.preventDefault();
@@ -79,32 +144,68 @@ const RolesManager = ({
     roles,
     onAdd,
     onRemove,
+    talentId,
 }: {
     roles: TalentRole[];
-    onAdd: (roleName: string, characterName: string) => void;
+    onAdd: (roleName: string, characterName: string, imageUrl: string | null) => void;
     onRemove: (roleId: string) => void;
+    talentId?: string;
 }) => {
-    const [newRole, setNewRole] = useState('');
+    const [showPopup, setShowPopup] = useState(false);
     const [newChar, setNewChar] = useState('');
+    const [newRole, setNewRole] = useState('');
+    const [newImage, setNewImage] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const { toast } = useToast();
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        try {
+            const ext = file.name.split('.').pop();
+            const fileName = `role-${Date.now()}.${ext}`;
+            const { data, error } = await supabase.storage
+                .from('talent-media')
+                .upload(fileName, file, { upsert: true });
+            if (error) throw error;
+            const { data: urlData } = supabase.storage.from('talent-media').getPublicUrl(data.path);
+            setNewImage(urlData.publicUrl);
+        } catch (err: any) {
+            toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleAdd = () => {
         if (!newChar.trim()) return;
-        onAdd(newRole.trim(), newChar.trim());
-        setNewRole('');
+        onAdd(newRole.trim(), newChar.trim(), newImage);
         setNewChar('');
+        setNewRole('');
+        setNewImage(null);
+        setShowPopup(false);
     };
 
     return (
         <div className="space-y-3">
-            <label className="text-sm font-bold block" style={{ color: 'var(--text-primary)' }}>
-                🎭 Characters / Voice Roles
-            </label>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                Add the character names and shows/series this talent has appeared in.
-            </p>
+            <div className="flex items-center justify-between">
+                <label className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                    🎭 Characters / Voice Roles
+                </label>
+                <button
+                    type="button"
+                    onClick={() => setShowPopup(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                    style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
+                >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add Role
+                </button>
+            </div>
 
-            {/* Existing roles */}
-            {roles.length > 0 && (
+            {/* Existing roles list */}
+            {roles.length > 0 ? (
                 <div className="space-y-1.5">
                     {roles.map((role) => (
                         <div
@@ -112,7 +213,16 @@ const RolesManager = ({
                             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm"
                             style={{ backgroundColor: 'var(--badge-bg)', border: '1px solid var(--badge-border)' }}
                         >
-                            <span className="text-base">🎤</span>
+                            {role.image_url ? (
+                                <img
+                                    src={role.image_url}
+                                    alt={role.character_name}
+                                    className="w-8 h-8 rounded object-cover flex-shrink-0"
+                                    style={{ border: '1px solid rgba(212,175,55,0.3)' }}
+                                />
+                            ) : (
+                                <span className="text-base">🎤</span>
+                            )}
                             <div className="flex-1 min-w-0">
                                 <span className="font-bold" style={{ color: 'var(--badge-text)' }}>
                                     {role.character_name}
@@ -129,49 +239,122 @@ const RolesManager = ({
                         </div>
                     ))}
                 </div>
+            ) : (
+                <p className="text-xs py-3 text-center" style={{ color: 'var(--text-muted)' }}>No roles added yet.</p>
             )}
 
-            {/* Add new role */}
-            <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--bg-elevated)', border: '1px dashed var(--border)' }}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
-                    <div>
-                        <label className="text-[11px] uppercase tracking-wider font-medium block mb-1" style={{ color: 'var(--text-muted)' }}>
-                            Character Name *
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="e.g. Goku, Naruto, Spike..."
-                            value={newChar}
-                            onChange={(e) => setNewChar(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAdd())}
-                            className="theme-input w-full text-sm"
-                        />
-                    </div>
-                    <div>
-                        <label className="text-[11px] uppercase tracking-wider font-medium block mb-1" style={{ color: 'var(--text-muted)' }}>
-                            Show / Series
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="e.g. Dragon Ball Z, Naruto, Cowboy Bebop..."
-                            value={newRole}
-                            onChange={(e) => setNewRole(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAdd())}
-                            className="theme-input w-full text-sm"
-                        />
+            {/* ─── Add Role Popup ───────────────────────────────────────── */}
+            {showPopup && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }} onClick={() => setShowPopup(false)}>
+                    <div
+                        className="w-full max-w-md mx-4 rounded-xl p-6 shadow-2xl"
+                        style={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between mb-5">
+                            <h3 className="text-lg font-bold" style={{ color: '#fff' }}>Add New Role</h3>
+                            <button type="button" onClick={() => setShowPopup(false)} className="p-1 rounded hover:opacity-80" style={{ color: '#888' }}>
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            {/* Character name */}
+                            <div>
+                                <label className="text-xs uppercase tracking-wider font-medium block mb-1.5" style={{ color: '#999' }}>
+                                    Character Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Goku, Naruto, Spike..."
+                                    value={newChar}
+                                    onChange={(e) => setNewChar(e.target.value)}
+                                    className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                                    style={{ backgroundColor: '#111', border: '1px solid #333', color: '#fff' }}
+                                    autoFocus
+                                />
+                            </div>
+
+                            {/* Show / Series */}
+                            <div>
+                                <label className="text-xs uppercase tracking-wider font-medium block mb-1.5" style={{ color: '#999' }}>
+                                    Show / Series
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Dragon Ball Z, Cowboy Bebop..."
+                                    value={newRole}
+                                    onChange={(e) => setNewRole(e.target.value)}
+                                    className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                                    style={{ backgroundColor: '#111', border: '1px solid #333', color: '#fff' }}
+                                />
+                            </div>
+
+                            {/* Character Image (optional) */}
+                            <div>
+                                <label className="text-xs uppercase tracking-wider font-medium block mb-1.5" style={{ color: '#999' }}>
+                                    Character Image <span style={{ color: '#666' }}>(optional)</span>
+                                </label>
+                                {newImage ? (
+                                    <div className="flex items-center gap-3">
+                                        <img
+                                            src={newImage}
+                                            alt="Preview"
+                                            className="w-14 h-14 rounded-lg object-cover"
+                                            style={{ border: '1.5px solid rgba(212,175,55,0.3)' }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setNewImage(null)}
+                                            className="text-xs font-medium px-2 py-1 rounded"
+                                            style={{ color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }}
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label
+                                        className="flex items-center justify-center gap-2 w-full py-3 rounded-lg cursor-pointer text-xs font-medium transition-colors"
+                                        style={{ border: '1px dashed #444', color: '#888' }}
+                                    >
+                                        {uploading ? (
+                                            <span>Uploading...</span>
+                                        ) : (
+                                            <>
+                                                <ImageIcon className="h-4 w-4" />
+                                                Upload character image
+                                            </>
+                                        )}
+                                        <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                                    </label>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-3 mt-6">
+                            <button
+                                type="button"
+                                onClick={handleAdd}
+                                disabled={!newChar.trim()}
+                                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-bold transition-colors disabled:opacity-40"
+                                style={{ backgroundColor: '#D4AF37', color: '#0A0A0A' }}
+                            >
+                                <Plus className="h-4 w-4" />
+                                Add Role
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setShowPopup(false)}
+                                className="px-4 py-2.5 rounded-lg text-sm font-medium"
+                                style={{ border: '1px solid #333', color: '#888' }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <button
-                    type="button"
-                    onClick={handleAdd}
-                    disabled={!newChar.trim()}
-                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-40"
-                    style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
-                >
-                    <Plus className="h-3.5 w-3.5" />
-                    Add Role
-                </button>
-            </div>
+            )}
         </div>
     );
 };
@@ -263,6 +446,7 @@ const AdminTalents = () => {
                                 talent_id: editingTalent.id,
                                 character_name: r.character_name,
                                 role_name: r.role_name || '',
+                                image_url: r.image_url || null,
                             }))
                         );
                     if (rolesError) throw rolesError;
@@ -295,6 +479,7 @@ const AdminTalents = () => {
                                 talent_id: data.id,
                                 character_name: r.character_name,
                                 role_name: r.role_name || '',
+                                image_url: r.image_url || null,
                             }))
                         );
                     if (rolesError) throw rolesError;
@@ -399,7 +584,7 @@ const AdminTalents = () => {
         toast({ title: 'Headshot uploaded & saved to Media Library' });
     };
 
-    const addRole = (roleName: string, characterName: string) => {
+    const addRole = (roleName: string, characterName: string, imageUrl: string | null) => {
         setRoles(prev => [
             ...prev,
             {
@@ -407,6 +592,7 @@ const AdminTalents = () => {
                 talent_id: editingTalent?.id || '',
                 role_name: roleName,
                 character_name: characterName,
+                image_url: imageUrl,
             },
         ]);
     };

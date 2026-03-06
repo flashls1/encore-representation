@@ -13,12 +13,12 @@ gsap.registerPlugin(ScrollTrigger);
 // ─── Role Card (for voice actors) ────────────────────────────────────────────
 const RoleCard = ({ role, index }: { role: any; index: number }) => (
     <motion.div
-        className="rounded-xl p-4 sm:p-5"
+        className="rounded-lg px-3 py-2.5 sm:px-4 sm:py-3"
         style={{
             backgroundColor: 'rgba(212, 175, 55, 0.04)',
             border: '1px solid rgba(212, 175, 55, 0.15)',
         }}
-        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+        initial={{ opacity: 0, y: 12, scale: 0.96 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: true }}
         transition={{ delay: index * 0.06, duration: 0.4 }}
@@ -27,23 +27,36 @@ const RoleCard = ({ role, index }: { role: any; index: number }) => (
             backgroundColor: 'rgba(212, 175, 55, 0.08)',
         }}
     >
-        <div className="flex items-start gap-3">
+        <div className="flex items-center gap-2.5">
+            {/* Left: Mic icon */}
             <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: 'rgba(212, 175, 55, 0.12)' }}
             >
-                <Mic className="h-4 w-4" style={{ color: '#D4AF37' }} />
+                <Mic className="h-3.5 w-3.5" style={{ color: '#D4AF37' }} />
             </div>
-            <div className="min-w-0">
-                <p className="font-bold text-base sm:text-lg" style={{ color: '#ffffff' }}>
+
+            {/* Center: Character info */}
+            <div className="flex-1 min-w-0">
+                <p className="font-bold text-sm sm:text-base leading-tight" style={{ color: '#ffffff' }}>
                     {role.character_name}
                 </p>
                 {role.role_name && (
-                    <p className="text-sm mt-0.5" style={{ color: 'rgba(212, 175, 55, 0.7)' }}>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgba(212, 175, 55, 0.7)' }}>
                         {role.role_name}
                     </p>
                 )}
             </div>
+
+            {/* Right: Optional character image — 1:1 square, rounded, gold border */}
+            {role.image_url && (
+                <img
+                    src={role.image_url}
+                    alt={role.character_name}
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover flex-shrink-0"
+                    style={{ border: '1.5px solid rgba(212, 175, 55, 0.35)' }}
+                />
+            )}
         </div>
     </motion.div>
 );

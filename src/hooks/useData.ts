@@ -92,7 +92,7 @@ export const useTalents = (featuredOnly: boolean = false) => {
         .select(`
           *,
           talent_roles (
-            id, talent_id, role_name, character_name
+            id, talent_id, role_name, character_name, image_url
           )
         `)
         .order('sort_order', { ascending: true })
@@ -104,7 +104,7 @@ export const useTalents = (featuredOnly: boolean = false) => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return (data as Talent[]) || [];
+      return (data as unknown as Talent[]) || [];
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -119,7 +119,7 @@ export const useTalent = (id: string) => {
         .select(`
           *,
           talent_roles (
-            id, talent_id, role_name, character_name
+            id, talent_id, role_name, character_name, image_url
           ),
           talent_images (
             id, talent_id, image_url, caption, sort_order
@@ -128,7 +128,7 @@ export const useTalent = (id: string) => {
         .eq('id', id)
         .maybeSingle();
       if (error) throw error;
-      return data as Talent | null;
+      return (data as unknown as Talent) || null;
     },
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
