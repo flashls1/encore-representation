@@ -94,49 +94,78 @@ const Admin = () => {
 
         {/* ─── Left Sidebar ─── */}
         <aside
-          className="flex-shrink-0 w-[220px] flex flex-col overflow-y-auto"
+          className="flex-shrink-0 w-[240px] flex flex-col overflow-y-auto"
           style={{
             backgroundColor: '#000000',
             borderRight: '1px solid rgba(212, 175, 55, 0.15)',
           }}
         >
-          <nav className="flex flex-col py-3 gap-1 px-3">
+          {/* Sidebar label */}
+          <div className="px-5 pt-4 pb-2">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#555555' }}>
+              Navigation
+            </p>
+          </div>
+
+          <nav className="flex flex-col py-1 gap-0.5 px-3">
             {ADMIN_SECTIONS.map((section) => {
               const isActive = section.id === activeSection;
               return (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all duration-200"
+                  className="group flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all duration-200 relative"
                   style={{
                     backgroundColor: isActive
-                      ? 'rgba(212, 175, 55, 0.12)'
+                      ? `${section.color}18`
                       : 'transparent',
-                    color: isActive ? '#d4af37' : '#999999',
-                    borderLeft: isActive ? '3px solid #d4af37' : '3px solid transparent',
+                    color: isActive ? '#ffffff' : '#888888',
+                    borderLeft: isActive ? `3px solid ${section.color}` : '3px solid transparent',
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)';
-                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.backgroundColor = `${section.color}0D`;
+                      e.currentTarget.style.color = '#cccccc';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) {
                       e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = '#999999';
+                      e.currentTarget.style.color = '#888888';
                     }
                   }}
                 >
-                  <section.icon
-                    className="h-4 w-4 flex-shrink-0"
-                    style={{ color: isActive ? '#d4af37' : '#666666' }}
-                  />
+                  {/* Icon container with colored background */}
+                  <span
+                    className="flex items-center justify-center w-7 h-7 rounded-md flex-shrink-0 transition-all duration-200"
+                    style={{
+                      backgroundColor: isActive ? `${section.color}25` : `${section.color}12`,
+                    }}
+                  >
+                    <section.icon
+                      className="h-4 w-4"
+                      style={{ color: section.color }}
+                    />
+                  </span>
                   <span className="truncate">{section.label}</span>
+                  {/* Active indicator dot */}
+                  {isActive && (
+                    <span
+                      className="absolute right-3 w-1.5 h-1.5 rounded-full"
+                      style={{ backgroundColor: section.color }}
+                    />
+                  )}
                 </button>
               );
             })}
           </nav>
+
+          {/* Sidebar footer */}
+          <div className="mt-auto px-5 py-4 border-t" style={{ borderColor: '#1a1a1a' }}>
+            <p className="text-[10px]" style={{ color: '#444444' }}>
+              Encore CMS v1.0
+            </p>
+          </div>
         </aside>
 
         {/* ─── Content Area ─── */}

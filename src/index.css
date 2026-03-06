@@ -304,6 +304,7 @@
 
 /* ── Admin CSS Custom Properties ── */
 .admin-dark-theme {
+  /* Admin-specific tokens */
   --admin-bg-page: #050505;
   --admin-bg-card: #111111;
   --admin-bg-elevated: #1a1a1a;
@@ -322,6 +323,65 @@
   --admin-error: #ef4444;
   --admin-warning: #f59e0b;
   color: #ffffff;
+
+  /* ══════════════════════════════════════════════════════
+     SITE-LEVEL CSS VARIABLE OVERRIDES
+     Components use var(--accent), var(--text-primary), etc.
+     We force them to admin palette so dark-on-dark never happens.
+     ══════════════════════════════════════════════════════ */
+
+  /* Backgrounds */
+  --bg-primary: #050505;
+  --bg-secondary: #0a0a0a;
+  --bg-card: #111111;
+  --bg-card-hover: #1a1a1a;
+  --bg-elevated: #1a1a1a;
+
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-muted: #888888;
+  --text-on-accent: #000000;
+
+  /* Accent (gold) */
+  --accent: #d4af37;
+  --accent-hover: #f5d060;
+  --accent-muted: #a08520;
+
+  /* Borders */
+  --border: #2a2a2a;
+  --border-hover: #3a3a3a;
+
+  /* Buttons */
+  --button-bg: #d4af37;
+  --button-hover: #f5d060;
+  --button-text: #000000;
+  --button-outline: #d4af37;
+  --button-outline-hover: rgba(212, 175, 55, 0.15);
+
+  /* Forms */
+  --input-bg: #0a0a0a;
+  --input-border: #2a2a2a;
+  --input-focus: #d4af37;
+  --input-text: #ffffff;
+  --input-placeholder: #666666;
+
+  /* Badges */
+  --badge-bg: rgba(212, 175, 55, 0.12);
+  --badge-text: #f5d060;
+  --badge-border: #d4af37;
+
+  /* Misc */
+  --shadow: rgba(212, 175, 55, 0.08);
+  --glow: rgba(212, 175, 55, 0.25);
+  --skeleton: #1a1a1a;
+  --skeleton-shine: #222222;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #38bdf8;
+  --scrollbar-track: #0a0a0a;
+  --scrollbar-thumb: #2a2a2a;
 }
 
 /* ── Page background ── */
@@ -484,12 +544,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* ── Buttons — Primary (Gold) ── */
-.admin-dark-theme button[class*="bg-primary"],
-.admin-dark-theme .btn-primary,
-.admin-dark-theme button:not([role="switch"]):not([aria-haspopup]):not([class*="ghost"]):not([class*="outline"]):not([class*="destructive"])[class*="inline-flex"][class*="rounded"] {
-  /* Only target shadcn Button component default variant */
-}
+/* ── Buttons — Primary (Gold) — handled by shadcn HSL overrides above ── */
 
 /* ── Buttons — Ghost ── */
 .admin-dark-theme button[class*="ghost"] {
