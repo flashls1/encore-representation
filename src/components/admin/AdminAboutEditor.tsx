@@ -27,35 +27,49 @@ const AdminAboutEditor = () => {
 
     useEffect(() => {
         if (aboutContent) {
+            const loadedSections: ContentSection[] = Array.isArray(aboutContent.sections) ? aboutContent.sections : [];
+            // Ensure owner-hero exists — only add one if DB data doesn't have one
+            const hasOwnerHero = loadedSections.some(s => s.type === 'owner-hero');
+            const sections = hasOwnerHero
+                ? loadedSections
+                : [
+                    {
+                        id: crypto.randomUUID(),
+                        type: 'owner-hero' as const,
+                        title: '',
+                        content: '',
+                        media_url: '',
+                    },
+                    ...loadedSections,
+                ];
             setForm({
                 page_title: aboutContent.page_title || '',
                 page_description: aboutContent.page_description || '',
                 hero_image_url: aboutContent.hero_image_url || '',
-                sections: Array.isArray(aboutContent.sections) ? aboutContent.sections : [],
+                sections,
+            });
+        } else if (aboutContent === null) {
+            // No row in DB yet — create default form with blank owner-hero
+            setForm({
+                page_title: 'About Encore Representation',
+                page_description: '',
+                hero_image_url: '',
+                sections: [
+                    {
+                        id: crypto.randomUUID(),
+                        type: 'owner-hero' as const,
+                        title: '',
+                        content: '',
+                        media_url: '',
+                    },
+                ],
             });
         }
     }, [aboutContent]);
 
-    // Ensure owner-hero exists
+    // Derived values for rendering
     const ownerHero = form.sections.find(s => s.type === 'owner-hero');
     const contentSections = form.sections.filter(s => s.type !== 'owner-hero');
-
-    const ensureOwnerHero = () => {
-        if (!ownerHero) {
-            const hero: ContentSection = {
-                id: crypto.randomUUID(),
-                type: 'owner-hero',
-                title: '',
-                content: '',
-                media_url: '',
-            };
-            setForm(f => ({ ...f, sections: [hero, ...f.sections] }));
-        }
-    };
-
-    useEffect(() => {
-        ensureOwnerHero();
-    }, []);
 
     const handleSave = async () => {
         setSaving(true);
