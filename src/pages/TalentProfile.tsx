@@ -6,14 +6,54 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useTalent } from "@/hooks/useData";
-import { ArrowLeft, Star } from "lucide-react";
+import { ArrowLeft, Star, Mic, Film, Sparkles } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// ─── Role Card (for voice actors) ────────────────────────────────────────────
+const RoleCard = ({ role, index }: { role: any; index: number }) => (
+    <motion.div
+        className="rounded-xl p-4 sm:p-5"
+        style={{
+            backgroundColor: 'rgba(212, 175, 55, 0.04)',
+            border: '1px solid rgba(212, 175, 55, 0.15)',
+        }}
+        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: index * 0.06, duration: 0.4 }}
+        whileHover={{
+            borderColor: 'rgba(212, 175, 55, 0.4)',
+            backgroundColor: 'rgba(212, 175, 55, 0.08)',
+        }}
+    >
+        <div className="flex items-start gap-3">
+            <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                style={{ backgroundColor: 'rgba(212, 175, 55, 0.12)' }}
+            >
+                <Mic className="h-4 w-4" style={{ color: '#D4AF37' }} />
+            </div>
+            <div className="min-w-0">
+                <p className="font-bold text-base sm:text-lg" style={{ color: '#ffffff' }}>
+                    {role.character_name}
+                </p>
+                {role.role_name && (
+                    <p className="text-sm mt-0.5" style={{ color: 'rgba(212, 175, 55, 0.7)' }}>
+                        {role.role_name}
+                    </p>
+                )}
+            </div>
+        </div>
+    </motion.div>
+);
+
+// ─── Main TalentProfile Page ─────────────────────────────────────────────────
 const TalentProfile = () => {
     const { id } = useParams<{ id: string }>();
     const { data: talent, isLoading } = useTalent(id || '');
     const nameRef = useRef<HTMLHeadingElement>(null);
+    const bioRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!nameRef.current || !talent) return;
@@ -23,20 +63,28 @@ const TalentProfile = () => {
         );
     }, [talent]);
 
+    useEffect(() => {
+        if (!bioRef.current || !talent) return;
+        gsap.fromTo(bioRef.current,
+            { y: 30, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out', delay: 0.4 }
+        );
+    }, [talent]);
+
     if (isLoading) {
         return (
-            <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
+            <div className="min-h-screen" style={{ backgroundColor: '#0A0A0A' }}>
                 <Navigation />
                 <div className="pt-24 px-4 max-w-5xl mx-auto">
                     <div className="animate-pulse">
-                        <div className="h-8 w-48 rounded mb-6" style={{ backgroundColor: 'var(--skeleton)' }} />
+                        <div className="h-8 w-48 rounded mb-6" style={{ backgroundColor: '#1a1a1a' }} />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="pb-[100%] rounded-xl" style={{ backgroundColor: 'var(--skeleton)' }} />
+                            <div className="pb-[100%] rounded-xl" style={{ backgroundColor: '#1a1a1a' }} />
                             <div className="space-y-4">
-                                <div className="h-10 rounded w-3/4" style={{ backgroundColor: 'var(--skeleton)' }} />
-                                <div className="h-4 rounded w-full" style={{ backgroundColor: 'var(--skeleton)' }} />
-                                <div className="h-4 rounded w-full" style={{ backgroundColor: 'var(--skeleton)' }} />
-                                <div className="h-4 rounded w-2/3" style={{ backgroundColor: 'var(--skeleton)' }} />
+                                <div className="h-10 rounded w-3/4" style={{ backgroundColor: '#1a1a1a' }} />
+                                <div className="h-4 rounded w-full" style={{ backgroundColor: '#1a1a1a' }} />
+                                <div className="h-4 rounded w-full" style={{ backgroundColor: '#1a1a1a' }} />
+                                <div className="h-4 rounded w-2/3" style={{ backgroundColor: '#1a1a1a' }} />
                             </div>
                         </div>
                     </div>
@@ -47,11 +95,11 @@ const TalentProfile = () => {
 
     if (!talent) {
         return (
-            <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
+            <div className="min-h-screen" style={{ backgroundColor: '#0A0A0A' }}>
                 <Navigation />
                 <div className="pt-24 px-4 max-w-3xl mx-auto text-center">
-                    <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Talent Not Found</h1>
-                    <Link to="/" className="font-medium" style={{ color: 'var(--accent)' }}>← Back to Roster</Link>
+                    <h1 className="text-2xl font-bold mb-4" style={{ color: '#fff' }}>Talent Not Found</h1>
+                    <Link to="/" className="font-medium" style={{ color: '#D4AF37' }}>← Back to Roster</Link>
                 </div>
                 <Footer />
             </div>
@@ -64,7 +112,7 @@ const TalentProfile = () => {
     const firstName = talent.name.split(' ')[0] || talent.name;
 
     return (
-        <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
+        <div className="min-h-screen" style={{ backgroundColor: '#0A0A0A' }}>
             <Navigation />
 
             <main className="pt-24 pb-16 px-4">
@@ -74,18 +122,18 @@ const TalentProfile = () => {
                         <Link
                             to="/"
                             className="inline-flex items-center gap-1.5 text-sm font-medium mb-6 transition-colors"
-                            style={{ color: 'var(--text-muted)' }}
-                            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent)'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
+                            style={{ color: '#888' }}
+                            onMouseEnter={(e) => { e.currentTarget.style.color = '#D4AF37'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.color = '#888'; }}
                         >
                             <ArrowLeft className="h-4 w-4" />
                             Back to Roster
                         </Link>
                     </motion.div>
 
-                    {/* Banner Image — natural aspect ratio, no cropping */}
+                    {/* ─── Hero Section: Banner + Name ─────────────────────────────── */}
                     <motion.div
-                        className="flex justify-center mb-10"
+                        className="flex justify-center mb-8"
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -93,7 +141,7 @@ const TalentProfile = () => {
                         {talent.headshot_url ? (
                             <div
                                 className="inline-block rounded-xl overflow-hidden"
-                                style={{ border: '2px solid var(--accent)', boxShadow: '0 8px 32px var(--shadow)', maxWidth: '100%' }}
+                                style={{ border: '2px solid rgba(212, 175, 55, 0.4)', boxShadow: '0 8px 40px rgba(212, 175, 55, 0.08)', maxWidth: '100%' }}
                             >
                                 <img
                                     src={talent.headshot_url}
@@ -107,84 +155,133 @@ const TalentProfile = () => {
                                 className="flex items-center justify-center rounded-xl"
                                 style={{
                                     width: '500px', height: '300px',
-                                    backgroundColor: 'var(--bg-elevated)',
-                                    border: '2px solid var(--border)',
+                                    backgroundColor: '#111',
+                                    border: '2px solid #222',
                                 }}
                             >
-                                <span className="text-6xl font-bold opacity-30" style={{ color: 'var(--accent)' }}>{initials}</span>
+                                <span className="text-6xl font-bold opacity-30" style={{ color: '#D4AF37' }}>{initials}</span>
                             </div>
                         )}
                     </motion.div>
 
-                    {/* Name + Info — centered below banner */}
-                    <div className="max-w-3xl mx-auto">
-                        <h1
-                            ref={nameRef}
-                            className="font-orbitron text-2xl sm:text-3xl md:text-4xl font-bold tracking-wider mb-4 text-center"
-                            style={{ color: 'var(--accent)', opacity: 0 }}
+                    <h1
+                        ref={nameRef}
+                        className="font-orbitron text-3xl sm:text-4xl md:text-5xl font-bold tracking-wider mb-2 text-center"
+                        style={{ color: '#D4AF37', opacity: 0 }}
+                    >
+                        {talent.name}
+                    </h1>
+
+                    {/* Thin accent divider */}
+                    <div className="w-12 h-[2px] mx-auto mb-10" style={{ backgroundColor: '#D4AF37' }} />
+
+                    {/* ─── Roles / Characters Section ─────────────────────────────── */}
+                    {roles.length > 0 && (
+                        <motion.section
+                            className="mb-12"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5 }}
                         >
-                            {talent.name}
-                        </h1>
-
-                        {/* Roles */}
-                        {roles.length > 0 && (
-                            <motion.div className="mb-8 text-center" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }}>
-                                <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>
-                                    Characters / Roles
+                            <div className="flex items-center gap-2 mb-5">
+                                <Star className="h-4 w-4" style={{ color: '#D4AF37' }} />
+                                <h2
+                                    className="font-orbitron text-lg sm:text-xl font-bold uppercase tracking-wider"
+                                    style={{ color: '#D4AF37' }}
+                                >
+                                    Notable Roles & Characters
                                 </h2>
-                                <div className="flex flex-wrap justify-center gap-2">
-                                    {roles.map((role, i) => (
-                                        <motion.div
-                                            key={role.id}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm"
-                                            style={{ backgroundColor: 'var(--badge-bg)', border: '1px solid var(--badge-border)', color: 'var(--badge-text)' }}
-                                            initial={{ opacity: 0, scale: 0.8 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            transition={{ delay: 0.5 + i * 0.05, duration: 0.3 }}
-                                        >
-                                            <Star className="h-3 w-3" />
-                                            <span className="font-medium">{role.character_name}</span>
-                                            {role.role_name && (
-                                                <span style={{ color: 'var(--text-muted)' }}>— {role.role_name}</span>
-                                            )}
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            </motion.div>
-                        )}
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {roles.map((role, i) => (
+                                    <RoleCard key={role.id} role={role} index={i} />
+                                ))}
+                            </div>
+                        </motion.section>
+                    )}
 
-                        {/* Bio */}
-                        {talent.bio && (
-                            <motion.div className="mb-8" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }}>
-                                <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>Biography</h2>
+                    {/* ─── Biography Section ──────────────────────────────────────── */}
+                    {talent.bio && (
+                        <motion.section
+                            ref={bioRef}
+                            className="mb-12"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5, duration: 0.5 }}
+                        >
+                            <div className="flex items-center gap-2 mb-5">
+                                <Sparkles className="h-4 w-4" style={{ color: '#D4AF37' }} />
+                                <h2
+                                    className="font-orbitron text-lg sm:text-xl font-bold uppercase tracking-wider"
+                                    style={{ color: '#D4AF37' }}
+                                >
+                                    Biography
+                                </h2>
+                            </div>
+                            <div
+                                className="rounded-xl p-6 sm:p-8 md:p-10"
+                                style={{
+                                    backgroundColor: '#111111',
+                                    border: '1px solid #222',
+                                }}
+                            >
                                 <div
-                                    className="prose prose-sm max-w-none leading-relaxed"
-                                    style={{ color: 'var(--text-secondary)' }}
+                                    className="prose prose-lg max-w-none leading-relaxed"
+                                    style={{
+                                        color: '#cccccc',
+                                        fontSize: '1.05rem',
+                                        lineHeight: '1.8',
+                                    }}
                                     dangerouslySetInnerHTML={{ __html: talent.bio }}
                                 />
-                            </motion.div>
-                        )}
+                            </div>
+                        </motion.section>
+                    )}
 
-                        {/* Book CTA — centered */}
-                        <motion.div className="text-center" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.5 }}>
-                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} className="inline-block">
-                                <Link to="/book" className="inline-block px-8 py-3 text-sm font-bold rounded-lg" style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}>
-                                    Book {firstName} →
-                                </Link>
-                            </motion.div>
+                    {/* ─── Book CTA ───────────────────────────────────────────────── */}
+                    <motion.div
+                        className="text-center mb-12"
+                        initial={{ opacity: 0, y: 15 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                    >
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} className="inline-block">
+                            <Link
+                                to="/booking"
+                                className="inline-block px-10 py-3.5 text-sm font-bold rounded-lg tracking-wide uppercase"
+                                style={{ backgroundColor: '#D4AF37', color: '#0A0A0A' }}
+                            >
+                                Book {firstName} →
+                            </Link>
                         </motion.div>
-                    </div>
+                    </motion.div>
 
-                    {/* Photo Gallery */}
+                    {/* ─── Photo Gallery ───────────────────────────────────────────── */}
                     {images.length > 0 && (
-                        <motion.section className="mt-12" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
-                            <h2 className="font-orbitron text-xl sm:text-2xl font-bold tracking-wider mb-6" style={{ color: 'var(--accent)' }}>Gallery</h2>
+                        <motion.section
+                            className="mt-12"
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <div className="flex items-center gap-2 mb-6">
+                                <Film className="h-4 w-4" style={{ color: '#D4AF37' }} />
+                                <h2
+                                    className="font-orbitron text-lg sm:text-xl font-bold uppercase tracking-wider"
+                                    style={{ color: '#D4AF37' }}
+                                >
+                                    Gallery
+                                </h2>
+                            </div>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
                                 {images.map((img, i) => (
                                     <motion.div
                                         key={img.id}
                                         className="relative pb-[100%] rounded-lg overflow-hidden"
-                                        style={{ border: '1px solid var(--border)' }}
+                                        style={{ border: '1px solid rgba(212, 175, 55, 0.15)' }}
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         whileInView={{ opacity: 1, scale: 1 }}
                                         viewport={{ once: true }}

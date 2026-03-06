@@ -95,48 +95,81 @@ const RolesManager = ({
     };
 
     return (
-        <div className="space-y-2">
-            <label className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                Characters / Roles
+        <div className="space-y-3">
+            <label className="text-sm font-bold block" style={{ color: 'var(--text-primary)' }}>
+                🎭 Characters / Voice Roles
             </label>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                Add the character names and shows/series this talent has appeared in.
+            </p>
 
-            {roles.map((role) => (
-                <div
-                    key={role.id}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm"
-                    style={{ backgroundColor: 'var(--badge-bg)', border: '1px solid var(--badge-border)' }}
-                >
-                    <span className="flex-1 font-medium" style={{ color: 'var(--badge-text)' }}>
-                        {role.character_name}
-                        {role.role_name && (
-                            <span style={{ color: 'var(--text-muted)' }}> — {role.role_name}</span>
-                        )}
-                    </span>
-                    <button type="button" onClick={() => onRemove(role.id)} className="p-0.5 rounded hover:opacity-80" style={{ color: 'var(--error)' }}>
-                        <X className="h-3.5 w-3.5" />
-                    </button>
+            {/* Existing roles */}
+            {roles.length > 0 && (
+                <div className="space-y-1.5">
+                    {roles.map((role) => (
+                        <div
+                            key={role.id}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm"
+                            style={{ backgroundColor: 'var(--badge-bg)', border: '1px solid var(--badge-border)' }}
+                        >
+                            <span className="text-base">🎤</span>
+                            <div className="flex-1 min-w-0">
+                                <span className="font-bold" style={{ color: 'var(--badge-text)' }}>
+                                    {role.character_name}
+                                </span>
+                                {role.role_name && (
+                                    <span className="ml-1.5" style={{ color: 'var(--text-muted)' }}>
+                                        — {role.role_name}
+                                    </span>
+                                )}
+                            </div>
+                            <button type="button" onClick={() => onRemove(role.id)} className="p-1 rounded hover:opacity-80 flex-shrink-0" style={{ color: 'var(--error)' }}>
+                                <X className="h-3.5 w-3.5" />
+                            </button>
+                        </div>
+                    ))}
                 </div>
-            ))}
+            )}
 
-            <div className="flex gap-2">
-                <input
-                    type="text"
-                    placeholder="Character name"
-                    value={newChar}
-                    onChange={(e) => setNewChar(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAdd())}
-                    className="theme-input flex-1 text-sm"
-                />
-                <input
-                    type="text"
-                    placeholder="Role/Show (optional)"
-                    value={newRole}
-                    onChange={(e) => setNewRole(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAdd())}
-                    className="theme-input flex-1 text-sm"
-                />
-                <button type="button" onClick={handleAdd} className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors" style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}>
-                    <Plus className="h-4 w-4" />
+            {/* Add new role */}
+            <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--bg-elevated)', border: '1px dashed var(--border)' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                    <div>
+                        <label className="text-[11px] uppercase tracking-wider font-medium block mb-1" style={{ color: 'var(--text-muted)' }}>
+                            Character Name *
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="e.g. Goku, Naruto, Spike..."
+                            value={newChar}
+                            onChange={(e) => setNewChar(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAdd())}
+                            className="theme-input w-full text-sm"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-[11px] uppercase tracking-wider font-medium block mb-1" style={{ color: 'var(--text-muted)' }}>
+                            Show / Series
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="e.g. Dragon Ball Z, Naruto, Cowboy Bebop..."
+                            value={newRole}
+                            onChange={(e) => setNewRole(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAdd())}
+                            className="theme-input w-full text-sm"
+                        />
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    onClick={handleAdd}
+                    disabled={!newChar.trim()}
+                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-40"
+                    style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
+                >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add Role
                 </button>
             </div>
         </div>
