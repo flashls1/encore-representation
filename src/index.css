@@ -297,89 +297,231 @@
 }
 
 /* ============================================================================
-   Admin CMS — Hardcoded dark theme (INDEPENDENT of site theme)
-   All colors fixed. Never references CSS variables.
+   Admin CMS — Premium Black & Gold Theme
+   INDEPENDENT of site theme. All colors hardcoded.
+   3-color system: Black (#000-#141414), Gold (#d4af37), White (#ffffff)
    ============================================================================ */
 
-/* ── Admin page background ── */
+/* ── Admin CSS Custom Properties ── */
 .admin-dark-theme {
-  color: #e2e8f0;
+  --admin-bg-page: #050505;
+  --admin-bg-card: #111111;
+  --admin-bg-elevated: #1a1a1a;
+  --admin-bg-input: #0a0a0a;
+  --admin-bg-hover: #1e1e1e;
+  --admin-gold: #d4af37;
+  --admin-gold-hover: #f5d060;
+  --admin-gold-muted: rgba(212, 175, 55, 0.15);
+  --admin-gold-dim: rgba(212, 175, 55, 0.08);
+  --admin-text: #ffffff;
+  --admin-text-secondary: #cccccc;
+  --admin-text-muted: #888888;
+  --admin-border: #2a2a2a;
+  --admin-border-focus: #d4af37;
+  --admin-success: #22c55e;
+  --admin-error: #ef4444;
+  --admin-warning: #f59e0b;
+  color: #ffffff;
 }
 
+/* ── Page background ── */
 .admin-dark-theme main {
-  background-color: #0d0d14 !important;
-  color: #e2e8f0 !important;
+  background-color: var(--admin-bg-page) !important;
+  color: var(--admin-text) !important;
 }
 
-/* ── Cards in admin content area ── */
+/* ── Override shadcn HSL CSS variables inside admin ── */
+.admin-dark-theme {
+  --background: 0 0% 3%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 7%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 43 71% 53%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 12%;
+  --muted-foreground: 0 0% 60%;
+  --accent: 43 71% 53%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 18%;
+  --input: 0 0% 18%;
+  --ring: 43 71% 53%;
+}
+
+/* ── Cards — shadcn and custom ── */
 .admin-dark-theme .bg-card\/50,
-.admin-dark-theme .bg-card {
-  background-color: #1e293b !important;
-  border: 1px solid #334155 !important;
+.admin-dark-theme .bg-card,
+.admin-dark-theme [class*="bg-card"] {
+  background-color: var(--admin-bg-card) !important;
+  border-color: var(--admin-border) !important;
 }
 
-/* ── Text ── */
+.admin-dark-theme .border-primary\/20,
+.admin-dark-theme .border-primary\/30 {
+  border-color: rgba(212, 175, 55, 0.25) !important;
+}
+
+/* ── Typography — Headings ── */
 .admin-dark-theme h1,
 .admin-dark-theme h2,
 .admin-dark-theme h3,
 .admin-dark-theme h4 {
-  color: #f1f5f9 !important;
+  color: #ffffff !important;
 }
 
 .admin-dark-theme .text-foreground,
 .admin-dark-theme .text-card-foreground {
-  color: #e2e8f0 !important;
+  color: #ffffff !important;
 }
 
 .admin-dark-theme .text-muted-foreground {
-  color: #94a3b8 !important;
+  color: #999999 !important;
+}
+
+.admin-dark-theme p {
+  color: var(--admin-text-secondary);
 }
 
 .admin-dark-theme label {
-  color: #cbd5e1 !important;
+  color: var(--admin-text-secondary) !important;
   margin-bottom: 6px !important;
   display: inline-block;
 }
 
-/* ── Inputs (in admin content area) ── */
-.admin-dark-theme input,
+/* ── Inputs / Textareas / Selects ── */
+.admin-dark-theme input:not([type="color"]):not([type="range"]):not([type="checkbox"]):not([role="switch"]),
 .admin-dark-theme textarea,
 .admin-dark-theme select,
 .admin-dark-theme [role="combobox"],
 .admin-dark-theme button[aria-haspopup="listbox"] {
-  background-color: #0f172a !important;
-  color: #e2e8f0 !important;
-  border: 1px solid #475569 !important;
+  background-color: var(--admin-bg-input) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--admin-border) !important;
   border-radius: 8px !important;
-  padding: 10px 12px !important;
+  padding: 10px 14px !important;
   margin-bottom: 4px !important;
+  font-size: 14px !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-.admin-dark-theme input:focus,
+.admin-dark-theme input:not([type="color"]):not([type="range"]):focus,
 .admin-dark-theme textarea:focus {
-  border-color: #60a5fa !important;
+  border-color: var(--admin-gold) !important;
   outline: none !important;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2) !important;
 }
 
 .admin-dark-theme input::placeholder,
 .admin-dark-theme textarea::placeholder {
-  color: #64748b !important;
+  color: #666666 !important;
 }
 
 .admin-dark-theme input[type="file"] {
-  background-color: #1e293b !important;
-  padding: 8px !important;
+  background-color: var(--admin-bg-elevated) !important;
+  padding: 10px !important;
+  border: 1px dashed var(--admin-border) !important;
 }
 
-/* ── Buttons ── */
-.admin-dark-theme button[class*="outline"] {
-  border-color: #475569 !important;
-  color: #e2e8f0 !important;
+/* ── Color input ── */
+.admin-dark-theme input[type="color"] {
+  background-color: transparent !important;
+  border: 2px solid var(--admin-border) !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  padding: 2px !important;
 }
 
+/* ── Sliders (Radix) — CRITICAL FIX ── */
+.admin-dark-theme [role="slider"] {
+  background-color: var(--admin-gold) !important;
+  border-color: var(--admin-gold) !important;
+  border: 2px solid var(--admin-gold) !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  cursor: grab !important;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.4) !important;
+}
+
+.admin-dark-theme [role="slider"]:hover {
+  background-color: var(--admin-gold-hover) !important;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.6) !important;
+}
+
+/* Slider track */
+.admin-dark-theme .bg-secondary:has(+ [role="slider"]),
+.admin-dark-theme span.relative.h-2.w-full.grow.overflow-hidden.rounded-full {
+  background-color: #2a2a2a !important;
+}
+
+/* Slider range (fill) */
+.admin-dark-theme .bg-primary[class*="absolute"][class*="h-full"],
+.admin-dark-theme span.absolute.h-full {
+  background-color: var(--admin-gold) !important;
+}
+
+/* ── Switches (Radix) — CRITICAL FIX ── */
 .admin-dark-theme [role="switch"] {
-  border-color: #475569 !important;
+  border: none !important;
+}
+
+.admin-dark-theme [role="switch"][data-state="checked"] {
+  background-color: var(--admin-gold) !important;
+}
+
+.admin-dark-theme [role="switch"][data-state="unchecked"] {
+  background-color: #333333 !important;
+}
+
+/* Switch thumb */
+.admin-dark-theme [role="switch"] span {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ── Buttons — Primary (Gold) ── */
+.admin-dark-theme button[class*="bg-primary"],
+.admin-dark-theme .btn-primary,
+.admin-dark-theme button:not([role="switch"]):not([aria-haspopup]):not([class*="ghost"]):not([class*="outline"]):not([class*="destructive"])[class*="inline-flex"][class*="rounded"] {
+  /* Only target shadcn Button component default variant */
+}
+
+/* ── Buttons — Ghost ── */
+.admin-dark-theme button[class*="ghost"] {
+  color: var(--admin-text-muted) !important;
+}
+
+.admin-dark-theme button[class*="ghost"]:hover {
+  color: #ffffff !important;
+  background-color: var(--admin-bg-elevated) !important;
+}
+
+/* ── Buttons — Outline ── */
+.admin-dark-theme button[class*="outline"] {
+  border-color: var(--admin-border) !important;
+  color: var(--admin-text-secondary) !important;
+}
+
+.admin-dark-theme button[class*="outline"]:hover {
+  background-color: var(--admin-bg-elevated) !important;
+  border-color: var(--admin-gold) !important;
+  color: var(--admin-gold) !important;
+}
+
+/* ── Separator / Divider ── */
+.admin-dark-theme [data-orientation="horizontal"] {
+  background-color: var(--admin-border) !important;
+}
+
+/* ── Muted backgrounds ── */
+.admin-dark-theme .bg-muted\/30,
+.admin-dark-theme .bg-muted {
+  background-color: var(--admin-bg-elevated) !important;
 }
 
 /* ── Scrollbar ── */
@@ -388,84 +530,89 @@
 }
 
 .admin-dark-theme ::-webkit-scrollbar-track {
-  background: #0d0d14;
+  background: var(--admin-bg-page);
 }
 
 .admin-dark-theme ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #333333;
   border-radius: 3px;
+}
+
+.admin-dark-theme ::-webkit-scrollbar-thumb:hover {
+  background: var(--admin-gold);
 }
 
 
 /* ============================================================================
-   Dialogs / Modals — Portaled outside admin-dark-theme
-   Uses SLATE palette: clearly visible against #0d0d14 page background
+   Dialogs / Modals — Portaled (outside admin-dark-theme)
+   Black & Gold palette to match admin
    ============================================================================ */
 
 /* Dialog overlay — darken page behind */
 [role="dialog"]::before {
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.75);
 }
 
-/* Dialog container — slate-800, clearly pops off black page */
+/* Dialog container */
 [role="dialog"]>div,
 [role="alertdialog"]>div {
-  background-color: #1e293b !important;
-  color: #e2e8f0 !important;
-  border: 1px solid #475569 !important;
+  background-color: #111111 !important;
+  color: #ffffff !important;
+  border: 1px solid #2a2a2a !important;
   border-radius: 12px !important;
   padding: 24px !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 175, 55, 0.05) !important;
 }
 
 /* Dialog text */
 [role="dialog"] h2,
 [role="dialog"] h3 {
-  color: #f1f5f9 !important;
+  color: #ffffff !important;
   margin-bottom: 4px !important;
 }
 
 [role="dialog"] label {
-  color: #cbd5e1 !important;
+  color: #cccccc !important;
   margin-bottom: 6px !important;
   display: inline-block;
 }
 
 [role="dialog"] p {
-  color: #94a3b8 !important;
+  color: #999999 !important;
   margin-bottom: 16px !important;
 }
 
-/* Dialog inputs — darker than dialog bg for clear contrast */
+/* Dialog inputs */
 [role="dialog"] input,
 [role="dialog"] textarea,
 [role="dialog"] select,
 [role="dialog"] [role="combobox"],
 [role="dialog"] button[aria-haspopup="listbox"] {
-  background-color: #0f172a !important;
-  color: #e2e8f0 !important;
-  border: 1px solid #475569 !important;
+  background-color: #0a0a0a !important;
+  color: #ffffff !important;
+  border: 1px solid #2a2a2a !important;
   border-radius: 8px !important;
-  padding: 10px 12px !important;
+  padding: 10px 14px !important;
   margin-bottom: 4px !important;
   width: 100%;
 }
 
 [role="dialog"] input:focus,
 [role="dialog"] textarea:focus {
-  border-color: #60a5fa !important;
+  border-color: #d4af37 !important;
   outline: none !important;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2) !important;
 }
 
 [role="dialog"] input::placeholder,
 [role="dialog"] textarea::placeholder {
-  color: #64748b !important;
+  color: #666666 !important;
 }
 
 [role="dialog"] input[type="file"] {
-  background-color: #1e293b !important;
-  padding: 8px !important;
+  background-color: #1a1a1a !important;
+  padding: 10px !important;
+  border: 1px dashed #2a2a2a !important;
 }
 
 /* Dialog form field spacing */
@@ -479,12 +626,23 @@
 
 /* Dialog buttons */
 [role="dialog"] button[class*="outline"] {
-  border-color: #475569 !important;
-  color: #e2e8f0 !important;
+  border-color: #2a2a2a !important;
+  color: #cccccc !important;
 }
 
-[role="dialog"] [role="switch"] {
-  border-color: #475569 !important;
+[role="dialog"] [role="switch"][data-state="checked"] {
+  background-color: #d4af37 !important;
+}
+
+[role="dialog"] [role="switch"][data-state="unchecked"] {
+  background-color: #333333 !important;
+}
+
+/* Dialog slider fixes */
+[role="dialog"] [role="slider"] {
+  background-color: #d4af37 !important;
+  border: 2px solid #d4af37 !important;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.4) !important;
 }
 
 
@@ -493,18 +651,19 @@
    ============================================================================ */
 [role="listbox"],
 [data-radix-popper-content-wrapper] .bg-popover {
-  background-color: #1e293b !important;
-  border: 1px solid #475569 !important;
+  background-color: #111111 !important;
+  border: 1px solid #2a2a2a !important;
   border-radius: 8px !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 175, 55, 0.05) !important;
 }
 
 [role="option"] {
-  color: #e2e8f0 !important;
+  color: #ffffff !important;
   padding: 8px 12px !important;
 }
 
 [role="option"]:hover,
 [role="option"][data-highlighted] {
-  background-color: #334155 !important;
+  background-color: rgba(212, 175, 55, 0.15) !important;
+  color: #d4af37 !important;
 }

@@ -36,38 +36,39 @@ const Admin = () => {
   const ActiveComponent = active.component;
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden admin-dark-theme" style={{ backgroundColor: '#0a0a0f' }}>
+    <div className="h-screen flex flex-col overflow-hidden admin-dark-theme" style={{ backgroundColor: '#050505' }}>
       {/* Top Navigation */}
       <Navigation />
 
       {/* Admin Header Bar */}
       <div
-        className="flex-shrink-0 px-6 py-3 flex items-center justify-between border-b"
+        className="flex-shrink-0 px-6 py-4 flex items-center justify-between"
         style={{
           backgroundColor: '#000000',
-          borderColor: 'var(--accent)',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.3)',
           marginTop: '64px',
         }}
       >
         <div>
           <h1
             className="font-orbitron text-2xl md:text-3xl tracking-wide font-bold"
-            style={{ color: 'var(--accent)' }}
+            style={{ color: '#d4af37' }}
           >
             ADMIN CMS
           </h1>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-            Welcome back, <span style={{ color: 'var(--text-primary)' }} className="font-medium">{user?.email}</span>
+          <p className="text-xs" style={{ color: '#888888' }}>
+            Welcome back, <span style={{ color: '#ffffff' }} className="font-medium">{user?.email}</span>
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => window.open('/', '_blank')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-[1.02]"
             style={{
-              border: '1px solid var(--accent)',
-              color: 'var(--accent)',
+              border: '1px solid #d4af37',
+              color: '#d4af37',
+              backgroundColor: 'rgba(212, 175, 55, 0.08)',
             }}
           >
             <ExternalLink className="h-3.5 w-3.5" />
@@ -75,10 +76,11 @@ const Admin = () => {
           </button>
           <button
             onClick={() => signOut()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-[1.02]"
             style={{
-              border: '1px solid var(--error, #ef4444)',
-              color: 'var(--error, #ef4444)',
+              border: '1px solid #ef4444',
+              color: '#ef4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.08)',
             }}
           >
             <LogOut className="h-3.5 w-3.5" />
@@ -92,31 +94,43 @@ const Admin = () => {
 
         {/* ─── Left Sidebar ─── */}
         <aside
-          className="flex-shrink-0 w-[200px] flex flex-col overflow-y-auto border-r"
+          className="flex-shrink-0 w-[220px] flex flex-col overflow-y-auto"
           style={{
             backgroundColor: '#000000',
-            borderColor: 'color-mix(in srgb, var(--accent) 20%, transparent)',
+            borderRight: '1px solid rgba(212, 175, 55, 0.15)',
           }}
         >
-          <nav className="flex flex-col py-2 gap-0.5 px-2">
+          <nav className="flex flex-col py-3 gap-1 px-3">
             {ADMIN_SECTIONS.map((section) => {
               const isActive = section.id === activeSection;
               return (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-sm font-medium transition-all duration-150"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all duration-200"
                   style={{
                     backgroundColor: isActive
-                      ? `color-mix(in srgb, ${section.color} 15%, transparent)`
+                      ? 'rgba(212, 175, 55, 0.12)'
                       : 'transparent',
-                    color: isActive ? section.color : '#ffffff',
-                    borderLeft: isActive ? `3px solid ${section.color}` : '3px solid transparent',
+                    color: isActive ? '#d4af37' : '#999999',
+                    borderLeft: isActive ? '3px solid #d4af37' : '3px solid transparent',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)';
+                      e.currentTarget.style.color = '#ffffff';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = '#999999';
+                    }
                   }}
                 >
                   <section.icon
                     className="h-4 w-4 flex-shrink-0"
-                    style={{ color: section.color }}
+                    style={{ color: isActive ? '#d4af37' : '#666666' }}
                   />
                   <span className="truncate">{section.label}</span>
                 </button>
@@ -127,8 +141,8 @@ const Admin = () => {
 
         {/* ─── Content Area ─── */}
         <main
-          className="flex-1 overflow-y-auto p-6"
-          style={{ backgroundColor: 'var(--bg-primary)' }}
+          className="flex-1 overflow-y-auto p-6 md:p-8"
+          style={{ backgroundColor: '#050505' }}
         >
           <div className="max-w-6xl mx-auto">
             <ActiveComponent />
