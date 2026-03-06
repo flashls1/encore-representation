@@ -1,115 +1,112 @@
-# SillCon 26 — Workspace Rules
+# Encore Representation — Workspace Rules
 
-> **These rules are LOCAL to the SillCon 26 workspace only.**
-
----
-
-## ✅ BUILD IN PROGRESS
-
-**Build was greenlit on 2026-02-17.** Implementation plan approved. Executing 8-phase production build per `implementation_plan.md`.
+> **These rules are LOCAL to the Encore Representation workspace only.**
+> Last updated: 2026-03-06
 
 ---
 
-## 🚨 HARD RULE: DO NOT MODIFY `bun.lockb`
+## 🔒 WORKSPACE BOUNDARY LOCK
 
-**Never modify, regenerate, or delete the `bun.lockb` file.** This is Lovable's build lockfile. If it is changed in any way, the site will break immediately on deploy. Treat it as a read-only, untouchable artifact.
+**This workspace is `/Users/flash/CODING PROJECTS/Encore` — NOTHING ELSE.**
 
-- Do NOT run `bun install`, `bun add`, or any bun command that would regenerate it
-- Do NOT delete it, move it, or overwrite it
-- If dependencies need to change, they must be handled through the Lovable pipeline
+- ✅ Read, write, modify files ONLY inside this directory
+- ❌ NEVER touch TMPRO, SillCon, or any other project's files
+- ❌ NEVER reference or use credentials from other projects
+- ❌ NEVER modify files in `/Users/flash/CODING PROJECTS/TMPRO` or any sibling directory
 
----
-
-## 🔄 Deployment Pipeline
-
-**How this project deploys:**
-
-```
-Local Code → git push → GitHub → Lovable 2-way sync → Auto-rebuild & Deploy
-```
-
-1. We make changes locally and push to GitHub
-2. GitHub has a **2-way sync** with Lovable.dev (project ID: `115c08f2-fab9-4ac7-ac04-c2f4c0b09e95`)
-3. When code is pushed, Lovable picks up the changes, rebuilds, and deploys automatically
-4. Changes made in the Lovable editor also sync back to GitHub
-
-### ⚠️ CRITICAL: Lovable Rebuild Trigger
-
-> **Lovable does NOT always auto-rebuild on push.** Its build cache can cause it to skip new commits. To **force a rebuild**, you MUST bump the build timestamp comment in `index.html` and include that in the push.
-
-**Every push to production MUST include this step:**
-
-```html
-<!-- in index.html, line 2 -->
-<!-- Build: YYYY-MM-DDTHH:MM -->
-```
-
-Update the timestamp to the current date/time before pushing. Without this, your code changes **will not deploy**.
-
-### Git Remote
-
-| Remote | Repo | Purpose |
-|---|---|---|
-| `origin` | `flashls1/sillcon-con-hub-723e12c4` | **Production** — triggers Lovable deploy |
-
-**Standard push command:**
-```bash
-git push origin main
-```
-
-> **Important:** Because of the 2-way sync, the code must remain compatible with Lovable's build system. This means the `bun.lockb` lockfile and overall project structure must stay intact.
+**If you catch yourself about to access a file outside this workspace — STOP. You are wrong.**
 
 ---
 
-## ⚠️ Supabase Access Constraint
+## 🚨 SERVER ISOLATION — ENCORE ONLY
 
-> **We have NO direct access to Supabase.** No CLI, no dashboard login, no migrations, no Edge Functions. The Supabase instance is fully managed by Lovable.dev.
+| Resource | Encore (✅ USE THIS) | TMPRO (❌ NEVER USE) |
+|----------|---------------------|---------------------|
+| **API URL** | `api.encorerepresentation.com` | `api.talentmanagementpro.com` |
+| **Coolify App UUID** | `po4k0ows880ss8ccg4kkgo0g` | `togw08co0g4kcogk488skc80` |
+| **Supabase Service UUID** | `s00gsowcgco444s448wskoks` | `b4ok40cwswc8cwwg44c0w0o4` |
+| **DB Container** | `supabase-db-s00gsowcgco444s448wskoks` | `supabase-db-b4ok40cwswc8cwwg44c0w0o4` |
+| **Coolify Project** | "The Girls Girl" → production | Different project |
 
-**The ONLY way to modify Supabase** (schema, RLS policies, storage buckets, seed data, etc.) is through **SQL commands executed on Lovable's SQL editor dashboard.**
-
-**Mandatory workflow for any Supabase change:**
-1. Write the complete SQL snippet
-2. Present it to the user with clear instructions
-3. The user will copy-paste and run it on Lovable's SQL dashboard
-4. Never attempt to run Supabase CLI commands, access the Supabase dashboard via browser, or assume direct DB access
-
-This applies to: table creation, column changes, RLS policies, storage buckets, data seeding, function creation, and any other database-level operation.
-
-## Project Context
-
-- **Type:** Website overhaul / refresh of an existing project
-- **Source:** GitHub repo `flashls1/sillcon-con-hub` (cloned into workspace)
-- **Platform:** Built on Lovable.dev with GitHub 2-way sync
-- **Mobile-First:** All designs and implementations MUST be mobile-friendly
-  - Support all iPhone screen sizes (iPhone SE through iPhone 16 Pro Max)
-  - Include proper viewport meta tags and responsive breakpoints
-  - Test against all common small-screen resolutions
+**Cross-connecting these WILL break production for one or both projects.**
 
 ---
 
-## Supabase Connection
+## 📋 MANDATORY PREFLIGHT
 
-| Key | Value |
-|---|---|
-| Project ID | `vyicjgxowsyerwzfirbk` |
-| URL | `https://vyicjgxowsyerwzfirbk.supabase.co` |
-| Anon Key | Set in `.env` as `VITE_SUPABASE_PUBLISHABLE_KEY` |
-| Dashboard | `https://supabase.com/dashboard/project/vyicjgxowsyerwzfirbk` |
-| Hosting | Supabase Cloud (free tier) |
+Before ANY of these operations, **re-read `.agent/PREFLIGHT.md`** — do NOT rely on memory:
+- `ssh` commands
+- `docker exec` commands
+- `curl` to production APIs
+- Database queries (DDL or DML)
+- Coolify API calls (deploy, restart)
+- `psql` via any method
+
+**Copy the exact command from PREFLIGHT.md.** Do NOT type commands from memory.
 
 ---
 
-## Design Requirements
+## ⚡ JUST DO IT — No Unnecessary Questions
 
-- Responsive design targeting all modern iPhone models
-- Breakpoints must cover:
-  - iPhone SE (375×667)
-  - iPhone 8 / SE 3rd gen (375×667)
-  - iPhone 12 mini / 13 mini (375×812)
-  - iPhone 12 / 13 / 14 (390×844)
-  - iPhone 14 Pro / 15 / 15 Pro (393×852)
-  - iPhone 14 Plus / 15 Plus (430×932)
-  - iPhone 14 Pro Max / 15 Pro Max / 16 Pro Max (430×932)
-  - iPhone 16 Pro (402×874)
-  - Generic small screens down to 320px width
-- Desktop and tablet layouts are also required but mobile is the priority
+**If you have the ability to do something, DO IT. Do not ask Flash for permission.**
+
+This includes:
+- `git add`, `git commit`, `git push` — just do it
+- `npm install` — just do it
+- Coolify deploy API calls — just do it
+- SSH commands for DB operations — just do it
+- File reads, searches, verifications — just do it
+
+**The only time you pause and ask** is for destructive operations defined in ALWAYS_ACTIVE.md Commandment 8 (rm -rf, dropping tables, truncating data, force-push to shared branches, major dependency upgrades).
+
+---
+
+## 🔄 SELF-CORRECTION PROTOCOL
+
+1. **Before running a server command:** Check PREFLIGHT.md for the exact syntax
+2. **If a command fails:** Do NOT retry the same command. Check PREFLIGHT.md "WHAT DOES NOT WORK" section for the correct alternative
+3. **Before reporting a task complete:** Verify the actual results — read the output, confirm it matches expectations. If unsure, say so
+4. **If you've seen this error before in this session:** Do NOT repeat the same approach. Reference the alternative from docs
+5. **Schema operations:** ALWAYS run PostgREST schema discovery before assuming column names. Migration files may NOT match live DB
+
+---
+
+## 🚀 STARTUP REQUIREMENT
+
+On every new session, run `/startup` to load all context files before doing any work.
+
+---
+
+## 🏗️ DEPLOYMENT PIPELINE
+
+After ANY code change:
+1. `npm run build` — must pass with zero errors
+2. `git add -A && git commit -m "..." && git push origin main`
+3. Deploy: `curl -s -X POST -H "Authorization: Bearer 1|ZQuSdx6eW3QlQXxRYva1U7nYuijWiZ2akcmbPCp92a50c908" "http://35.188.155.233:8000/api/v1/deploy?uuid=po4k0ows880ss8ccg4kkgo0g&force=true"`
+4. Verify live within 60s
+
+---
+
+## 🎨 COLOR CONTRAST RULES (MANDATORY)
+
+- **Gold/yellow backgrounds** → ALWAYS use black (#000000) text
+- **Dark backgrounds** → ALWAYS use white/light text
+- **Light backgrounds** → ALWAYS use dark text
+- **Audit ALL pages** before deploying any UI change
+
+## ADMIN CMS COLOR PALETTE
+| Token | Value |
+|-------|-------|
+| Page background | #050505 |
+| Card background | #111111 |
+| Elevated surface | #1a1a1a |
+| Input background | #0a0a0a |
+| Accent (gold) | #d4af37 |
+| Accent hover | #f5d060 |
+| Primary text | #ffffff |
+| Secondary text | #cccccc |
+| Muted text | #888888 |
+| Borders | #2a2a2a |
+| Text on gold | #000000 |
+| Error | #ef4444 |
+| Success | #22c55e |
