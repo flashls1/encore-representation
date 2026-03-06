@@ -206,10 +206,18 @@ const TalentProfile = () => {
                                     Notable Roles & Characters
                                 </h2>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {roles.map((role, i) => (
-                                    <RoleCard key={role.id} role={role} index={i} />
-                                ))}
+                            <div
+                                className="rounded-xl p-4 sm:p-5"
+                                style={{
+                                    backgroundColor: '#000000',
+                                    border: '1px solid rgba(212, 175, 55, 0.25)',
+                                }}
+                            >
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {roles.map((role, i) => (
+                                        <RoleCard key={role.id} role={role} index={i} />
+                                    ))}
+                                </div>
                             </div>
                         </motion.section>
                     )}
@@ -235,8 +243,8 @@ const TalentProfile = () => {
                             <div
                                 className="rounded-xl p-6 sm:p-8 md:p-10"
                                 style={{
-                                    backgroundColor: '#111111',
-                                    border: '1px solid #222',
+                                    backgroundColor: '#000000',
+                                    border: '1px solid rgba(212, 175, 55, 0.25)',
                                 }}
                             >
                                 <div
