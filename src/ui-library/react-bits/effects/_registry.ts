@@ -87,7 +87,7 @@ export const UI_EFFECTS_REGISTRY: EffectEntry[] = [
       raysColor: {
         label: 'Rays Color',
         control: 'color',
-        defaultValue: '#ffffff',
+        defaultValue: '#D4AF37',
         description: 'Color of the light rays in hex format.',
         type: 'string',
       },
@@ -294,11 +294,24 @@ export const UI_EFFECTS_REGISTRY: EffectEntry[] = [
     id: 'talent-carousel',
     name: 'Talent Carousel',
     category: 'components',
-    description: 'Vertical auto-scrolling carousel for talent banners (5:3 aspect ratio). 3 items visible — center crisp, top/bottom blurred. Silk background.',
+    description: 'Vertical auto-scrolling carousel for talent banners (5:3 aspect ratio). 3 items visible — center crisp, top/bottom blurred. Switchable background effect.',
     dependencies: [],
     source: 'custom',
     importPath: 'ui-library/react-bits/effects/components/talent-carousel/TalentCarousel',
     propConfig: {
+      background: {
+        label: 'Background Effect',
+        control: 'select',
+        defaultValue: 'light-rays',
+        description: 'Which background effect to render behind the carousel. Only one can be active at a time.',
+        type: 'string',
+        options: [
+          { value: 'light-rays', label: 'Light Rays' },
+          { value: 'hyperspeed', label: 'Hyperspeed' },
+          { value: 'silk', label: 'Silk' },
+          { value: 'none', label: 'None (solid dark)' },
+        ],
+      },
       autoScrollSpeed: {
         label: 'Auto-Scroll Speed',
         control: 'slider',
@@ -318,13 +331,6 @@ export const UI_EFFECTS_REGISTRY: EffectEntry[] = [
         min: 300,
         max: 800,
         step: 10,
-      },
-      bgColor: {
-        label: 'Background Color (Silk)',
-        control: 'color',
-        defaultValue: '#8B0000',
-        description: 'Color of the Silk background pattern behind the carousel.',
-        type: 'string',
       },
     },
   },

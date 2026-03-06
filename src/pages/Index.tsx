@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import { useTalents, useUIEffect } from "@/hooks/useData";
 import type { Talent } from "@/types/database";
 import TalentCarousel from "@/ui-library/react-bits/effects/components/talent-carousel/TalentCarousel";
+import LightRays from "@/ui-library/react-bits/effects/backgrounds/light-rays/LightRays";
 import Silk from "@/ui-library/react-bits/effects/backgrounds/silk/Silk";
 import BlurText from "@/ui-library/react-bits/effects/text-animations/blur-text/BlurText";
 import ShinyText from "@/ui-library/react-bits/effects/text-animations/shiny-text/ShinyText";
@@ -26,6 +27,11 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
   // Fetch admin UI settings for the two text effects
   const { config: blurConfig } = useUIEffect('blur-text');
   const { config: shinyConfig } = useUIEffect('shiny-text');
+
+  // Fetch background selection + individual effect configs
+  const { config: carouselConfig } = useUIEffect('talent-carousel');
+  const { config: lightRaysConfig } = useUIEffect('light-rays');
+  const { config: silkConfig } = useUIEffect('talent-carousel'); // for legacy silk color if needed
 
   // Build carousel items from talent data
   const carouselItems = useMemo(() => {
@@ -71,10 +77,29 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
         }}
       >
-        {/* Layer 0: Silk Background (dark red pattern) — wrapped for GPU safety */}
+        {/* Layer 0: Switchable Background Effect — controlled via Admin UI Effects panel */}
         <div className="absolute inset-0 z-0" style={{ pointerEvents: 'none' }}>
           <SafeBackground>
-            <Silk color="#8B0000" speed={5} scale={1} noiseIntensity={1.5} rotation={0} />
+            {carouselConfig.background === 'light-rays' && (
+              <LightRays
+                raysOrigin={lightRaysConfig.raysOrigin}
+                raysColor={lightRaysConfig.raysColor}
+                raysSpeed={lightRaysConfig.raysSpeed}
+                lightSpread={lightRaysConfig.lightSpread}
+                rayLength={lightRaysConfig.rayLength}
+                pulsating={lightRaysConfig.pulsating}
+                fadeDistance={lightRaysConfig.fadeDistance}
+                saturation={lightRaysConfig.saturation}
+                followMouse={lightRaysConfig.followMouse}
+                mouseInfluence={lightRaysConfig.mouseInfluence}
+                noiseAmount={lightRaysConfig.noiseAmount}
+                distortion={lightRaysConfig.distortion}
+              />
+            )}
+            {carouselConfig.background === 'silk' && (
+              <Silk color="#8B0000" speed={5} scale={1} noiseIntensity={1.5} rotation={0} />
+            )}
+            {carouselConfig.background === 'none' && null}
           </SafeBackground>
         </div>
 
@@ -120,7 +145,7 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
     </section>
   );
 };
-// ─── Safe Silk wrapper (WebGL may crash on some mobile GPUs) ────────────────
+// ─── Safe WebGL wrapper (WebGL may crash on some mobile GPUs) ────────────────
 
 class SafeBackground extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
