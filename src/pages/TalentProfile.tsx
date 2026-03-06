@@ -248,14 +248,17 @@ const TalentProfile = () => {
                                 }}
                             >
                                 <div
-                                    className="prose prose-lg max-w-none leading-relaxed"
+                                    className="prose prose-lg max-w-none leading-relaxed bio-clean"
                                     style={{
                                         color: '#cccccc',
                                         fontSize: '1.05rem',
                                         lineHeight: '1.8',
                                     }}
-                                    dangerouslySetInnerHTML={{ __html: talent.bio }}
+                                    dangerouslySetInnerHTML={{
+                                        __html: talent.bio.replace(/background-color\s*:\s*[^;"]+;?/gi, ''),
+                                    }}
                                 />
+                                <style>{`.bio-clean * { background-color: transparent !important; }`}</style>
                             </div>
                         </motion.section>
                     )}
