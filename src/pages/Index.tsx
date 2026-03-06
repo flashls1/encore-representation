@@ -67,7 +67,7 @@ const TalentCarouselSection = ({ talents }: { talents: Talent[] }) => {
   if (!carouselItems.length) return null;
 
   return (
-    <section className="px-3 md:px-[10px] mt-2">
+    <section className="px-3 md:px-[10px] mt-4 md:mt-2">
       {/* Carousel container — responsive, matches hero gold box on mobile */}
       <div
         ref={containerRef}
