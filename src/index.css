@@ -544,7 +544,28 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* ── Buttons — Primary (Gold) — handled by shadcn HSL overrides above ── */
+/* ── Buttons — Primary (Gold) ── */
+/* shadcn <Button> default variant: bg-primary text-primary-foreground */
+.admin-dark-theme .bg-primary {
+  background-color: #d4af37 !important;
+  color: #000000 !important;
+}
+
+.admin-dark-theme .text-primary-foreground {
+  color: #000000 !important;
+}
+
+/*
+ * CONTRAST RULE: Any element with a gold/yellow/accent background
+ * MUST have black (#000) text. Never white on gold.
+ * This applies to inline styles using var(--accent), var(--button-bg),
+ * and var(--text-on-accent) which is set to #000000.
+ */
+
+.admin-dark-theme .bg-primary:hover {
+  background-color: #f5d060 !important;
+  color: #000000 !important;
+}
 
 /* ── Buttons — Ghost ── */
 .admin-dark-theme button[class*="ghost"] {

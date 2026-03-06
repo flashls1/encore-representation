@@ -243,10 +243,10 @@ const AdminUsers = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
         <div className="flex items-center gap-2">
-          <ShieldAlert className="h-6 w-6" style={{ color: "var(--accent)" }} />
+          <ShieldAlert className="h-6 w-6" style={{ color: "#d4af37" }} />
           <h2
             className="font-orbitron text-xl font-bold tracking-wider"
-            style={{ color: "var(--accent)" }}
+            style={{ color: "#d4af37" }}
           >
             Admin Users
           </h2>
@@ -260,8 +260,8 @@ const AdminUsers = () => {
             }}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 hover:scale-[1.02]"
             style={{
-              backgroundColor: "var(--accent)",
-              color: "#000",
+              backgroundColor: "#d4af37",
+              color: "#000000",
             }}
           >
             <UserPlus className="h-4 w-4" />
@@ -276,14 +276,14 @@ const AdminUsers = () => {
           ref={createFormRef}
           className="rounded-xl p-5 sm:p-6 mb-6 animate-in fade-in slide-in-from-top-2 duration-300"
           style={{
-            backgroundColor: "var(--bg-card)",
-            border: "1px solid var(--accent)",
-            boxShadow: "0 0 20px color-mix(in srgb, var(--accent) 15%, transparent)",
+            backgroundColor: "#111111",
+            border: "1px solid #d4af37",
+            boxShadow: "0 0 20px rgba(212, 175, 55, 0.15)",
           }}
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <UserPlus className="h-5 w-5" style={{ color: "var(--accent)" }} />
+              <UserPlus className="h-5 w-5" style={{ color: "#d4af37" }} />
               <h3 className="font-bold text-base" style={{ color: "var(--text-primary)" }}>
                 Create New Admin
               </h3>
@@ -404,8 +404,8 @@ const AdminUsers = () => {
               disabled={creating}
               className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-200 disabled:opacity-50 hover:scale-[1.02]"
               style={{
-                backgroundColor: "var(--accent)",
-                color: "#000",
+                backgroundColor: "#d4af37",
+                color: "#000000",
               }}
             >
               {creating ? (
@@ -672,8 +672,8 @@ const AdminUsers = () => {
                           disabled={saving}
                           className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 disabled:opacity-50"
                           style={{
-                            backgroundColor: "var(--accent)",
-                            color: "#000",
+                            backgroundColor: "#d4af37",
+                            color: "#000000",
                           }}
                         >
                           {saving ? (

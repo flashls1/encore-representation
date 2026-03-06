@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
-import { Eye, EyeOff, LogIn, UserPlus, Shield } from 'lucide-react';
+import { Eye, EyeOff, LogIn, Shield } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 
@@ -13,11 +13,10 @@ const authSchema = z.object({
 });
 
 const Login = () => {
-  const { user, isAdmin, loading, signIn, signUp } = useAuth();
+  const { user, isAdmin, loading, signIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -59,34 +58,14 @@ const Login = () => {
       toast({ title: 'Sign In Failed', description: error.message || 'Please check your credentials.', variant: 'destructive' });
     } else {
       toast({ title: 'Welcome back!', description: 'You have successfully signed in.' });
-      // Use the returned admin status — NOT the hook's closure value which is stale.
       navigate(resolvedAdmin ? '/admin' : '/', { replace: true });
-    }
-    setIsLoading(false);
-  };
-
-  const handleSignUp = async () => {
-    if (!validateForm()) return;
-    setIsLoading(true);
-    const { error } = await signUp(formData.email, formData.password);
-    if (error) {
-      toast({
-        title: error.message?.includes('already registered') ? 'Account Exists' : 'Sign Up Failed',
-        description: error.message?.includes('already registered')
-          ? 'An account with this email already exists. Please sign in instead.'
-          : error.message || 'Failed to create account.',
-        variant: 'destructive'
-      });
-    } else {
-      toast({ title: 'Account Created!', description: 'You can now sign in.' });
-      setActiveTab('signin');
     }
     setIsLoading(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    activeTab === 'signin' ? handleSignIn() : handleSignUp();
+    handleSignIn();
   };
 
   return (
@@ -128,37 +107,6 @@ const Login = () => {
       <section className="py-12 md:py-20 px-4">
         <div className="max-w-md mx-auto">
 
-          {/* Tab switcher */}
-          <div
-            className="flex rounded-xl overflow-hidden mb-8"
-            style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
-          >
-            <button
-              type="button"
-              onClick={() => setActiveTab('signin')}
-              className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 text-sm font-semibold transition-all duration-300"
-              style={{
-                backgroundColor: activeTab === 'signin' ? 'var(--accent)' : 'transparent',
-                color: activeTab === 'signin' ? 'var(--text-on-accent)' : 'var(--text-muted)',
-              }}
-            >
-              <LogIn className="w-4 h-4" />
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('signup')}
-              className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 text-sm font-semibold transition-all duration-300"
-              style={{
-                backgroundColor: activeTab === 'signup' ? 'var(--accent)' : 'transparent',
-                color: activeTab === 'signup' ? 'var(--text-on-accent)' : 'var(--text-muted)',
-              }}
-            >
-              <UserPlus className="w-4 h-4" />
-              Sign Up
-            </button>
-          </div>
-
           {/* Form card */}
           <div
             className="rounded-2xl p-8 md:p-10 relative overflow-hidden"
@@ -174,18 +122,24 @@ const Login = () => {
               style={{ background: `linear-gradient(90deg, transparent, var(--accent), transparent)` }}
             />
 
+            {/* Sign in header */}
+            <div className="flex items-center gap-2 mb-6">
+              <LogIn className="w-5 h-5" style={{ color: 'var(--accent)' }} />
+              <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Admin Sign In</h2>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email */}
               <div className="space-y-2">
                 <label
-                  htmlFor={`${activeTab}-email`}
+                  htmlFor="signin-email"
                   className="block text-sm font-semibold tracking-wide uppercase"
                   style={{ color: 'var(--text-secondary)' }}
                 >
                   Email Address
                 </label>
                 <input
-                  id={`${activeTab}-email`}
+                  id="signin-email"
                   type="email"
                   placeholder="you@example.com"
                   value={formData.email}
@@ -207,7 +161,7 @@ const Login = () => {
               {/* Password */}
               <div className="space-y-2">
                 <label
-                  htmlFor={`${activeTab}-password`}
+                  htmlFor="signin-password"
                   className="block text-sm font-semibold tracking-wide uppercase"
                   style={{ color: 'var(--text-secondary)' }}
                 >
@@ -215,9 +169,9 @@ const Login = () => {
                 </label>
                 <div className="relative">
                   <input
-                    id={`${activeTab}-password`}
+                    id="signin-password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder={activeTab === 'signup' ? 'Min. 6 characters' : 'Enter your password'}
+                    placeholder="Enter your password"
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
                     className="w-full px-4 py-3 pr-12 rounded-lg text-base transition-all duration-200 outline-none"
@@ -257,35 +211,15 @@ const Login = () => {
                 onMouseEnter={(e) => { if (!isLoading) e.currentTarget.style.backgroundColor = 'var(--button-hover)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--button-bg)'; }}
               >
-                {isLoading
-                  ? (activeTab === 'signin' ? 'Signing In…' : 'Creating Account…')
-                  : (activeTab === 'signin' ? 'Sign In' : 'Create Account')
-                }
+                {isLoading ? 'Signing In…' : 'Sign In'}
               </button>
             </form>
-
-            {/* Footer text */}
-            {activeTab === 'signup' && (
-              <p className="text-xs text-center mt-6" style={{ color: 'var(--text-muted)' }}>
-                By creating an account, you agree to our terms of service.
-              </p>
-            )}
           </div>
 
-          {/* Helpful info below the card */}
-          <div className="mt-8 text-center">
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-              {activeTab === 'signin'
-                ? "Don't have an account? "
-                : 'Already have an account? '}
-              <button
-                type="button"
-                onClick={() => setActiveTab(activeTab === 'signin' ? 'signup' : 'signin')}
-                className="font-semibold underline-offset-2 hover:underline transition-colors"
-                style={{ color: 'var(--accent)' }}
-              >
-                {activeTab === 'signin' ? 'Create one' : 'Sign in'}
-              </button>
+          {/* Admin-only notice */}
+          <div className="mt-6 text-center">
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+              Access restricted to authorized administrators only.
             </p>
           </div>
         </div>

@@ -25,7 +25,13 @@ const AdminSiteContent = () => {
             </div>
 
             {/* Sub-tabs */}
-            <div className="flex gap-1 p-1 rounded-lg" style={{ backgroundColor: 'var(--bg-elevated)' }}>
+            <div
+                className="flex gap-1 p-1 rounded-lg"
+                style={{
+                    backgroundColor: '#1a1a1a',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                }}
+            >
                 {TABS.map(tab => {
                     const isActive = tab.id === activeTab;
                     return (
@@ -34,8 +40,9 @@ const AdminSiteContent = () => {
                             onClick={() => setActiveTab(tab.id)}
                             className="flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-all duration-150 flex-1 justify-center"
                             style={{
-                                backgroundColor: isActive ? 'var(--accent)' : 'transparent',
-                                color: isActive ? 'var(--text-on-accent, #000)' : 'var(--text-muted)',
+                                backgroundColor: isActive ? '#d4af37' : 'transparent',
+                                color: isActive ? '#000000' : '#888888',
+                                fontWeight: isActive ? 700 : 500,
                             }}
                         >
                             <tab.icon className="h-4 w-4" />
