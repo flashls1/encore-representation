@@ -45,7 +45,7 @@ const Navigation = () => {
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center group">
               <motion.img
-                src="/encore-logo.png"
+                src="/encore-logo.png?v=2"
                 alt="Encore Representation"
                 className="h-9 sm:h-10 w-auto"
                 style={{
