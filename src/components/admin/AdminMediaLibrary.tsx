@@ -1,7 +1,7 @@
 import { useRef, useCallback, useState } from 'react';
 import { useMediaLibrary, useUploadMedia, useDeleteMedia, useMediaUsage, MAX_FILE_BYTES } from '@/hooks/useMediaLibrary';
 import { convertMovToMp4, isMovFile, ConversionProgress } from '@/hooks/useVideoConverter';
-import { Upload, Trash2, Image as ImageIcon, Film, HardDrive } from 'lucide-react';
+import { Upload, Trash2, Download, Image as ImageIcon, Film, HardDrive } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const AdminMediaLibrary = () => {
@@ -64,6 +64,23 @@ const AdminMediaLibrary = () => {
             await deleteMedia.mutateAsync(item);
         } catch (err: any) {
             toast({ title: 'Delete failed', description: err.message || 'Delete failed', variant: 'destructive' });
+        }
+    };
+
+    const handleDownload = async (item: any) => {
+        try {
+            const response = await fetch(item.file_url);
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = item.file_name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (err: any) {
+            toast({ title: 'Download failed', description: err.message || 'Download failed', variant: 'destructive' });
         }
     };
 
@@ -208,13 +225,23 @@ const AdminMediaLibrary = () => {
                                 )}
                             </div>
 
-                            {/* Delete */}
-                            <button
-                                onClick={() => handleDelete(item)}
-                                className="absolute top-2 right-2 p-1.5 rounded-lg bg-red-600 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
-                            >
-                                <Trash2 className="h-3.5 w-3.5" />
-                            </button>
+                            {/* Actions */}
+                            <div className="absolute top-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                    onClick={() => handleDownload(item)}
+                                    className="p-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                                    title="Download"
+                                >
+                                    <Download className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(item)}
+                                    className="p-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
+                                    title="Delete"
+                                >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
