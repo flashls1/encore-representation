@@ -7,8 +7,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useUpcomingEvents, useUpsertEvent, useDeleteEvent, type UpcomingEvent } from '@/hooks/useUpcomingEvents';
+import { useUIEffect } from '@/hooks/useData';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 import MediaPicker from './MediaPicker';
-import { CalendarDays, Plus, Trash2, Save, Loader2, Image as ImageIcon, Edit, Eye, EyeOff } from 'lucide-react';
+import { CalendarDays, Plus, Trash2, Save, Loader2, Image as ImageIcon, Edit, Eye, EyeOff, Settings } from 'lucide-react';
 
 const EMPTY_EVENT: Partial<UpcomingEvent> = {
     title: '',
@@ -27,6 +30,8 @@ const AdminEventsEditor = () => {
     const upsert = useUpsertEvent();
     const deleteEvent = useDeleteEvent();
     const { toast } = useToast();
+    const queryClient = useQueryClient();
+    const { config: eventsCarouselConfig } = useUIEffect('events-carousel');
 
     const [editing, setEditing] = useState<Partial<UpcomingEvent> | null>(null);
     const [showMediaPicker, setShowMediaPicker] = useState(false);
@@ -190,8 +195,70 @@ const AdminEventsEditor = () => {
     }
 
     // Event list
+    const saveCarouselSpeed = async (key: string, value: number) => {
+        const newProps = { ...eventsCarouselConfig, [key]: value };
+        try {
+            await (supabase as any).from('ui_effect_overrides').upsert(
+                { effect_id: 'events-carousel', props: newProps },
+                { onConflict: 'effect_id' }
+            );
+            queryClient.invalidateQueries({ queryKey: ['ui-effect-overrides'] });
+        } catch (err: any) {
+            toast({ title: 'Save failed', description: err.message, variant: 'destructive' });
+        }
+    };
+
     return (
         <div className="space-y-6">
+            {/* Carousel Speed Settings */}
+            <Card className="bg-card/50 border-primary/30">
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-bold flex items-center gap-2">
+                        <Settings className="h-4 w-4" style={{ color: 'var(--accent)' }} />
+                        Homepage Events Carousel Settings
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <Label className="text-xs">🖥️ Desktop Scroll Speed</Label>
+                            <div className="flex items-center gap-3 mt-1">
+                                <input
+                                    type="range"
+                                    min={0.2}
+                                    max={10}
+                                    step={0.1}
+                                    value={eventsCarouselConfig.desktopSpeed ?? 1.0}
+                                    onChange={(e) => saveCarouselSpeed('desktopSpeed', parseFloat(e.target.value))}
+                                    className="flex-1"
+                                />
+                                <span className="text-xs font-mono w-8" style={{ color: 'var(--text-muted)' }}>
+                                    {(eventsCarouselConfig.desktopSpeed ?? 1.0).toFixed(1)}
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <Label className="text-xs">📱 Mobile Scroll Speed</Label>
+                            <div className="flex items-center gap-3 mt-1">
+                                <input
+                                    type="range"
+                                    min={0.2}
+                                    max={10}
+                                    step={0.1}
+                                    value={eventsCarouselConfig.mobileSpeed ?? 0.6}
+                                    onChange={(e) => saveCarouselSpeed('mobileSpeed', parseFloat(e.target.value))}
+                                    className="flex-1"
+                                />
+                                <span className="text-xs font-mono w-8" style={{ color: 'var(--text-muted)' }}>
+                                    {(eventsCarouselConfig.mobileSpeed ?? 0.6).toFixed(1)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Header + Add Event */}
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="text-lg font-bold text-foreground">Upcoming Events</h3>

@@ -7,8 +7,10 @@ import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import Footer from "@/components/Footer";
 import { useTalents, useUIEffect } from "@/hooks/useData";
+import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
 import type { Talent } from "@/types/database";
 import TalentCarousel from "@/ui-library/react-bits/effects/components/talent-carousel/TalentCarousel";
+import EventsCarousel from "@/components/EventsCarousel";
 import LightRays from "@/ui-library/react-bits/effects/backgrounds/light-rays/LightRays";
 import Spotlights from "@/ui-library/react-bits/effects/backgrounds/spotlights/Spotlights";
 import Silk from "@/ui-library/react-bits/effects/backgrounds/silk/Silk";
@@ -249,6 +251,75 @@ const useDesktopSnapScroll = (sectionRefs: React.RefObject<HTMLElement>[]) => {
   }, [sectionRefs, snapTo]);
 };
 
+// ─── Events Carousel Section ─────────────────────────────────────────────────
+const EventsCarouselSection = () => {
+  const { data: events } = useUpcomingEvents(true);
+  const { config: eventsConfig } = useUIEffect('events-carousel');
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    gsap.fromTo(containerRef.current,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 90%',
+          toggleActions: 'play none none reverse',
+        },
+      }
+    );
+  }, []);
+
+  const carouselItems = useMemo(() => {
+    if (!events) return [];
+    return events
+      .filter(e => e.image_url)
+      .map(e => ({
+        image: e.image_url,
+        id: e.id,
+        title: e.title,
+      }));
+  }, [events]);
+
+  if (!carouselItems.length) return null;
+
+  return (
+    <section className="px-3 md:px-[10px] mt-4 md:mt-2">
+      <div
+        ref={containerRef}
+        className="relative w-full overflow-hidden rounded-xl md:rounded-2xl"
+        style={{
+          height: 'clamp(280px, 45vh, 420px)',
+          border: '1.5px solid #D4AF37',
+          backgroundColor: 'rgba(10, 10, 10, 0.9)',
+        }}
+      >
+        {/* Heading overlay */}
+        <div className="absolute top-3 md:top-5 left-0 right-0 z-20 text-center pointer-events-none">
+          <h2
+            className="font-orbitron text-xl md:text-3xl tracking-wider font-bold mb-1 md:mb-2"
+            style={{ color: '#D4AF37', textShadow: '0 0 20px rgba(212,175,55,0.3), 1px 1px 0 rgba(0,0,0,0.8)' }}
+          >
+            Events
+          </h2>
+          <div className="w-12 md:w-16 h-[2px] mx-auto mt-1 md:mt-2" style={{ backgroundColor: '#D4AF37' }} />
+        </div>
+
+        {/* Carousel */}
+        <div className="absolute inset-0 z-10">
+          <EventsCarousel
+            items={carouselItems}
+            desktopSpeed={eventsConfig.desktopSpeed}
+            mobileSpeed={eventsConfig.mobileSpeed}
+          />
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // ─── Main page ─────────────────────────────────────────────────────────────────
 const Index = () => {
   const { data: talents, isLoading } = useTalents();
@@ -256,10 +327,11 @@ const Index = () => {
   // Section refs for desktop snap-scroll
   const heroRef = useRef<HTMLDivElement>(null!);
   const talentRef = useRef<HTMLDivElement>(null!);
+  const eventsRef = useRef<HTMLDivElement>(null!);
   const footerRef = useRef<HTMLDivElement>(null!);
 
   // Desktop snap scroll between sections
-  useDesktopSnapScroll([heroRef, talentRef, footerRef]);
+  useDesktopSnapScroll([heroRef, talentRef, eventsRef, footerRef]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0A0A0A' }}>
@@ -273,7 +345,6 @@ const Index = () => {
       {/* Section 1: Talent Roster */}
       <div ref={talentRef}>
         {isLoading ? (
-          /* Loading skeleton — visible on mobile too */
           <section className="px-3 md:px-[10px] mt-2">
             <div className="text-center mb-4 md:mb-8">
               <div className="h-8 w-48 mx-auto rounded bg-white/5 animate-pulse" />
@@ -292,7 +363,12 @@ const Index = () => {
         ) : null}
       </div>
 
-      {/* Section 2: Footer — 80px spacing from talent section */}
+      {/* Section 2: Events */}
+      <div ref={eventsRef}>
+        <EventsCarouselSection />
+      </div>
+
+      {/* Section 3: Footer */}
       <div ref={footerRef} className="mt-20">
         <Footer />
       </div>
