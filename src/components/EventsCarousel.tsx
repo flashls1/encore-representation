@@ -1,11 +1,8 @@
 /**
- * EventsCarousel — Horizontal Image Carousel
+ * EventsCarousel — Horizontal Infinite Image Carousel
  *
- * CSS/DOM-based horizontal carousel for event images.
- *   - Continuous auto-scroll left-to-right
- *   - Configurable desktop/mobile speeds
- *   - Touch/pointer drag support
- *   - Infinite loop wrapping
+ * Seamless infinite scroll left-to-right with 1:1 square event cards.
+ * Touch/pointer drag support. Never stops or resets.
  */
 
 import { useRef, useEffect, useMemo, useCallback } from 'react';
@@ -29,14 +26,8 @@ interface EventsCarouselProps {
 
 /* ─── Constants ─────────────────────────────────────────────────────────────── */
 
-const GAP = 16;
-const MIN_EFFECTIVE = 12; // Ensure enough cards for seamless looping
-
-/* ─── Helpers ───────────────────────────────────────────────────────────────── */
-
-function lerp(a: number, b: number, t: number): number {
-    return a + (b - a) * t;
-}
+const GAP = 24; // spacing between cards
+const MIN_COPIES = 4; // minimum duplications for seamless wrap
 
 /* ─── Component ─────────────────────────────────────────────────────────────── */
 
@@ -48,56 +39,41 @@ export default function EventsCarousel({
     className = '',
 }: EventsCarouselProps) {
     const containerRef = useRef<HTMLDivElement>(null);
-    const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-    const scrollRef = useRef({ current: 0, target: 0, last: 0 });
+    const trackRef = useRef<HTMLDivElement>(null);
+    const offsetRef = useRef(0);
     const rafRef = useRef(0);
     const isDownRef = useRef(false);
-    const dragStartRef = useRef({ x: 0, scroll: 0 });
+    const dragStartRef = useRef({ x: 0, offset: 0 });
     const dragVelocityRef = useRef(0);
     const lastDragXRef = useRef(0);
     const dragDistRef = useRef(0);
-    const resumeTimer = useRef(0);
     const didDragRef = useRef(false);
     const speedRef = useRef(desktopSpeed);
+    const resumeTimer = useRef(0);
+    const singleSetWidthRef = useRef(0);
 
-    // Mutable layout values
-    const layoutRef = useRef({
-        itemW: 0, stride: 0, totalTrack: 0,
-    });
-
-    // Duplicate items for seamless infinite wrapping
+    // Duplicate items enough times for seamless wrapping
     const effectiveItems = useMemo(() => {
         if (!items.length) return [];
-        const arr = [...items];
-        while (arr.length < MIN_EFFECTIVE) arr.push(...items);
+        const copies = Math.max(MIN_COPIES, Math.ceil(20 / items.length));
+        const arr: EventCardItem[] = [];
+        for (let i = 0; i < copies; i++) arr.push(...items);
         return arr;
     }, [items]);
 
-    // Compute layout dimensions
+    // Compute card size — 1:1 square, height = 70% of container
     const computeLayout = useCallback(() => {
         const el = containerRef.current;
-        if (!el || !effectiveItems.length) return;
+        if (!el || !items.length) return;
         const containerH = el.clientHeight;
-        // Card height = 85% of container, width = 5:3 aspect ratio
-        const cardH = Math.round(containerH * 0.85);
-        const cardW = Math.round(cardH * (5 / 3));
-        const stride = cardW + GAP;
-        const totalTrack = stride * effectiveItems.length;
+        const cardSize = Math.round(containerH * 0.7);
+        const singleSetWidth = items.length * (cardSize + GAP);
+        singleSetWidthRef.current = singleSetWidth;
 
-        layoutRef.current = { itemW: cardW, stride, totalTrack };
+        // Set CSS variable for card size
+        el.style.setProperty('--card-size', `${cardSize}px`);
+    }, [items.length]);
 
-        // Apply dimensions to items
-        itemRefs.current.forEach((div) => {
-            if (!div) return;
-            div.style.width = `${cardW}px`;
-            div.style.height = `${cardH}px`;
-        });
-    }, [effectiveItems.length]);
-
-    // On image load, recompute
-    const onImgLoad = useCallback(() => computeLayout(), [computeLayout]);
-
-    // Set up RAF loop + pointer handlers + resize
     useEffect(() => {
         const el = containerRef.current;
         if (!el || !effectiveItems.length) return;
@@ -107,67 +83,35 @@ export default function EventsCarousel({
 
         computeLayout();
 
-        // RAF loop — scroll left-to-right
+        // RAF — continuous scroll
         const update = () => {
-            const { stride, totalTrack } = layoutRef.current;
-            if (!stride || !totalTrack) {
-                rafRef.current = requestAnimationFrame(update);
-                return;
-            }
-
-            const sc = scrollRef.current;
-
             if (!isDownRef.current) {
-                // Auto-scroll: left-to-right means offset increases
-                sc.target += speedRef.current;
+                offsetRef.current += speedRef.current;
             }
 
-            // Wrap
-            if (sc.target >= totalTrack) sc.target -= totalTrack;
-            if (sc.target < 0) sc.target += totalTrack;
+            // Seamless wrap: when we've scrolled past one full set, wrap back
+            const singleW = singleSetWidthRef.current;
+            if (singleW > 0 && offsetRef.current >= singleW) {
+                offsetRef.current -= singleW;
+            }
+            if (singleW > 0 && offsetRef.current < 0) {
+                offsetRef.current += singleW;
+            }
 
-            sc.current = lerp(sc.current, sc.target, 0.08);
+            if (trackRef.current) {
+                trackRef.current.style.transform = `translateX(-${offsetRef.current}px)`;
+            }
 
-            // Wrap current too
-            if (sc.current >= totalTrack) sc.current -= totalTrack;
-            if (sc.current < 0) sc.current += totalTrack;
-
-            // Position items
-            const containerW = el.clientWidth;
-            const halfContainer = containerW / 2;
-
-            itemRefs.current.forEach((div, i) => {
-                if (!div) return;
-                let pos = i * stride - sc.current;
-
-                // Wrap items for infinite scroll
-                if (pos < -stride) pos += totalTrack;
-                if (pos > totalTrack - stride) pos -= totalTrack;
-
-                const centerX = pos + layoutRef.current.itemW / 2;
-                const distFromCenter = Math.abs(centerX - halfContainer);
-                const maxDist = containerW;
-                const normalizedDist = Math.min(distFromCenter / maxDist, 1);
-
-                // Subtle scale and opacity for items near edges
-                const scale = 1 - normalizedDist * 0.08;
-                const opacity = 1 - normalizedDist * 0.4;
-
-                div.style.transform = `translateX(${pos}px) scale(${scale})`;
-                div.style.opacity = `${opacity}`;
-            });
-
-            sc.last = sc.current;
             rafRef.current = requestAnimationFrame(update);
         };
 
         rafRef.current = requestAnimationFrame(update);
 
-        // ── Pointer handlers (mouse + touch) ───────────────────
+        // ── Pointer handlers ───────────────────
         const onPointerDown = (e: PointerEvent) => {
             isDownRef.current = true;
             didDragRef.current = false;
-            dragStartRef.current = { x: e.clientX, scroll: scrollRef.current.target };
+            dragStartRef.current = { x: e.clientX, offset: offsetRef.current };
             lastDragXRef.current = e.clientX;
             dragDistRef.current = 0;
             dragVelocityRef.current = 0;
@@ -182,20 +126,19 @@ export default function EventsCarousel({
             lastDragXRef.current = e.clientX;
             dragDistRef.current += Math.abs(dx);
             if (dragDistRef.current > 4) didDragRef.current = true;
-            // Drag opposite to scroll direction for natural feel
-            scrollRef.current.target -= dx * 1.5;
+            offsetRef.current -= dx;
         };
 
         const onPointerUp = (e: PointerEvent) => {
             if (!isDownRef.current) return;
             isDownRef.current = false;
             el.releasePointerCapture(e.pointerId);
-            // Apply fling velocity
-            scrollRef.current.target -= dragVelocityRef.current * 12;
-            // Resume auto-scroll after 2s
+            // Apply fling
+            const fling = dragVelocityRef.current * 10;
+            offsetRef.current -= fling;
             resumeTimer.current = window.setTimeout(() => {
                 dragVelocityRef.current = 0;
-            }, 2000);
+            }, 1500);
         };
 
         const onPointerLeave = () => {
@@ -203,7 +146,7 @@ export default function EventsCarousel({
                 isDownRef.current = false;
                 resumeTimer.current = window.setTimeout(() => {
                     dragVelocityRef.current = 0;
-                }, 2000);
+                }, 1500);
             }
         };
 
@@ -244,31 +187,29 @@ export default function EventsCarousel({
             className={`events-carousel ${className}`}
             style={{ touchAction: 'pan-y' }}
         >
-            {effectiveItems.map((item, i) => (
-                <div
-                    key={`${item.id}-${i}`}
-                    ref={(el) => { itemRefs.current[i] = el; }}
-                    className="events-carousel__card"
-                    onClick={() => {
-                        if (!didDragRef.current && onItemClick) {
-                            onItemClick(item.id);
-                        }
-                    }}
-                >
-                    <img
-                        src={item.image}
-                        alt={item.title || ''}
-                        className="events-carousel__img"
-                        onLoad={onImgLoad}
-                        draggable={false}
-                    />
-                    {item.title && (
-                        <div className="events-carousel__label">
-                            <span>{item.title}</span>
-                        </div>
-                    )}
-                </div>
-            ))}
+            <div
+                ref={trackRef}
+                className="events-carousel__track"
+            >
+                {effectiveItems.map((item, i) => (
+                    <div
+                        key={`${item.id}-${i}`}
+                        className="events-carousel__card"
+                        onClick={() => {
+                            if (!didDragRef.current && onItemClick) {
+                                onItemClick(item.id);
+                            }
+                        }}
+                    >
+                        <img
+                            src={item.image}
+                            alt={item.title || ''}
+                            className="events-carousel__img"
+                            draggable={false}
+                        />
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }

@@ -8,26 +8,37 @@
     cursor: grab;
     user-select: none;
     -webkit-user-select: none;
+    display: flex;
+    align-items: center;
 }
 
 .events-carousel:active {
     cursor: grabbing;
 }
 
+.events-carousel__track {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    will-change: transform;
+    /* No transition — we drive transform via RAF for continuous scroll */
+}
+
 .events-carousel__card {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
+    flex-shrink: 0;
+    width: var(--card-size, 250px);
+    height: var(--card-size, 250px);
     border-radius: 12px;
     overflow: hidden;
-    will-change: transform, opacity;
-    transition: box-shadow 0.3s ease;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    border: 2px solid #D4AF37;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 12px rgba(212, 175, 55, 0.1);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
 }
 
 .events-carousel__card:hover {
-    box-shadow: 0 8px 32px rgba(212, 175, 55, 0.15), 0 4px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 32px rgba(212, 175, 55, 0.2), 0 4px 20px rgba(0, 0, 0, 0.6);
+    transform: scale(1.03);
 }
 
 .events-carousel__img {
@@ -36,18 +47,4 @@
     object-fit: cover;
     display: block;
     pointer-events: none;
-}
-
-.events-carousel__label {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 8px 12px;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
 }
