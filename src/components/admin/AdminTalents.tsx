@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTalents } from "@/hooks/useData";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, GripVertical, X, Save, Upload, Bold, Italic, List, Link as LinkIcon, Palette, Image as ImageIcon, Pencil } from "lucide-react";
+import { Plus, Trash2, GripVertical, X, Save, Upload, Bold, Italic, List, Link as LinkIcon, Palette, Image as ImageIcon, Pencil, Mic, Clapperboard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Talent, TalentRole } from "@/types/database";
 
@@ -147,8 +147,8 @@ const RolesManager = ({
     talentId,
 }: {
     roles: TalentRole[];
-    onAdd: (roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null) => void;
-    onEdit: (roleId: string, roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null) => void;
+    onAdd: (roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null, roleType: string) => void;
+    onEdit: (roleId: string, roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null, roleType: string) => void;
     onRemove: (roleId: string) => void;
     talentId?: string;
 }) => {
@@ -159,6 +159,7 @@ const RolesManager = ({
     const [newImage, setNewImage] = useState<string | null>(null);
     const [newShowColor, setNewShowColor] = useState<string | null>(null);
     const [newBgImage, setNewBgImage] = useState<string | null>(null);
+    const [newRoleType, setNewRoleType] = useState<string>('voice');
     const [uploading, setUploading] = useState(false);
     const [uploadingBg, setUploadingBg] = useState(false);
     const [showColorPicker, setShowColorPicker] = useState(false);
@@ -171,6 +172,7 @@ const RolesManager = ({
         setNewImage(null);
         setNewShowColor(null);
         setNewBgImage(null);
+        setNewRoleType('voice');
         setShowPopup(true);
     };
 
@@ -181,6 +183,7 @@ const RolesManager = ({
         setNewImage(role.image_url || null);
         setNewShowColor(role.show_color || null);
         setNewBgImage(role.bg_image_url || null);
+        setNewRoleType(role.role_type || 'voice');
         setShowPopup(true);
     };
 
@@ -227,15 +230,16 @@ const RolesManager = ({
     const handleSave = () => {
         if (!newChar.trim()) return;
         if (editingRoleId) {
-            onEdit(editingRoleId, newRole.trim(), newChar.trim(), newImage, newShowColor, newBgImage);
+            onEdit(editingRoleId, newRole.trim(), newChar.trim(), newImage, newShowColor, newBgImage, newRoleType);
         } else {
-            onAdd(newRole.trim(), newChar.trim(), newImage, newShowColor, newBgImage);
+            onAdd(newRole.trim(), newChar.trim(), newImage, newShowColor, newBgImage, newRoleType);
         }
         setNewChar('');
         setNewRole('');
         setNewImage(null);
         setNewShowColor(null);
         setNewBgImage(null);
+        setNewRoleType('voice');
         setEditingRoleId(null);
         setShowPopup(false);
     };
@@ -273,8 +277,10 @@ const RolesManager = ({
                                     className="w-8 h-8 rounded object-cover flex-shrink-0"
                                     style={{ border: '1px solid rgba(212,175,55,0.3)' }}
                                 />
+                            ) : role.role_type === 'on_screen' ? (
+                                <Clapperboard className="h-4 w-4 flex-shrink-0" style={{ color: '#D4AF37' }} />
                             ) : (
-                                <span className="text-base">🎤</span>
+                                <Mic className="h-4 w-4 flex-shrink-0" style={{ color: '#D4AF37' }} />
                             )}
                             <div className="flex-1 min-w-0">
                                 <span className="font-bold" style={{ color: 'var(--badge-text)' }}>
@@ -315,6 +321,41 @@ const RolesManager = ({
                         </div>
 
                         <div className="space-y-4">
+                            {/* Role Type Selector */}
+                            <div>
+                                <label className="text-xs uppercase tracking-wider font-medium block mb-1.5" style={{ color: '#999' }}>
+                                    Role Type
+                                </label>
+                                <div className="flex gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setNewRoleType('voice')}
+                                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all"
+                                        style={{
+                                            backgroundColor: newRoleType === 'voice' ? 'rgba(212,175,55,0.15)' : '#111',
+                                            border: newRoleType === 'voice' ? '2px solid #D4AF37' : '1px solid #333',
+                                            color: newRoleType === 'voice' ? '#D4AF37' : '#888',
+                                        }}
+                                    >
+                                        <Mic className="h-4 w-4" />
+                                        Voice
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setNewRoleType('on_screen')}
+                                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all"
+                                        style={{
+                                            backgroundColor: newRoleType === 'on_screen' ? 'rgba(212,175,55,0.15)' : '#111',
+                                            border: newRoleType === 'on_screen' ? '2px solid #D4AF37' : '1px solid #333',
+                                            color: newRoleType === 'on_screen' ? '#D4AF37' : '#888',
+                                        }}
+                                    >
+                                        <Clapperboard className="h-4 w-4" />
+                                        On Screen
+                                    </button>
+                                </div>
+                            </div>
+
                             {/* Character name */}
                             <div>
                                 <label className="text-xs uppercase tracking-wider font-medium block mb-1.5" style={{ color: '#999' }}>
@@ -536,6 +577,7 @@ const AdminTalents = () => {
                                 image_url: r.image_url || null,
                                 show_color: r.show_color || null,
                                 bg_image_url: r.bg_image_url || null,
+                                role_type: r.role_type || 'voice',
                             }))
                         );
                     if (rolesError) throw rolesError;
@@ -571,6 +613,7 @@ const AdminTalents = () => {
                                 image_url: r.image_url || null,
                                 show_color: r.show_color || null,
                                 bg_image_url: r.bg_image_url || null,
+                                role_type: r.role_type || 'voice',
                             }))
                         );
                     if (rolesError) throw rolesError;
@@ -675,7 +718,7 @@ const AdminTalents = () => {
         toast({ title: 'Headshot uploaded & saved to Media Library' });
     };
 
-    const addRole = (roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null) => {
+    const addRole = (roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null, roleType: string) => {
         setRoles(prev => [
             ...prev,
             {
@@ -686,6 +729,7 @@ const AdminTalents = () => {
                 image_url: imageUrl,
                 show_color: showColor,
                 bg_image_url: bgImageUrl,
+                role_type: roleType,
             },
         ]);
     };
@@ -694,7 +738,7 @@ const AdminTalents = () => {
         setRoles(prev => prev.filter(r => r.id !== roleId));
     };
 
-    const editRole = (roleId: string, roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null) => {
+    const editRole = (roleId: string, roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null, roleType: string) => {
         setRoles(prev => prev.map(r => r.id === roleId ? {
             ...r,
             role_name: roleName,
@@ -702,6 +746,7 @@ const AdminTalents = () => {
             image_url: imageUrl,
             show_color: showColor,
             bg_image_url: bgImageUrl,
+            role_type: roleType,
         } : r));
     };
 

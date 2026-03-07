@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useTalent } from "@/hooks/useData";
-import { ArrowLeft, Star, Mic, Film, Sparkles } from "lucide-react";
+import { ArrowLeft, Star, Mic, Clapperboard, Film, Sparkles } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,29 +26,34 @@ const RoleCard = ({ role, index }: { role: any; index: number }) => (
             borderColor: 'rgba(212, 175, 55, 0.4)',
         }}
     >
-        {/* Optional background image */}
+        {/* Optional background image — bright and vibrant */}
         {role.bg_image_url && (
             <>
                 <img
                     src={role.bg_image_url}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover"
-                    style={{ opacity: 0.35 }}
                 />
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.5) 100%)' }} />
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.35) 100%)' }} />
             </>
         )}
 
         <div className="flex items-center gap-4 px-3 py-2.5 sm:px-4 sm:py-3 relative z-10">
-            {/* Left: Mic icon + "Voice" label */}
+            {/* Left: Role type icon + label */}
             <div className="flex flex-col items-center flex-shrink-0">
                 <div
                     className="w-7 h-7 rounded-md flex items-center justify-center"
                     style={{ backgroundColor: 'rgba(212, 175, 55, 0.12)' }}
                 >
-                    <Mic className="h-3.5 w-3.5" style={{ color: '#D4AF37' }} />
+                    {role.role_type === 'on_screen' ? (
+                        <Clapperboard className="h-3.5 w-3.5" style={{ color: '#D4AF37' }} />
+                    ) : (
+                        <Mic className="h-3.5 w-3.5" style={{ color: '#D4AF37' }} />
+                    )}
                 </div>
-                <span className="text-[9px] uppercase tracking-wider font-medium mt-1" style={{ color: 'rgba(212, 175, 55, 0.5)' }}>Voice</span>
+                <span className="text-[9px] uppercase tracking-wider font-medium mt-1" style={{ color: 'rgba(212, 175, 55, 0.5)' }}>
+                    {role.role_type === 'on_screen' ? 'On Screen' : 'Voice'}
+                </span>
             </div>
 
             {/* Center: Character info */}
