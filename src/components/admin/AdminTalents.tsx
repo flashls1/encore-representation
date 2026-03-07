@@ -827,12 +827,8 @@ const AdminTalents = () => {
                         </div>
                     </div>
 
-                    {/* Featured + Sort Order */}
+                    {/* Sort Order */}
                     <div className="flex items-center gap-6 mb-4">
-                        <label className="flex items-center gap-2 text-sm cursor-pointer" style={{ color: 'var(--text-primary)' }}>
-                            <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="rounded" />
-                            Featured
-                        </label>
                         <div className="flex items-center gap-2">
                             <label className="text-sm" style={{ color: 'var(--text-muted)' }}>Sort Order:</label>
                             <input type="number" value={sortOrder} onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)} className="theme-input w-20 text-sm text-center" />
@@ -912,12 +908,6 @@ const AdminTalents = () => {
                                 </p>
                             </div>
 
-                            {/* Featured badge */}
-                            {talent.featured && (
-                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: 'var(--badge-bg)', color: 'var(--badge-text)' }}>
-                                    Featured
-                                </span>
-                            )}
 
                             {/* Delete — inline confirmation */}
                             {pendingDeleteId === talent.id ? (
