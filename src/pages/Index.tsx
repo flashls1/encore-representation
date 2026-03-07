@@ -256,6 +256,7 @@ const EventsCarouselSection = () => {
   const { data: events } = useUpcomingEvents(true);
   const { config: eventsConfig } = useUIEffect('events-carousel');
   const containerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -282,6 +283,10 @@ const EventsCarouselSection = () => {
         title: e.title,
       }));
   }, [events]);
+
+  const handleEventClick = useCallback(() => {
+    navigate('/events');
+  }, [navigate]);
 
   if (!carouselItems.length) return null;
 
@@ -313,6 +318,7 @@ const EventsCarouselSection = () => {
             items={carouselItems}
             desktopSpeed={eventsConfig.desktopSpeed}
             mobileSpeed={eventsConfig.mobileSpeed}
+            onItemClick={handleEventClick}
           />
         </div>
       </div>
