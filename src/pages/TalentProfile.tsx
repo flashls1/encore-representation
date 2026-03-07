@@ -26,15 +26,16 @@ const RoleCard = ({ role, index }: { role: any; index: number }) => (
             borderColor: 'rgba(212, 175, 55, 0.4)',
         }}
     >
-        {/* Optional background image — bright and vibrant */}
+        {/* Optional background image */}
         {role.bg_image_url && (
             <>
                 <img
                     src={role.bg_image_url}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover"
+                    style={{ opacity: 0.35 }}
                 />
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.35) 100%)' }} />
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.5) 100%)' }} />
             </>
         )}
 
