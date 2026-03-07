@@ -34,8 +34,11 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-3">
             <Link to="/" className="inline-block">
-              <span className="font-orbitron text-xl font-bold tracking-wider" style={{ color: 'var(--accent)' }}>
-                ENCORE
+              <span
+                className="text-base font-semibold tracking-wider"
+                style={{ fontFamily: "'Cinzel', Georgia, serif", color: 'var(--accent)' }}
+              >
+                Encore Representation
               </span>
             </Link>
             <p className="text-sm" style={{ color: 'var(--footer-text)' }}>

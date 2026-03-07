@@ -43,7 +43,7 @@ const Navigation = () => {
         <div className="flex items-center h-16">
           {/* LEFT: Brand Logo */}
           <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center group">
+            <Link to="/" className="flex items-center gap-2.5 group">
               <motion.img
                 src="/encore-logo.png?v=2"
                 alt="Encore Representation"
@@ -55,6 +55,12 @@ const Navigation = () => {
                 whileHover={{ scale: 1.08 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
               />
+              <span
+                className="hidden sm:inline text-sm font-semibold tracking-wider"
+                style={{ fontFamily: "'Cinzel', Georgia, serif", color: '#D4AF37' }}
+              >
+                Encore Representation
+              </span>
             </Link>
           </div>
 

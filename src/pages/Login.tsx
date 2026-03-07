@@ -94,8 +94,8 @@ const Login = () => {
             style={{ backgroundColor: 'var(--bg-card)', border: '2px solid var(--accent)' }}>
             <Shield className="w-8 h-8" style={{ color: 'var(--accent)' }} />
           </div>
-          <h1 className="font-orbitron text-3xl md:text-5xl tracking-wider mb-3 font-bold" style={{ color: 'var(--accent)' }}>
-            ENCORE ACCESS
+          <h1 className="text-3xl md:text-5xl tracking-wider mb-3 font-bold" style={{ fontFamily: "'Cinzel', Georgia, serif", color: 'var(--accent)' }}>
+            Encore Access
           </h1>
           <p className="text-lg max-w-lg mx-auto" style={{ color: 'var(--text-secondary)' }}>
             Sign in to manage your talent roster and site content
