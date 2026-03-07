@@ -291,7 +291,7 @@ const EventsCarouselSection = () => {
         ref={containerRef}
         className="relative w-full overflow-hidden rounded-xl md:rounded-2xl"
         style={{
-          height: 'clamp(280px, 45vh, 420px)',
+          height: 'clamp(380px, 65vh, 625px)',
           border: '1.5px solid #D4AF37',
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
         }}
