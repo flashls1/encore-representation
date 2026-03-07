@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useTalents } from "@/hooks/useData";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, GripVertical, X, Save, Upload, Bold, Italic, List, Link as LinkIcon, Palette, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, GripVertical, X, Save, Upload, Bold, Italic, List, Link as LinkIcon, Palette, Image as ImageIcon, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Talent, TalentRole } from "@/types/database";
 
@@ -139,19 +139,21 @@ const RichTextEditor = ({
     );
 };
 
-// ─── Roles Manager ──────────────────────────────────────────────────────────────
 const RolesManager = ({
     roles,
     onAdd,
+    onEdit,
     onRemove,
     talentId,
 }: {
     roles: TalentRole[];
     onAdd: (roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null) => void;
+    onEdit: (roleId: string, roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null) => void;
     onRemove: (roleId: string) => void;
     talentId?: string;
 }) => {
     const [showPopup, setShowPopup] = useState(false);
+    const [editingRoleId, setEditingRoleId] = useState<string | null>(null);
     const [newChar, setNewChar] = useState('');
     const [newRole, setNewRole] = useState('');
     const [newImage, setNewImage] = useState<string | null>(null);
@@ -161,6 +163,26 @@ const RolesManager = ({
     const [uploadingBg, setUploadingBg] = useState(false);
     const [showColorPicker, setShowColorPicker] = useState(false);
     const { toast } = useToast();
+
+    const openForAdd = () => {
+        setEditingRoleId(null);
+        setNewChar('');
+        setNewRole('');
+        setNewImage(null);
+        setNewShowColor(null);
+        setNewBgImage(null);
+        setShowPopup(true);
+    };
+
+    const openForEdit = (role: TalentRole) => {
+        setEditingRoleId(role.id);
+        setNewChar(role.character_name);
+        setNewRole(role.role_name || '');
+        setNewImage(role.image_url || null);
+        setNewShowColor(role.show_color || null);
+        setNewBgImage(role.bg_image_url || null);
+        setShowPopup(true);
+    };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -202,14 +224,19 @@ const RolesManager = ({
         }
     };
 
-    const handleAdd = () => {
+    const handleSave = () => {
         if (!newChar.trim()) return;
-        onAdd(newRole.trim(), newChar.trim(), newImage, newShowColor, newBgImage);
+        if (editingRoleId) {
+            onEdit(editingRoleId, newRole.trim(), newChar.trim(), newImage, newShowColor, newBgImage);
+        } else {
+            onAdd(newRole.trim(), newChar.trim(), newImage, newShowColor, newBgImage);
+        }
         setNewChar('');
         setNewRole('');
         setNewImage(null);
         setNewShowColor(null);
         setNewBgImage(null);
+        setEditingRoleId(null);
         setShowPopup(false);
     };
 
@@ -221,7 +248,7 @@ const RolesManager = ({
                 </label>
                 <button
                     type="button"
-                    onClick={() => setShowPopup(true)}
+                    onClick={openForAdd}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
                     style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
                 >
@@ -259,7 +286,10 @@ const RolesManager = ({
                                     </span>
                                 )}
                             </div>
-                            <button type="button" onClick={() => onRemove(role.id)} className="p-1 rounded hover:opacity-80 flex-shrink-0" style={{ color: 'var(--error)' }}>
+                            <button type="button" onClick={() => openForEdit(role)} className="p-1 rounded hover:opacity-80 flex-shrink-0" style={{ color: 'var(--accent)' }} title="Edit role">
+                                <Pencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button type="button" onClick={() => onRemove(role.id)} className="p-1 rounded hover:opacity-80 flex-shrink-0" style={{ color: 'var(--error)' }} title="Delete role">
                                 <X className="h-3.5 w-3.5" />
                             </button>
                         </div>
@@ -278,7 +308,7 @@ const RolesManager = ({
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-5">
-                            <h3 className="text-lg font-bold" style={{ color: '#fff' }}>Add New Role</h3>
+                            <h3 className="text-lg font-bold" style={{ color: '#fff' }}>{editingRoleId ? 'Edit Role' : 'Add New Role'}</h3>
                             <button type="button" onClick={() => setShowPopup(false)} className="p-1 rounded hover:opacity-80" style={{ color: '#888' }}>
                                 <X className="h-5 w-5" />
                             </button>
@@ -393,13 +423,12 @@ const RolesManager = ({
                         <div className="flex gap-3 mt-6">
                             <button
                                 type="button"
-                                onClick={handleAdd}
+                                onClick={handleSave}
                                 disabled={!newChar.trim()}
                                 className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-bold transition-colors disabled:opacity-40"
                                 style={{ backgroundColor: '#D4AF37', color: '#0A0A0A' }}
                             >
-                                <Plus className="h-4 w-4" />
-                                Add Role
+                                {editingRoleId ? <><Save className="h-4 w-4" />Save Changes</> : <><Plus className="h-4 w-4" />Add Role</>}
                             </button>
                             <button
                                 type="button"
@@ -665,6 +694,17 @@ const AdminTalents = () => {
         setRoles(prev => prev.filter(r => r.id !== roleId));
     };
 
+    const editRole = (roleId: string, roleName: string, characterName: string, imageUrl: string | null, showColor: string | null, bgImageUrl: string | null) => {
+        setRoles(prev => prev.map(r => r.id === roleId ? {
+            ...r,
+            role_name: roleName,
+            character_name: characterName,
+            image_url: imageUrl,
+            show_color: showColor,
+            bg_image_url: bgImageUrl,
+        } : r));
+    };
+
     const isEditing = isCreating || !!editingTalent;
 
     return (
@@ -756,7 +796,7 @@ const AdminTalents = () => {
 
                     {/* Roles Manager */}
                     <div className="mb-4">
-                        <RolesManager roles={roles} onAdd={addRole} onRemove={removeRole} />
+                        <RolesManager roles={roles} onAdd={addRole} onEdit={editRole} onRemove={removeRole} />
                     </div>
 
                     {/* Bio (Rich Text) */}
