@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -194,18 +194,30 @@ const AdminEventsEditor = () => {
         );
     }
 
-    // Event list
-    const saveCarouselSpeed = async (key: string, value: number) => {
-        const newProps = { ...eventsCarouselConfig, [key]: value };
+    // Event list — carousel speed settings with explicit Save
+    const [localDesktopSpeed, setLocalDesktopSpeed] = useState<number>(eventsCarouselConfig.desktopSpeed ?? 1.0);
+    const [localMobileSpeed, setLocalMobileSpeed] = useState<number>(eventsCarouselConfig.mobileSpeed ?? 0.6);
+    const [savingSpeed, setSavingSpeed] = useState(false);
+
+    // Sync local state when config loads
+    useEffect(() => {
+        setLocalDesktopSpeed(eventsCarouselConfig.desktopSpeed ?? 1.0);
+        setLocalMobileSpeed(eventsCarouselConfig.mobileSpeed ?? 0.6);
+    }, [eventsCarouselConfig.desktopSpeed, eventsCarouselConfig.mobileSpeed]);
+
+    const saveCarouselSettings = async () => {
+        setSavingSpeed(true);
         try {
             await (supabase as any).from('ui_effect_overrides').upsert(
-                { effect_id: 'events-carousel', props: newProps },
+                { effect_id: 'events-carousel', props: { desktopSpeed: localDesktopSpeed, mobileSpeed: localMobileSpeed } },
                 { onConflict: 'effect_id' }
             );
             queryClient.invalidateQueries({ queryKey: ['ui-effect-overrides'] });
+            toast({ title: 'Saved', description: 'Carousel settings saved successfully.' });
         } catch (err: any) {
             toast({ title: 'Save failed', description: err.message, variant: 'destructive' });
         }
+        setSavingSpeed(false);
     };
 
     return (
@@ -228,12 +240,12 @@ const AdminEventsEditor = () => {
                                     min={0.2}
                                     max={10}
                                     step={0.1}
-                                    value={eventsCarouselConfig.desktopSpeed ?? 1.0}
-                                    onChange={(e) => saveCarouselSpeed('desktopSpeed', parseFloat(e.target.value))}
+                                    value={localDesktopSpeed}
+                                    onChange={(e) => setLocalDesktopSpeed(parseFloat(e.target.value))}
                                     className="flex-1"
                                 />
                                 <span className="text-xs font-mono w-8" style={{ color: 'var(--text-muted)' }}>
-                                    {(eventsCarouselConfig.desktopSpeed ?? 1.0).toFixed(1)}
+                                    {localDesktopSpeed.toFixed(1)}
                                 </span>
                             </div>
                         </div>
@@ -245,15 +257,21 @@ const AdminEventsEditor = () => {
                                     min={0.2}
                                     max={10}
                                     step={0.1}
-                                    value={eventsCarouselConfig.mobileSpeed ?? 0.6}
-                                    onChange={(e) => saveCarouselSpeed('mobileSpeed', parseFloat(e.target.value))}
+                                    value={localMobileSpeed}
+                                    onChange={(e) => setLocalMobileSpeed(parseFloat(e.target.value))}
                                     className="flex-1"
                                 />
                                 <span className="text-xs font-mono w-8" style={{ color: 'var(--text-muted)' }}>
-                                    {(eventsCarouselConfig.mobileSpeed ?? 0.6).toFixed(1)}
+                                    {localMobileSpeed.toFixed(1)}
                                 </span>
                             </div>
                         </div>
+                    </div>
+                    <div className="flex justify-end pt-2">
+                        <Button onClick={saveCarouselSettings} disabled={savingSpeed} size="sm">
+                            {savingSpeed ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                            Save Settings
+                        </Button>
                     </div>
                 </CardContent>
             </Card>
