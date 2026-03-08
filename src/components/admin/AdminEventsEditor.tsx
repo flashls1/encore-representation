@@ -36,6 +36,17 @@ const AdminEventsEditor = () => {
     const [editing, setEditing] = useState<Partial<UpcomingEvent> | null>(null);
     const [showMediaPicker, setShowMediaPicker] = useState(false);
 
+    // Carousel speed settings — MUST be declared before any early returns (Rules of Hooks)
+    const [localDesktopSpeed, setLocalDesktopSpeed] = useState<number>(eventsCarouselConfig.desktopSpeed ?? 1.0);
+    const [localMobileSpeed, setLocalMobileSpeed] = useState<number>(eventsCarouselConfig.mobileSpeed ?? 0.6);
+    const [savingSpeed, setSavingSpeed] = useState(false);
+
+    // Sync local state when config loads
+    useEffect(() => {
+        setLocalDesktopSpeed(eventsCarouselConfig.desktopSpeed ?? 1.0);
+        setLocalMobileSpeed(eventsCarouselConfig.mobileSpeed ?? 0.6);
+    }, [eventsCarouselConfig.desktopSpeed, eventsCarouselConfig.mobileSpeed]);
+
     const handleSave = async () => {
         if (!editing?.title?.trim()) {
             toast({ title: 'Title required', description: 'Please enter an event title.', variant: 'destructive' });
@@ -193,17 +204,6 @@ const AdminEventsEditor = () => {
             </div>
         );
     }
-
-    // Event list — carousel speed settings with explicit Save
-    const [localDesktopSpeed, setLocalDesktopSpeed] = useState<number>(eventsCarouselConfig.desktopSpeed ?? 1.0);
-    const [localMobileSpeed, setLocalMobileSpeed] = useState<number>(eventsCarouselConfig.mobileSpeed ?? 0.6);
-    const [savingSpeed, setSavingSpeed] = useState(false);
-
-    // Sync local state when config loads
-    useEffect(() => {
-        setLocalDesktopSpeed(eventsCarouselConfig.desktopSpeed ?? 1.0);
-        setLocalMobileSpeed(eventsCarouselConfig.mobileSpeed ?? 0.6);
-    }, [eventsCarouselConfig.desktopSpeed, eventsCarouselConfig.mobileSpeed]);
 
     const saveCarouselSettings = async () => {
         setSavingSpeed(true);
