@@ -8,11 +8,11 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 
 import MediaPicker from '@/components/admin/MediaPicker';
-import { useHomeContent } from '@/hooks/useData';
+import { useHomeContent, useUIEffect } from '@/hooks/useData';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-import { Home, Image, Video, ExternalLink, Save, Loader2, X, Timer, ImagePlus, Eye, ArrowDown } from 'lucide-react';
+import { Home, Image, Video, ExternalLink, Save, Loader2, X, Timer, ImagePlus, Eye, ArrowDown, Sparkles } from 'lucide-react';
 
 /** Check if a URL points to a video file by extension */
 const isVideoUrl = (url: string): boolean => {
@@ -22,10 +22,12 @@ const isVideoUrl = (url: string): boolean => {
 
 const AdminHomeContent = () => {
   const { data: homeContent, isLoading } = useHomeContent();
+  const { config: logoAnimConfig } = useUIEffect('logo-animation');
   const qc = useQueryClient();
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [logoAnimDuration, setLogoAnimDuration] = useState(2.5);
 
   const [form, setForm] = useState({
     hero_title: '',
@@ -62,6 +64,13 @@ const AdminHomeContent = () => {
       });
     }
   }, [homeContent]);
+
+  // Sync logo animation duration from DB
+  useEffect(() => {
+    if (logoAnimConfig?.duration != null) {
+      setLogoAnimDuration(Number(logoAnimConfig.duration));
+    }
+  }, [logoAnimConfig]);
 
   const set = (field: string, value: string | boolean) => setForm(p => ({ ...p, [field]: value }));
 
@@ -141,6 +150,46 @@ const AdminHomeContent = () => {
               <p className="text-xs text-muted-foreground mt-0.5">
                 Disable if your hero video/image already contains text.
               </p>
+            </div>
+          </div>
+
+          {/* Logo Animation Duration slider */}
+          <div className="p-3 rounded-lg border border-border bg-muted/30">
+            <Label className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-4 w-4" /> Logo Animation Duration: {logoAnimDuration}s
+            </Label>
+            <Slider
+              value={[logoAnimDuration]}
+              onValueChange={([v]) => setLogoAnimDuration(v)}
+              min={1}
+              max={5}
+              step={0.5}
+              className="w-full"
+            />
+            <div className="flex items-center justify-between mt-2">
+              <p className="text-xs text-muted-foreground">
+                Controls how long the intro logo animation takes (1s fast, 5s cinematic).
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    await supabase.from('ui_effect_overrides' as any).upsert({
+                      effect_id: 'logo-animation',
+                      props: { duration: logoAnimDuration },
+                      updated_at: new Date().toISOString(),
+                    }, { onConflict: 'effect_id' });
+                    qc.invalidateQueries({ queryKey: ['ui-effect-overrides'] });
+                    toast({ title: 'Logo animation speed saved' });
+                  } catch (err: any) {
+                    toast({ title: 'Save failed', description: err.message, variant: 'destructive' });
+                  }
+                }}
+                className="flex-shrink-0"
+              >
+                <Save className="h-3 w-3 mr-1" /> Save Speed
+              </Button>
             </div>
           </div>
 

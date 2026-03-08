@@ -2,8 +2,9 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
-import { useHomeContent, useSiteSettings } from "@/hooks/useData";
+import { useHomeContent, useSiteSettings, useUIEffect } from "@/hooks/useData";
 import { supabase } from "@/integrations/supabase/client";
+import AnimatedLogo from "@/components/AnimatedLogo";
 
 // ─── Kinetic gold flare background ──────────────────────────────────────────────
 const KineticFlares = () => (
@@ -113,7 +114,10 @@ const RevealText = ({ text, className, style }: { text: string; className?: stri
 const HeroSection = () => {
   const { data: homeContent, isLoading: homeLoading, refetch } = useHomeContent();
   const { data: siteSettings } = useSiteSettings();
+  const { config: logoAnimConfig } = useUIEffect('logo-animation');
   const subtitleRef = useRef<HTMLDivElement>(null);
+
+  const logoDuration = Number(logoAnimConfig?.duration) || 2.5;
 
   // Realtime updates
   useEffect(() => {
@@ -129,14 +133,14 @@ const HeroSection = () => {
     return () => { supabase.removeChannel(channel); };
   }, [refetch]);
 
-  // Animate subtitle after title
+  // Animate subtitle after logo animation completes
   useEffect(() => {
     if (!subtitleRef.current) return;
     gsap.fromTo(subtitleRef.current,
       { y: 30, opacity: 0 },
-      { y: 0, opacity: 1, duration: 1, ease: 'power3.out', delay: 1.0 }
+      { y: 0, opacity: 1, duration: 1, ease: 'power3.out', delay: logoDuration + 0.3 }
     );
-  }, [homeContent]);
+  }, [homeContent, logoDuration]);
 
   const heroImage = homeLoading ? '' : (homeContent?.hero_image_url || '');
   const heroVideoUrl = homeLoading ? null : (homeContent?.hero_video_url || null);
@@ -197,29 +201,10 @@ const HeroSection = () => {
           {/* Bottom gradient */}
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 40%, rgba(10,10,10,0.9))' }} />
 
-          {/* Mobile text overlay — positioned at bottom of video */}
+          {/* Mobile animated logo — positioned at bottom of video */}
           {heroTextVisible && (
-            <div className="absolute bottom-3 left-0 right-0 px-3 text-center z-10">
-              <h1
-                className="text-xl font-bold uppercase mb-1"
-                style={{
-                  fontFamily: "'Cinzel', Georgia, serif",
-                  color: '#D4AF37',
-                  letterSpacing: '0.06em',
-                  textShadow: '0 0 20px rgba(212,175,55,0.4), 1px 1px 0 rgba(0,0,0,0.8)',
-                }}
-              >
-                {heroTitle}
-              </h1>
-              <p
-                className="text-xs font-medium leading-snug"
-                style={{
-                  color: 'rgba(255, 255, 255, 0.85)',
-                  textShadow: '0 1px 4px rgba(0,0,0,0.9)',
-                }}
-              >
-                {heroSubtitle}
-              </p>
+            <div className="absolute bottom-3 left-0 right-0 px-3 z-10">
+              <AnimatedLogo duration={logoDuration} className="max-w-[280px] mx-auto" />
             </div>
           )}
         </div>
@@ -229,7 +214,7 @@ const HeroSection = () => {
           className="flex flex-row justify-center items-center gap-3 mt-5 mb-1 px-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ delay: logoDuration + 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
           {ctaPrimaryText && ctaPrimaryUrl && (
             isInternalUrl(ctaPrimaryUrl) ? (
@@ -286,18 +271,8 @@ const HeroSection = () => {
 
       {/* Desktop content overlay — unchanged */}
       <div className="hidden md:block relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Title — GSAP staggered reveal */}
         {heroTextVisible && (
-          <RevealText
-            text={heroTitle}
-            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl mb-4 font-bold uppercase"
-            style={{
-              fontFamily: "'Cinzel', Georgia, serif",
-              color: 'var(--accent)',
-              letterSpacing: '0.08em',
-              textShadow: '0 0 60px var(--glow), 2px 2px 0 rgba(0,0,0,0.7)',
-            }}
-          />
+          <AnimatedLogo duration={logoDuration} className="max-w-[600px] mx-auto mb-6" />
         )}
 
         {/* Subtitle — fade up after title */}
@@ -326,7 +301,7 @@ const HeroSection = () => {
           style={ctaOffsetTop > 0 ? { marginTop: `${ctaOffsetTop}px` } : undefined}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ delay: logoDuration + 0.8, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
           {ctaPrimaryText && ctaPrimaryUrl && (
             isInternalUrl(ctaPrimaryUrl) ? (
