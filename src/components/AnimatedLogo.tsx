@@ -30,6 +30,16 @@ const CLIP_ENCORE = 'inset(18% 0% 46% 0%)';        // Shows ~18% to ~54% (extend
 const CLIP_REPRESENTATION = 'inset(49% 0% 38% 0%)'; // Shows ~49% to ~62% (overlaps both neighbors)
 const CLIP_REFLECTION = 'inset(56% 0% 34% 0%)';     // Shows ~56% to ~66% (overlaps REP by 6%)
 
+// Shared image style — preserves crisp quality at all sizes
+const IMG_STYLE: React.CSSProperties = {
+    width: '100%',
+    height: 'auto',
+    display: 'block',
+    imageRendering: 'auto',           // best quality downscale (browser default but explicit)
+    WebkitBackfaceVisibility: 'hidden',
+    backfaceVisibility: 'hidden',
+};
+
 const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const encoreRef = useRef<HTMLDivElement>(null);
@@ -103,14 +113,17 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
             className={`relative select-none ${className}`}
             style={{ perspective: '800px' }}
         >
-            {/* Master container — positioned relative so clip-path pieces stack */}
+            {/* Master container — determines layout width, images scale naturally */}
             <div className="relative w-full" style={{ maxWidth: '600px', margin: '0 auto' }}>
-                {/* Invisible sizing reference — determines container height */}
+                {/* Invisible sizing reference — sets natural height from the visible region */}
                 <img
                     src={LOGO_SRC}
                     alt=""
-                    className="w-full invisible"
-                    style={{ clipPath: 'inset(18% 0% 34% 0%)' }}
+                    style={{
+                        ...IMG_STYLE,
+                        clipPath: 'inset(18% 0% 34% 0%)',
+                        visibility: 'hidden',
+                    }}
                     draggable={false}
                 />
 
@@ -118,13 +131,17 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                 <div
                     ref={encoreRef}
                     className="absolute inset-0"
-                    style={{ opacity: 0, willChange: 'transform, opacity' }}
+                    style={{
+                        opacity: 0,
+                        willChange: 'transform, opacity',
+                        transform: 'translateZ(0)',  // force GPU layer
+                    }}
                 >
                     <img
                         src={LOGO_SRC}
                         alt="Encore"
-                        className="w-full h-full object-cover"
                         style={{
+                            ...IMG_STYLE,
                             clipPath: CLIP_ENCORE,
                         }}
                         draggable={false}
@@ -135,13 +152,17 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                 <div
                     ref={repRef}
                     className="absolute inset-0"
-                    style={{ opacity: 0, willChange: 'transform, opacity' }}
+                    style={{
+                        opacity: 0,
+                        willChange: 'transform, opacity',
+                        transform: 'translateZ(0)',
+                    }}
                 >
                     <img
                         src={LOGO_SRC}
                         alt="Representation"
-                        className="w-full h-full object-cover"
                         style={{
+                            ...IMG_STYLE,
                             clipPath: CLIP_REPRESENTATION,
                         }}
                         draggable={false}
@@ -173,13 +194,14 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                         opacity: 0,
                         willChange: 'transform, opacity',
                         transformOrigin: 'center top',
+                        transform: 'translateZ(0)',
                     }}
                 >
                     <img
                         src={LOGO_SRC}
                         alt=""
-                        className="w-full h-full object-cover"
                         style={{
+                            ...IMG_STYLE,
                             clipPath: CLIP_REFLECTION,
                         }}
                         draggable={false}
