@@ -180,7 +180,7 @@ export default function EventsCarousel({
             dragVelocityRef.current = dx;
             lastDragXRef.current = e.clientX;
             dragDistRef.current += Math.abs(dx);
-            if (dragDistRef.current > 4) didDragRef.current = true;
+            if (dragDistRef.current > 10) didDragRef.current = true;
             scrollRef.current.target -= dx * 1.5;
         };
 
