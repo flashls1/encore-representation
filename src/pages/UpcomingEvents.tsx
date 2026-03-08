@@ -108,13 +108,17 @@ const TimelineNode = ({ event, index, isLast }: { event: any; index: number; isL
                     {/* Image — 1:1 square with gold border */}
                     {event.image_url && (
                         <div
-                            className="relative w-full pb-[100%] overflow-hidden"
-                            style={{ border: '1.5px solid rgba(212, 175, 55, 0.35)' }}
+                            className="relative w-full overflow-hidden"
+                            style={{
+                                paddingBottom: '100%',
+                                border: '1.5px solid rgba(212, 175, 55, 0.35)',
+                                backgroundColor: '#0A0A0A',
+                            }}
                         >
                             <img
                                 src={event.image_url}
                                 alt={event.title}
-                                className="absolute inset-0 w-full h-full object-cover"
+                                className="absolute inset-0 w-full h-full object-contain"
                                 loading="lazy"
                             />
                             <div
