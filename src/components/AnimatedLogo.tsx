@@ -24,12 +24,11 @@ interface AnimatedLogoProps {
 const LOGO_SRC = '/encore-logo-full.png';
 
 // Clip-path regions — pixel-measured from 1024×1024 PNG
-// ENCORE content: rows 211–517 (20.6%–50.5%), REPRESENTATION: 528–591 (51.6%–57.7%),
-// Separator+Reflection: 596–655 (58.2%–64.0%)
-// Using slightly overlapping regions to eliminate any visible seams
-const CLIP_ENCORE = 'inset(19% 0% 49% 0%)';        // Shows ~19% to ~51%
-const CLIP_REPRESENTATION = 'inset(50% 0% 41% 0%)'; // Shows ~50% to ~59% (1% overlap with ENCORE)
-const CLIP_REFLECTION = 'inset(57% 0% 35% 0%)';     // Shows ~57% to ~65% (2% overlap with REP)
+// ENCORE content: rows 211–517, REPRESENTATION: 528–591, Separator+Reflection: 596–655
+// Using generous 3-4% overlaps to eliminate subpixel rendering seams
+const CLIP_ENCORE = 'inset(18% 0% 46% 0%)';        // Shows ~18% to ~54% (extends 3% past REP start)
+const CLIP_REPRESENTATION = 'inset(49% 0% 38% 0%)'; // Shows ~49% to ~62% (overlaps both neighbors)
+const CLIP_REFLECTION = 'inset(56% 0% 34% 0%)';     // Shows ~56% to ~66% (overlaps REP by 6%)
 
 const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -111,7 +110,7 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                     src={LOGO_SRC}
                     alt=""
                     className="w-full invisible"
-                    style={{ clipPath: 'inset(19% 0% 35% 0%)' }}
+                    style={{ clipPath: 'inset(18% 0% 34% 0%)' }}
                     draggable={false}
                 />
 
