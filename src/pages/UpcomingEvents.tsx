@@ -6,9 +6,55 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
-import { Calendar, MapPin, ExternalLink, Loader2 } from "lucide-react";
+import { Calendar, MapPin, ExternalLink, Loader2, Clock } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
+
+/** Convert 24h time (e.g. "14:00") or legacy freetext to 12h display */
+const formatTime12 = (time: string): string => {
+    // If already in AM/PM format, return as-is (legacy data)
+    if (/[ap]m/i.test(time)) return time;
+    const [h, m] = time.split(':').map(Number);
+    if (isNaN(h)) return time;
+    const period = h >= 12 ? 'PM' : 'AM';
+    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return `${h12}:${String(m ?? 0).padStart(2, '0')} ${period}`;
+};
+
+/** Smart date/time formatting for events */
+const formatEventDateTime = (event: any): { dateLine: string; timeLine: string | null } => {
+    const start = event.event_date ? new Date(event.event_date + 'T00:00:00') : null;
+    const end = event.event_end_date && event.event_end_date !== event.event_date
+        ? new Date(event.event_end_date + 'T00:00:00') : null;
+
+    let dateLine = '';
+    if (start && end) {
+        // Multi-day
+        if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+            // Same month: "March 18–20, 2026"
+            dateLine = `${start.toLocaleDateString('en-US', { month: 'long' })} ${start.getDate()}–${end.getDate()}, ${start.getFullYear()}`;
+        } else {
+            // Cross-month: "March 30 – April 2, 2026"
+            dateLine = `${start.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} – ${end.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+        }
+    } else if (start) {
+        // Single day: "Saturday, March 18, 2026"
+        dateLine = start.toLocaleDateString('en-US', {
+            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+        });
+    }
+
+    // Time
+    let timeLine: string | null = null;
+    if (event.event_time) {
+        timeLine = formatTime12(event.event_time);
+        if (event.event_end_time) {
+            timeLine += ` – ${formatTime12(event.event_end_time)}`;
+        }
+    }
+
+    return { dateLine, timeLine };
+};
 
 /** Ensures a URL has a proper protocol — fixes admin-entered URLs like "www.example.com" */
 const normalizeUrl = (url: string): string => {
@@ -165,15 +211,23 @@ const TimelineNode = ({ event, index, isLast }: { event: any; index: number; isL
                         )}
 
                         <div className="flex flex-wrap gap-3 text-xs" style={{ color: 'var(--text-muted)' }}>
-                            {event.event_date && (
-                                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.08)' }}>
-                                    <Calendar className="h-3 w-3" style={{ color: '#D4AF37' }} />
-                                    {new Date(event.event_date + 'T00:00:00').toLocaleDateString('en-US', {
-                                        month: 'long', day: 'numeric', year: 'numeric',
-                                    })}
-                                    {event.event_time && ` · ${event.event_time}`}
-                                </span>
-                            )}
+                            {event.event_date && (() => {
+                                const { dateLine, timeLine } = formatEventDateTime(event);
+                                return (
+                                    <>
+                                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.08)' }}>
+                                            <Calendar className="h-3 w-3" style={{ color: '#D4AF37' }} />
+                                            {dateLine}
+                                        </span>
+                                        {timeLine && (
+                                            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.08)' }}>
+                                                <Clock className="h-3 w-3" style={{ color: '#D4AF37' }} />
+                                                {timeLine}
+                                            </span>
+                                        )}
+                                    </>
+                                );
+                            })()}
                             {event.location && (
                                 <span className="flex items-center gap-1.5 px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.08)' }}>
                                     <MapPin className="h-3 w-3" style={{ color: '#D4AF37' }} />

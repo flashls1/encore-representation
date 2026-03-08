@@ -11,19 +11,30 @@ import { useUIEffect } from '@/hooks/useData';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import MediaPicker from './MediaPicker';
-import { CalendarDays, Plus, Trash2, Save, Loader2, Image as ImageIcon, Edit, Eye, EyeOff, Settings, Link2, Link2Off } from 'lucide-react';
+import { CalendarDays, Plus, Trash2, Save, Loader2, Image as ImageIcon, Edit, Eye, EyeOff, Settings, Link2, Link2Off, Clock } from 'lucide-react';
 
 const EMPTY_EVENT: Partial<UpcomingEvent> = {
     title: '',
     description: '',
     image_url: '',
     event_date: null,
+    event_end_date: null,
     event_time: '',
+    event_end_time: '',
     location: '',
     link_url: '',
     link_visible: true,
     sort_order: 0,
     visible: true,
+};
+
+/** Convert 24h time string (e.g. "14:00") to 12h display (e.g. "2:00 PM") */
+const formatTime12 = (time: string): string => {
+    const [h, m] = time.split(':').map(Number);
+    if (isNaN(h)) return time;
+    const period = h >= 12 ? 'PM' : 'AM';
+    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return `${h12}:${String(m ?? 0).padStart(2, '0')} ${period}`;
 };
 
 const AdminEventsEditor = () => {
@@ -134,22 +145,47 @@ const AdminEventsEditor = () => {
                             )}
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <Label>Event Date</Label>
-                                <Input
-                                    type="date"
-                                    value={editing.event_date || ''}
-                                    onChange={e => setEditing(p => ({ ...p, event_date: e.target.value || null }))}
-                                />
+                        {/* Date & Time Section */}
+                        <div className="rounded-lg p-4 space-y-4" style={{ backgroundColor: 'rgba(212, 175, 55, 0.03)', border: '1px solid rgba(212, 175, 55, 0.1)' }}>
+                            <h4 className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
+                                <CalendarDays className="h-3.5 w-3.5" /> Date & Time
+                            </h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <Label>Start Date</Label>
+                                    <Input
+                                        type="date"
+                                        value={editing.event_date || ''}
+                                        onChange={e => setEditing(p => ({ ...p, event_date: e.target.value || null }))}
+                                    />
+                                </div>
+                                <div>
+                                    <Label>End Date <span className="text-muted-foreground font-normal">(optional, for multi-day)</span></Label>
+                                    <Input
+                                        type="date"
+                                        value={editing.event_end_date || ''}
+                                        onChange={e => setEditing(p => ({ ...p, event_end_date: e.target.value || null }))}
+                                        min={editing.event_date || undefined}
+                                    />
+                                </div>
                             </div>
-                            <div>
-                                <Label>Event Time</Label>
-                                <Input
-                                    value={editing.event_time || ''}
-                                    onChange={e => setEditing(p => ({ ...p, event_time: e.target.value }))}
-                                    placeholder="7:00 PM"
-                                />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <Label>Start Time</Label>
+                                    <Input
+                                        type="time"
+                                        value={editing.event_time || ''}
+                                        onChange={e => setEditing(p => ({ ...p, event_time: e.target.value }))}
+                                    />
+                                </div>
+                                <div>
+                                    <Label>End Time <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                                    <Input
+                                        type="time"
+                                        value={editing.event_end_time || ''}
+                                        onChange={e => setEditing(p => ({ ...p, event_end_time: e.target.value }))}
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -343,7 +379,11 @@ const AdminEventsEditor = () => {
                             {event.event_date && (
                                 <p className="text-xs text-muted-foreground">
                                     {new Date(event.event_date + 'T00:00:00').toLocaleDateString()}
-                                    {event.event_time && ` · ${event.event_time}`}
+                                    {event.event_end_date && event.event_end_date !== event.event_date && (
+                                        <> – {new Date(event.event_end_date + 'T00:00:00').toLocaleDateString()}</>
+                                    )}
+                                    {event.event_time && ` · ${formatTime12(event.event_time)}`}
+                                    {event.event_end_time && `–${formatTime12(event.event_end_time)}`}
                                 </p>
                             )}
                             <div className="flex gap-2 pt-1">
