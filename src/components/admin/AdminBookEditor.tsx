@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { useBookContent, type ContentSection } from '@/hooks/useUpcomingEvents';
+import { useBookContent } from '@/hooks/useUpcomingEvents';
+import type { ContentSection } from '@/types/database';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import MediaPicker from './MediaPicker';
@@ -44,7 +45,7 @@ const AdminBookEditor = () => {
                 ...form,
                 updated_at: new Date().toISOString(),
             };
-            const { error } = await (supabase as any).from('book_content').upsert(payload).select().maybeSingle();
+            const { error } = await supabase.from('book_content').upsert(payload as any).select().maybeSingle();
             if (error) throw error;
             qc.invalidateQueries({ queryKey: ['book-content'] });
             toast({ title: 'Saved', description: 'Book Now page updated.' });

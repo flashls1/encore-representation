@@ -18,7 +18,7 @@ const useUIEffectOverrides = () => {
   return useQuery({
     queryKey: ['ui-effect-overrides'],
     queryFn: async (): Promise<Record<string, Record<string, any>>> => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('ui_effect_overrides')
         .select('effect_id, props');
       if (error) throw error;

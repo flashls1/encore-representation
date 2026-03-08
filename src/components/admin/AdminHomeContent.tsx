@@ -57,8 +57,8 @@ const AdminHomeContent = () => {
         cta_secondary_url: homeContent.cta_secondary_url || '',
         featured_content_title: homeContent.featured_content_title || '',
         featured_content_description: homeContent.featured_content_description || '',
-        hero_text_visible: (homeContent as any).hero_text_visible ?? true,
-        cta_offset_top: (homeContent as any).cta_offset_top || '0',
+        hero_text_visible: homeContent.hero_text_visible ?? true,
+        cta_offset_top: homeContent.cta_offset_top || '0',
       });
     }
   }, [homeContent]);
@@ -88,7 +88,7 @@ const AdminHomeContent = () => {
         ...form,
         updated_at: new Date().toISOString(),
       };
-      const { error } = await (supabase as any).from('home_content').upsert(payload).select().maybeSingle();
+      const { error } = await supabase.from('home_content').upsert(payload).select().maybeSingle();
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ['home-content'] });
       toast({ title: 'Saved', description: 'Home page content updated successfully.' });

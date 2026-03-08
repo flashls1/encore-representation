@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useContactSubmissions, useContactSettings } from '@/hooks/useData';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -14,16 +14,18 @@ const AdminContact = () => {
   const [saving, setSaving] = useState(false);
   const [settingsForm, setSettingsForm] = useState<any>(null);
 
-  // Init settings form
-  if (settings && !settingsForm) {
-    setSettingsForm({
-      page_title: settings.page_title || 'Contact Us',
-      page_description: settings.page_description || '',
-      form_enabled: settings.form_enabled,
-      notification_email: settings.notification_email || '',
-      success_message: settings.success_message || '',
-    });
-  }
+  // Init settings form (moved to useEffect to avoid setState during render)
+  useEffect(() => {
+    if (settings && !settingsForm) {
+      setSettingsForm({
+        page_title: settings.page_title || 'Contact Us',
+        page_description: settings.page_description || '',
+        form_enabled: settings.form_enabled,
+        notification_email: settings.notification_email || '',
+        success_message: settings.success_message || '',
+      });
+    }
+  }, [settings, settingsForm]);
 
   const handleDeleteSubmission = async (id: string) => {
     if (!confirm('Delete this submission?')) return;

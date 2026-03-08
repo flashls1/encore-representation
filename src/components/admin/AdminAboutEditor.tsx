@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { useAboutContent, type ContentSection } from '@/hooks/useUpcomingEvents';
+import { useAboutContent } from '@/hooks/useUpcomingEvents';
+import type { ContentSection } from '@/types/database';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import MediaPicker from './MediaPicker';
@@ -79,7 +80,7 @@ const AdminAboutEditor = () => {
                 ...form,
                 updated_at: new Date().toISOString(),
             };
-            const { error } = await (supabase as any).from('about_content').upsert(payload).select().maybeSingle();
+            const { error } = await supabase.from('about_content').upsert(payload as any).select().maybeSingle();
             if (error) throw error;
             qc.invalidateQueries({ queryKey: ['about-content'] });
             toast({ title: 'Saved', description: 'About page updated.' });

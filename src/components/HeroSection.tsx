@@ -146,8 +146,8 @@ const HeroSection = () => {
 
   const heroTitle = homeContent?.hero_title || "ENCORE REPRESENTATION";
   const heroSubtitle = homeContent?.hero_subtitle || "Premier Talent Representation";
-  const heroTextVisible = (homeContent as any)?.hero_text_visible ?? true;
-  const ctaOffsetTop = parseInt((homeContent as any)?.cta_offset_top || '0') || 0;
+  const heroTextVisible = homeContent?.hero_text_visible ?? true;
+  const ctaOffsetTop = parseInt(homeContent?.cta_offset_top || '0') || 0;
   const ctaPrimaryText = homeContent?.cta_primary_text;
   const ctaPrimaryUrl = homeContent?.cta_primary_url;
   const ctaSecondaryText = homeContent?.cta_secondary_text;

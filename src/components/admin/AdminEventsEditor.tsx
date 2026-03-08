@@ -208,7 +208,7 @@ const AdminEventsEditor = () => {
     const saveCarouselSettings = async () => {
         setSavingSpeed(true);
         try {
-            await (supabase as any).from('ui_effect_overrides').upsert(
+            await supabase.from('ui_effect_overrides').upsert(
                 { effect_id: 'events-carousel', props: { desktopSpeed: localDesktopSpeed, mobileSpeed: localMobileSpeed } },
                 { onConflict: 'effect_id' }
             );

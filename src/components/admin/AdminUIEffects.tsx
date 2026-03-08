@@ -48,14 +48,14 @@ const EffectCard = ({ effect }: EffectCardProps) => {
     useEffect(() => {
         (async () => {
             try {
-                const { data } = await (supabase as any)
+                const { data } = await supabase
                     .from('ui_effect_overrides')
                     .select('props')
                     .eq('effect_id', effect.id)
                     .maybeSingle();
-                if (data?.props) {
+                if (data?.props && typeof data.props === 'object' && !Array.isArray(data.props)) {
                     const defaults = getDefaultProps(effect.id);
-                    setProps({ ...defaults, ...data.props });
+                    setProps({ ...defaults, ...(data.props as Record<string, any>) });
                 }
             } catch { /* use defaults */ }
         })();
@@ -72,10 +72,10 @@ const EffectCard = ({ effect }: EffectCardProps) => {
     const saveProps = useCallback(async () => {
         setSaving(true);
         try {
-            const { error } = await (supabase as any)
+            const { error } = await supabase
                 .from('ui_effect_overrides')
                 .upsert(
-                    { effect_id: effect.id, props, updated_at: new Date().toISOString() },
+                    { effect_id: effect.id, props: props as any, updated_at: new Date().toISOString() },
                     { onConflict: 'effect_id' }
                 );
             if (error) throw error;

@@ -55,7 +55,7 @@ const AdminUsers = () => {
   const fetchAdmins = async () => {
     setLoading(true);
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("admin_profiles")
         .select("*")
         .order("created_at", { ascending: true });
@@ -99,7 +99,7 @@ const AdminUsers = () => {
 
     setCreating(true);
     try {
-      const { data, error } = await supabase.rpc("create_admin_user" as any, {
+      const { data, error } = await supabase.rpc("create_admin_user", {
         _email: email,
         _password: password,
         _first_name: firstName,
@@ -156,7 +156,7 @@ const AdminUsers = () => {
     setSaving(true);
     try {
       // Update profile name
-      const { error: profileError } = await supabase.rpc("update_admin_profile" as any, {
+      const { error: profileError } = await supabase.rpc("update_admin_profile", {
         _target_user_id: userId,
         _first_name: firstName,
         _last_name: lastName,
@@ -165,7 +165,7 @@ const AdminUsers = () => {
 
       // Update password if provided
       if (password) {
-        const { error: pwError } = await supabase.rpc("update_admin_password" as any, {
+        const { error: pwError } = await supabase.rpc("update_admin_password", {
           _target_user_id: userId,
           _new_password: password,
         });
@@ -186,7 +186,7 @@ const AdminUsers = () => {
   const handleDeleteAdmin = async (userId: string) => {
     setDeleting(true);
     try {
-      const { error } = await supabase.rpc("delete_admin_user" as any, {
+      const { error } = await supabase.rpc("delete_admin_user", {
         _target_user_id: userId,
       });
       if (error) throw error;

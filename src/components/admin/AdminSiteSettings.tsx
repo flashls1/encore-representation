@@ -44,27 +44,30 @@ const AdminSiteSettings = () => {
 
   useEffect(() => {
     if (settings) {
+      // Note: some fields (event_start_date, venue_name, etc.) are UI-only and 
+      // not yet backed by DB columns. Cast to any to access them.
+      const s = settings as any;
       setForm({
         site_name: settings.site_name || '',
         site_description: settings.site_description || '',
         contact_email: settings.contact_email || '',
         contact_phone: settings.contact_phone || '',
         contact_address: settings.contact_address || '',
-        event_start_date: settings.event_start_date || '',
-        event_end_date: settings.event_end_date || '',
-        event_start_time: settings.event_start_time || '',
+        event_start_date: s.event_start_date || '',
+        event_end_date: s.event_end_date || '',
+        event_start_time: s.event_start_time || '',
         facebook_url: settings.facebook_url || '',
         twitter_url: settings.twitter_url || '',
         instagram_url: settings.instagram_url || '',
         discord_url: settings.discord_url || '',
         tiktok_url: settings.tiktok_url || '',
         theme: settings.theme || 'neon-nights',
-        venue_name: settings.venue_name || '',
-        venue_address: settings.venue_address || '',
-        show_hours_sat: settings.show_hours_sat || '',
-        show_hours_sun: settings.show_hours_sun || '',
-        vip_early_access: settings.vip_early_access || '',
-        ticket_url: settings.ticket_url || '',
+        venue_name: s.venue_name || '',
+        venue_address: s.venue_address || '',
+        show_hours_sat: s.show_hours_sat || '',
+        show_hours_sun: s.show_hours_sun || '',
+        vip_early_access: s.vip_early_access || '',
+        ticket_url: s.ticket_url || '',
       });
     }
   }, [settings]);
@@ -80,7 +83,7 @@ const AdminSiteSettings = () => {
         ...form,
         updated_at: new Date().toISOString(),
       };
-      const { error } = await (supabase as any).from('site_settings').upsert(payload).select().maybeSingle();
+      const { error } = await supabase.from('site_settings').upsert(payload as any).select().maybeSingle();
       if (error) throw error;
       qc.invalidateQueries({ queryKey: ['site-settings'] });
       toast({ title: 'Saved', description: 'Site settings updated successfully.' });

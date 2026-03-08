@@ -1,32 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type {
+    UpcomingEvent,
+    AboutContent,
+    BookContent,
+} from '@/types/database';
+
+// Re-export shared types for consumers
+export type { UpcomingEvent, AboutContent, BookContent };
 
 // ============================================================================
-// Types
-// ============================================================================
-export interface UpcomingEvent {
-    id: string;
-    title: string;
-    description: string;
-    image_url: string;
-    event_date: string | null;
-    event_time: string;
-    location: string;
-    link_url: string;
-    sort_order: number;
-    visible: boolean;
-    created_at: string;
-    updated_at: string;
-}
-
-// ============================================================================
-// Hooks
+// Upcoming Events Hooks
 // ============================================================================
 export const useUpcomingEvents = (visibleOnly: boolean = false) => {
     return useQuery({
         queryKey: ['upcoming-events', { visibleOnly }],
         queryFn: async (): Promise<UpcomingEvent[]> => {
-            let query = (supabase as any)
+            let query = supabase
                 .from('upcoming_events')
                 .select('*')
                 .order('sort_order', { ascending: true })
@@ -38,7 +28,7 @@ export const useUpcomingEvents = (visibleOnly: boolean = false) => {
 
             const { data, error } = await query;
             if (error) throw error;
-            return data || [];
+            return (data as unknown as UpcomingEvent[]) || [];
         },
         staleTime: 5 * 60 * 1000,
     });
@@ -49,9 +39,9 @@ export const useUpsertEvent = () => {
     return useMutation({
         mutationFn: async (event: Partial<UpcomingEvent>) => {
             const payload = { ...event, updated_at: new Date().toISOString() };
-            const { data, error } = await (supabase as any)
+            const { data, error } = await supabase
                 .from('upcoming_events')
-                .upsert(payload)
+                .upsert(payload as any)
                 .select()
                 .single();
             if (error) throw error;
@@ -65,7 +55,7 @@ export const useDeleteEvent = () => {
     const qc = useQueryClient();
     return useMutation({
         mutationFn: async (id: string) => {
-            const { error } = await (supabase as any)
+            const { error } = await supabase
                 .from('upcoming_events')
                 .delete()
                 .eq('id', id);
@@ -78,33 +68,16 @@ export const useDeleteEvent = () => {
 // ============================================================================
 // About Content
 // ============================================================================
-export interface AboutContent {
-    id: string;
-    page_title: string;
-    page_description: string;
-    hero_image_url: string;
-    sections: ContentSection[];
-    updated_at: string;
-}
-
-export interface ContentSection {
-    id: string;
-    type: 'text' | 'image' | 'video' | 'image-text' | 'owner-hero';
-    title?: string;
-    content: string;
-    media_url: string;
-}
-
 export const useAboutContent = () => {
     return useQuery({
         queryKey: ['about-content'],
         queryFn: async (): Promise<AboutContent | null> => {
-            const { data, error } = await (supabase as any)
+            const { data, error } = await supabase
                 .from('about_content')
                 .select('*')
                 .maybeSingle();
             if (error) throw error;
-            return data;
+            return data as unknown as AboutContent | null;
         },
         staleTime: 5 * 60 * 1000,
     });
@@ -113,25 +86,16 @@ export const useAboutContent = () => {
 // ============================================================================
 // Book Content
 // ============================================================================
-export interface BookContent {
-    id: string;
-    page_title: string;
-    page_description: string;
-    hero_image_url: string;
-    sections: ContentSection[];
-    updated_at: string;
-}
-
 export const useBookContent = () => {
     return useQuery({
         queryKey: ['book-content'],
         queryFn: async (): Promise<BookContent | null> => {
-            const { data, error } = await (supabase as any)
+            const { data, error } = await supabase
                 .from('book_content')
                 .select('*')
                 .maybeSingle();
             if (error) throw error;
-            return data;
+            return data as unknown as BookContent | null;
         },
         staleTime: 5 * 60 * 1000,
     });

@@ -13,6 +13,7 @@ import AdminSiteSettings from "@/components/admin/AdminSiteSettings";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminBookings from "@/components/admin/AdminBookings";
 import AdminUIEffects from "@/components/admin/AdminUIEffects";
+import AdminErrorBoundary from "@/components/admin/AdminErrorBoundary";
 import { useState } from "react";
 
 // ─── Sidebar sections ──────────────────────────────────────────────────────────
@@ -174,7 +175,9 @@ const Admin = () => {
           style={{ backgroundColor: '#050505' }}
         >
           <div className="max-w-6xl mx-auto">
-            <ActiveComponent />
+            <AdminErrorBoundary key={activeSection}>
+              <ActiveComponent />
+            </AdminErrorBoundary>
           </div>
         </main>
       </div>

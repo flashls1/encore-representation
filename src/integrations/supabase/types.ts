@@ -134,6 +134,7 @@ export type Database = {
           about_description: string | null
           about_title: string | null
           countdown_enabled: boolean
+          cta_offset_top: string | null
           cta_primary_text: string | null
           cta_primary_url: string | null
           cta_secondary_text: string | null
@@ -143,6 +144,7 @@ export type Database = {
           hero_image_url: string | null
           hero_mode: string | null
           hero_subtitle: string | null
+          hero_text_visible: boolean
           hero_title: string
           hero_video_url: string | null
           id: string
@@ -152,6 +154,7 @@ export type Database = {
           about_description?: string | null
           about_title?: string | null
           countdown_enabled?: boolean
+          cta_offset_top?: string | null
           cta_primary_text?: string | null
           cta_primary_url?: string | null
           cta_secondary_text?: string | null
@@ -161,6 +164,7 @@ export type Database = {
           hero_image_url?: string | null
           hero_mode?: string | null
           hero_subtitle?: string | null
+          hero_text_visible?: boolean
           hero_title?: string
           hero_video_url?: string | null
           id?: string
@@ -170,6 +174,7 @@ export type Database = {
           about_description?: string | null
           about_title?: string | null
           countdown_enabled?: boolean
+          cta_offset_top?: string | null
           cta_primary_text?: string | null
           cta_primary_url?: string | null
           cta_secondary_text?: string | null
@@ -179,6 +184,7 @@ export type Database = {
           hero_image_url?: string | null
           hero_mode?: string | null
           hero_subtitle?: string | null
+          hero_text_visible?: boolean
           hero_title?: string
           hero_video_url?: string | null
           id?: string
@@ -370,21 +376,33 @@ export type Database = {
       }
       talent_roles: {
         Row: {
+          bg_image_url: string | null
           character_name: string
           id: string
+          image_url: string | null
           role_name: string
+          role_type: string
+          show_color: string | null
           talent_id: string
         }
         Insert: {
+          bg_image_url?: string | null
           character_name: string
           id?: string
+          image_url?: string | null
           role_name: string
+          role_type?: string
           talent_id: string
+          show_color?: string | null
         }
         Update: {
+          bg_image_url?: string | null
           character_name?: string
           id?: string
+          image_url?: string | null
           role_name?: string
+          role_type?: string
+          show_color?: string | null
           talent_id?: string
         }
         Relationships: [
@@ -399,19 +417,169 @@ export type Database = {
       }
       user_roles: {
         Row: {
+          created_at: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
+          created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
+          created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      upcoming_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_date: string | null
+          event_time: string | null
+          id: string
+          image_url: string | null
+          link_url: string | null
+          location: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          event_time?: string | null
+          id?: string
+          image_url?: string | null
+          link_url?: string | null
+          location?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          event_time?: string | null
+          id?: string
+          image_url?: string | null
+          link_url?: string | null
+          location?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Relationships: []
+      }
+      about_content: {
+        Row: {
+          id: string
+          page_title: string
+          page_description: string | null
+          hero_image_url: string | null
+          sections: Json | null
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          page_title?: string
+          page_description?: string | null
+          hero_image_url?: string | null
+          sections?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          page_title?: string
+          page_description?: string | null
+          hero_image_url?: string | null
+          sections?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      book_content: {
+        Row: {
+          id: string
+          page_title: string
+          page_description: string | null
+          hero_image_url: string | null
+          sections: Json | null
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          page_title?: string
+          page_description?: string | null
+          hero_image_url?: string | null
+          sections?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          page_title?: string
+          page_description?: string | null
+          hero_image_url?: string | null
+          sections?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ui_effect_overrides: {
+        Row: {
+          effect_id: string
+          props: Json | null
+          updated_at: string
+        }
+        Insert: {
+          effect_id: string
+          props?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          effect_id?: string
+          props?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      admin_profiles: {
+        Row: {
+          user_id: string
+          first_name: string
+          last_name: string
+          email: string
+          display_password: string
+          is_super_admin: boolean
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          first_name: string
+          last_name: string
+          email: string
+          display_password: string
+          is_super_admin?: boolean
+          created_at?: string
+        }
+        Update: {
+          user_id?: string
+          first_name?: string
+          last_name?: string
+          email?: string
+          display_password?: string
+          is_super_admin?: boolean
+          created_at?: string
         }
         Relationships: []
       }
@@ -424,6 +592,36 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
         }
         Returns: boolean
+      }
+      create_admin_user: {
+        Args: {
+          _email: string
+          _password: string
+          _first_name: string
+          _last_name: string
+        }
+        Returns: string
+      }
+      update_admin_profile: {
+        Args: {
+          _target_user_id: string
+          _first_name: string
+          _last_name: string
+        }
+        Returns: void
+      }
+      update_admin_password: {
+        Args: {
+          _target_user_id: string
+          _new_password: string
+        }
+        Returns: void
+      }
+      delete_admin_user: {
+        Args: {
+          _target_user_id: string
+        }
+        Returns: void
       }
     }
     Enums: {

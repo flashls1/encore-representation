@@ -35,30 +35,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const checkAdminStatus = async (userId?: string): Promise<boolean> => {
     const userIdToCheck = userId || user?.id;
-    console.log('[AUTH] checkAdminStatus called with userId:', userIdToCheck);
     if (!userIdToCheck) {
-      console.log('[AUTH] No userId to check, returning false');
       return false;
     }
 
     try {
-      console.log('[AUTH] Calling has_role RPC...');
       const { data, error } = await supabase.rpc('has_role', {
         _user_id: userIdToCheck,
         _role: 'admin'
       });
 
-      console.log('[AUTH] has_role response — data:', data, 'error:', error);
-
       if (error) {
-        console.error('[AUTH] has_role RPC error:', error.message, error.code, error);
         return false;
       }
 
-      console.log('[AUTH] Admin status resolved:', !!data);
       return data || false;
-    } catch (error) {
-      console.error('[AUTH] has_role RPC exception:', error);
+    } catch {
       return false;
     }
   };
@@ -80,8 +72,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       } else {
         setIsAdmin(false);
       }
-    } catch (error) {
-      console.error('Error updating auth state:', error);
+    } catch {
       setIsAdmin(false);
     } finally {
       setLoading(false);
