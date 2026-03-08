@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -8,6 +9,19 @@ import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
 import { Calendar, MapPin, ExternalLink, Loader2 } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
+
+/** Ensures a URL has a proper protocol — fixes admin-entered URLs like "www.example.com" */
+const normalizeUrl = (url: string): string => {
+    const trimmed = url.trim();
+    if (trimmed.startsWith('/') || trimmed.startsWith('#')) return trimmed; // internal
+    if (/^https?:\/\//i.test(trimmed)) return trimmed; // already has protocol
+    return `https://${trimmed}`; // add protocol
+};
+
+const isInternalUrl = (url: string): boolean => {
+    const trimmed = url.trim();
+    return trimmed.startsWith('/') || trimmed.startsWith('#');
+};
 
 // ─── 3D Tilt Card ──────────────────────────────────────────────────────────────
 const TiltCard = ({ children, className }: { children: React.ReactNode; className?: string }) => {
@@ -170,9 +184,9 @@ const TimelineNode = ({ event, index, isLast }: { event: any; index: number; isL
 
                         {event.link_url && (
                             <motion.a
-                                href={event.link_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href={normalizeUrl(event.link_url)}
+                                target={isInternalUrl(event.link_url) ? undefined : "_blank"}
+                                rel={isInternalUrl(event.link_url) ? undefined : "noopener noreferrer"}
                                 className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-lg text-xs font-bold tracking-wide uppercase"
                                 style={{
                                     backgroundColor: '#D4AF37',
