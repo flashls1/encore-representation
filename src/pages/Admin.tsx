@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,30 @@ const Admin = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Lock body scroll on iOS to prevent rubber-band bounce
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    html.style.overflow = 'hidden';
+    html.style.position = 'fixed';
+    html.style.width = '100%';
+    html.style.height = '100%';
+    body.style.overflow = 'hidden';
+    body.style.position = 'fixed';
+    body.style.width = '100%';
+    body.style.height = '100%';
+    return () => {
+      html.style.overflow = '';
+      html.style.position = '';
+      html.style.width = '';
+      html.style.height = '';
+      body.style.overflow = '';
+      body.style.position = '';
+      body.style.width = '';
+      body.style.height = '';
+    };
+  }, []);
+
   const active = ADMIN_SECTIONS.find(s => s.id === activeSection) || ADMIN_SECTIONS[0];
   const ActiveComponent = active.component;
 
@@ -43,7 +68,7 @@ const Admin = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden admin-dark-theme" style={{ backgroundColor: '#050505' }}>
+    <div className="h-screen flex flex-col overflow-hidden admin-dark-theme" style={{ backgroundColor: '#050505', overscrollBehavior: 'none', touchAction: 'pan-x pan-y' }}>
       {/* Top Navigation */}
       <Navigation />
 
@@ -249,7 +274,7 @@ const Admin = () => {
         {/* ─── Content Area ─── */}
         <main
           className="flex-1 overflow-y-auto p-4 md:p-8 pb-20 md:pb-8"
-          style={{ backgroundColor: '#050505' }}
+          style={{ backgroundColor: '#050505', overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
         >
           <div className="max-w-6xl mx-auto">
             <AdminErrorBoundary key={activeSection}>
