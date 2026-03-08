@@ -182,7 +182,7 @@ const TimelineNode = ({ event, index, isLast }: { event: any; index: number; isL
                             )}
                         </div>
 
-                        {event.link_url && (
+                        {event.link_url && event.link_visible !== false && (
                             <motion.a
                                 href={normalizeUrl(event.link_url)}
                                 target={isInternalUrl(event.link_url) ? undefined : "_blank"}

@@ -11,7 +11,7 @@ import { useUIEffect } from '@/hooks/useData';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import MediaPicker from './MediaPicker';
-import { CalendarDays, Plus, Trash2, Save, Loader2, Image as ImageIcon, Edit, Eye, EyeOff, Settings } from 'lucide-react';
+import { CalendarDays, Plus, Trash2, Save, Loader2, Image as ImageIcon, Edit, Eye, EyeOff, Settings, Link2, Link2Off } from 'lucide-react';
 
 const EMPTY_EVENT: Partial<UpcomingEvent> = {
     title: '',
@@ -21,6 +21,7 @@ const EMPTY_EVENT: Partial<UpcomingEvent> = {
     event_time: '',
     location: '',
     link_url: '',
+    link_visible: true,
     sort_order: 0,
     visible: true,
 };
@@ -161,13 +162,29 @@ const AdminEventsEditor = () => {
                                     placeholder="Venue name or address"
                                 />
                             </div>
-                            <div>
-                                <Label>Link URL</Label>
-                                <Input
-                                    value={editing.link_url || ''}
-                                    onChange={e => setEditing(p => ({ ...p, link_url: e.target.value }))}
-                                    placeholder="https://..."
-                                />
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <Switch
+                                        checked={editing.link_visible ?? true}
+                                        onCheckedChange={v => setEditing(p => ({ ...p, link_visible: v }))}
+                                        id="event-link-visible"
+                                    />
+                                    <Label htmlFor="event-link-visible" className="flex items-center gap-1.5">
+                                        {editing.link_visible !== false
+                                            ? <><Link2 className="h-3.5 w-3.5" /> Show Link Button</>
+                                            : <><Link2Off className="h-3.5 w-3.5" /> Link Button Hidden</>}
+                                    </Label>
+                                </div>
+                                {editing.link_visible !== false && (
+                                    <div>
+                                        <Label>Link URL</Label>
+                                        <Input
+                                            value={editing.link_url || ''}
+                                            onChange={e => setEditing(p => ({ ...p, link_url: e.target.value }))}
+                                            placeholder="https://..."
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
 

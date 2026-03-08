@@ -140,6 +140,7 @@ export interface UpcomingEvent {
   event_time: string | null;
   location: string | null;
   link_url: string | null;
+  link_visible: boolean;
   sort_order: number;
   visible: boolean;
   created_at: string;
