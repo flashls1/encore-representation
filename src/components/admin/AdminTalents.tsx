@@ -6,6 +6,13 @@ import { Plus, Trash2, GripVertical, X, Save, Upload, Bold, Italic, List, Link a
 import { useToast } from "@/hooks/use-toast";
 import type { Talent, TalentRole } from "@/types/database";
 
+// ─── Tiptap imports ──────────────────────────────────────────────────────────────
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Link from '@tiptap/extension-link';
+import { TextStyle } from '@tiptap/extension-text-style';
+import Color from '@tiptap/extension-color';
+
 // ─── Text Color Presets ──────────────────────────────────────────────────────────
 const TEXT_COLORS = [
     { label: 'White', value: '#ffffff' },
@@ -18,7 +25,7 @@ const TEXT_COLORS = [
     { label: 'Purple', value: '#a855f7' },
 ];
 
-// ─── Rich Text Editor ────────────────────────────────────────────────────────────
+// ─── Rich Text Editor (Tiptap) ───────────────────────────────────────────────────
 const RichTextEditor = ({
     value,
     onChange,
@@ -26,26 +33,51 @@ const RichTextEditor = ({
     value: string;
     onChange: (html: string) => void;
 }) => {
-    const editorRef = useRef<HTMLDivElement>(null);
     const [showColors, setShowColors] = useState(false);
 
-    useEffect(() => {
-        if (editorRef.current && editorRef.current.innerHTML !== value) {
-            editorRef.current.innerHTML = value || '';
-        }
-    }, []);
-
-    const exec = (command: string, val?: string) => {
-        document.execCommand(command, false, val);
-        if (editorRef.current) {
-            onChange(editorRef.current.innerHTML);
-        }
-    };
+    const editor = useEditor({
+        extensions: [
+            StarterKit.configure({
+                // We only need bold, italic, bulletList — disable extras
+                heading: false,
+                codeBlock: false,
+                blockquote: false,
+                horizontalRule: false,
+                code: false,
+                strike: false,
+            }),
+            Link.configure({
+                openOnClick: false,
+                HTMLAttributes: { target: '_blank', rel: 'noopener noreferrer' },
+            }),
+            TextStyle,
+            Color,
+        ],
+        content: value || '',
+        onUpdate: ({ editor: e }) => {
+            onChange(e.getHTML());
+        },
+        editorProps: {
+            attributes: {
+                class: 'min-h-[250px] p-4 outline-none prose prose-lg max-w-none',
+                style: 'background-color: #111; color: #ffffff; font-size: 0.95rem; line-height: 1.7;',
+            },
+        },
+    });
 
     const applyColor = (color: string) => {
-        exec('foreColor', color);
+        editor?.chain().focus().setColor(color).run();
         setShowColors(false);
     };
+
+    const insertLink = () => {
+        const url = prompt('Enter URL:');
+        if (url) {
+            editor?.chain().focus().setLink({ href: url }).run();
+        }
+    };
+
+    if (!editor) return null;
 
     return (
         <div
@@ -60,16 +92,52 @@ const RichTextEditor = ({
                     borderColor: 'var(--input-border)',
                 }}
             >
-                <button type="button" onClick={() => exec('bold')} className="p-1.5 rounded hover:opacity-80" style={{ color: 'var(--text-primary)' }} title="Bold">
+                <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleBold().run()}
+                    className="p-1.5 rounded hover:opacity-80"
+                    style={{
+                        color: 'var(--text-primary)',
+                        backgroundColor: editor.isActive('bold') ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+                    }}
+                    title="Bold"
+                >
                     <Bold className="h-4 w-4" />
                 </button>
-                <button type="button" onClick={() => exec('italic')} className="p-1.5 rounded hover:opacity-80" style={{ color: 'var(--text-primary)' }} title="Italic">
+                <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleItalic().run()}
+                    className="p-1.5 rounded hover:opacity-80"
+                    style={{
+                        color: 'var(--text-primary)',
+                        backgroundColor: editor.isActive('italic') ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+                    }}
+                    title="Italic"
+                >
                     <Italic className="h-4 w-4" />
                 </button>
-                <button type="button" onClick={() => exec('insertUnorderedList')} className="p-1.5 rounded hover:opacity-80" style={{ color: 'var(--text-primary)' }} title="Bullet List">
+                <button
+                    type="button"
+                    onClick={() => editor.chain().focus().toggleBulletList().run()}
+                    className="p-1.5 rounded hover:opacity-80"
+                    style={{
+                        color: 'var(--text-primary)',
+                        backgroundColor: editor.isActive('bulletList') ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+                    }}
+                    title="Bullet List"
+                >
                     <List className="h-4 w-4" />
                 </button>
-                <button type="button" onClick={() => { const url = prompt('Enter URL:'); if (url) exec('createLink', url); }} className="p-1.5 rounded hover:opacity-80" style={{ color: 'var(--text-primary)' }} title="Insert Link">
+                <button
+                    type="button"
+                    onClick={insertLink}
+                    className="p-1.5 rounded hover:opacity-80"
+                    style={{
+                        color: 'var(--text-primary)',
+                        backgroundColor: editor.isActive('link') ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+                    }}
+                    title="Insert Link"
+                >
                     <LinkIcon className="h-4 w-4" />
                 </button>
 
@@ -122,19 +190,7 @@ const RichTextEditor = ({
             </div>
 
             {/* Editable area — white text on dark background */}
-            <div
-                ref={editorRef}
-                contentEditable
-                className="min-h-[250px] p-4 outline-none prose prose-lg max-w-none"
-                style={{ backgroundColor: '#111', color: '#ffffff', fontSize: '0.95rem', lineHeight: '1.7' }}
-                onInput={() => { if (editorRef.current) onChange(editorRef.current.innerHTML); }}
-                onPaste={(e) => {
-                    e.preventDefault();
-                    const text = e.clipboardData.getData('text/html') || e.clipboardData.getData('text/plain');
-                    document.execCommand('insertHTML', false, text);
-                    if (editorRef.current) onChange(editorRef.current.innerHTML);
-                }}
-            />
+            <EditorContent editor={editor} />
         </div>
     );
 };
