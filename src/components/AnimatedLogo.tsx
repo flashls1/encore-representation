@@ -21,7 +21,7 @@ interface AnimatedLogoProps {
     className?: string;
 }
 
-const LOGO_SRC = '/encore-logo-full.jpg';
+const LOGO_SRC = '/encore-logo-full.png';
 
 // Clip-path regions (percentage-based, inset: top right bottom left)
 const CLIP_ENCORE = 'inset(5% 0% 55% 0%)';       // Top portion — "ENCORE"
@@ -124,7 +124,6 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                         className="w-full h-full object-cover"
                         style={{
                             clipPath: CLIP_ENCORE,
-                            mixBlendMode: 'lighten',
                         }}
                         draggable={false}
                     />
@@ -142,7 +141,6 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                         className="w-full h-full object-cover"
                         style={{
                             clipPath: CLIP_REPRESENTATION,
-                            mixBlendMode: 'lighten',
                         }}
                         draggable={false}
                     />
@@ -181,7 +179,6 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                         className="w-full h-full object-cover"
                         style={{
                             clipPath: CLIP_REFLECTION,
-                            mixBlendMode: 'lighten',
                         }}
                         draggable={false}
                     />
