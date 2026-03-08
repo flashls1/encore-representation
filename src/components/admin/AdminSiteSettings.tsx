@@ -103,12 +103,12 @@ const AdminSiteSettings = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Site Settings</h2>
-          <p className="text-muted-foreground">Global configuration for your site</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">Site Settings</h2>
+          <p className="text-sm text-muted-foreground">Global configuration for your site</p>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
+        <Button onClick={handleSave} disabled={saving} className="w-full sm:w-auto">
           {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
           Save Settings
         </Button>

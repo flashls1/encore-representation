@@ -79,13 +79,13 @@ const AdminEventsEditor = () => {
     if (editing) {
         return (
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <h3 className="text-lg font-bold text-foreground">
                         {editing.id ? 'Edit Event' : 'New Event'}
                     </h3>
                     <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
-                        <Button onClick={handleSave} disabled={upsert.isPending}>
+                        <Button variant="outline" onClick={() => setEditing(null)} className="flex-1 sm:flex-none">Cancel</Button>
+                        <Button onClick={handleSave} disabled={upsert.isPending} className="flex-1 sm:flex-none">
                             {upsert.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
                             Save Event
                         </Button>

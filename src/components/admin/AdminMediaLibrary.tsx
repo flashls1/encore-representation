@@ -108,14 +108,14 @@ const AdminMediaLibrary = () => {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                 <div>
-                    <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Media Library</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Media Library</h2>
                     <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
                         Upload images &amp; videos. MOV files are automatically converted to optimised MP4.
                     </p>
                 </div>
-                <div>
+                <div className="flex-shrink-0">
                     <input
                         ref={fileInputRef}
                         type="file"
@@ -127,7 +127,7 @@ const AdminMediaLibrary = () => {
                     <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isBusy}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-opacity disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-opacity disabled:opacity-50 w-full sm:w-auto justify-center"
                         style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
                     >
                         <Upload className="h-4 w-4" />
@@ -183,7 +183,7 @@ const AdminMediaLibrary = () => {
                         }}
                     />
                 </div>
-                <div className="flex justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-0.5 text-xs" style={{ color: 'var(--text-muted)' }}>
                     <span>{formatSize(totalUsed)} of {formatSize(maxBytes)} used ({pct}%)</span>
                     <span>{items?.length || 0} files · {imageCount} images · {videoCount} videos</span>
                 </div>

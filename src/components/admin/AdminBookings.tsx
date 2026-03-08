@@ -104,7 +104,7 @@ const AdminBookings = () => {
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h2 className="font-orbitron text-xl font-bold tracking-wider" style={{ color: 'var(--accent)' }}>
+                <h2 className="font-orbitron text-lg sm:text-xl font-bold tracking-wider" style={{ color: 'var(--accent)' }}>
                     Booking Requests
                 </h2>
                 <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: 'var(--badge-bg)', color: 'var(--badge-text)' }}>
@@ -115,7 +115,7 @@ const AdminBookings = () => {
             {/* Detail Modal */}
             {selectedBooking && (
                 <div
-                    className="rounded-xl p-5 mb-6"
+                    className="rounded-xl p-4 sm:p-5 mb-6"
                     style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)' }}
                 >
                     <div className="flex justify-between items-start mb-4">

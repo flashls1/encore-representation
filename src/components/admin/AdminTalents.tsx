@@ -810,14 +810,14 @@ const AdminTalents = () => {
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="font-orbitron text-xl font-bold tracking-wider" style={{ color: 'var(--accent)' }}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                <h2 className="font-orbitron text-lg sm:text-xl font-bold tracking-wider" style={{ color: 'var(--accent)' }}>
                     Talent Management
                 </h2>
                 {!isEditing && (
                     <button
                         onClick={startCreate}
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold transition-colors"
+                        className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold transition-colors w-full sm:w-auto"
                         style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
                     >
                         <Plus className="h-4 w-4" />
@@ -828,7 +828,7 @@ const AdminTalents = () => {
 
             {/* Edit / Create Form */}
             {isEditing && (
-                <div className="rounded-xl p-6 mb-6" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                <div className="rounded-xl p-4 sm:p-6 mb-6" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)' }}>
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                             {editingTalent ? `Editing: ${editingTalent.name}` : 'Add New Talent'}
@@ -903,11 +903,11 @@ const AdminTalents = () => {
                     </div>
 
                     {/* Save / Cancel */}
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3">
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-bold transition-colors disabled:opacity-50"
+                            className="flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-lg text-sm font-bold transition-colors disabled:opacity-50 w-full sm:w-auto"
                             style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
                         >
                             <Save className="h-4 w-4" />
@@ -915,7 +915,7 @@ const AdminTalents = () => {
                         </button>
                         <button
                             onClick={resetForm}
-                            className="px-5 py-2 rounded-lg text-sm font-medium transition-colors"
+                            className="px-5 py-2.5 rounded-lg text-sm font-medium transition-colors w-full sm:w-auto"
                             style={{ border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
                         >
                             Cancel

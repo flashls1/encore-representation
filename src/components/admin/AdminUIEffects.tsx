@@ -157,11 +157,11 @@ const EffectCard = ({ effect }: EffectCardProps) => {
                     <Separator />
 
                     {/* Action bar */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                             Props Configuration
                         </span>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                             <Button variant="ghost" size="sm" onClick={resetAll}>
                                 <RotateCcw className="h-3 w-3 mr-1" /> Reset
                             </Button>

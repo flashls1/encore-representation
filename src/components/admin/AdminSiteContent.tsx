@@ -26,7 +26,7 @@ const AdminSiteContent = () => {
 
             {/* Sub-tabs */}
             <div
-                className="flex gap-1 p-1 rounded-lg"
+                className="flex gap-1 p-1 rounded-lg overflow-x-auto"
                 style={{
                     backgroundColor: '#1a1a1a',
                     border: '1px solid rgba(255, 255, 255, 0.15)',
@@ -38,15 +38,15 @@ const AdminSiteContent = () => {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className="flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-all duration-150 flex-1 justify-center"
+                            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-150 flex-1 justify-center whitespace-nowrap min-w-0"
                             style={{
                                 backgroundColor: isActive ? '#d4af37' : 'transparent',
                                 color: isActive ? '#000000' : '#888888',
                                 fontWeight: isActive ? 700 : 500,
                             }}
                         >
-                            <tab.icon className="h-4 w-4" />
-                            {tab.label}
+                            <tab.icon className="h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">{tab.label}</span>
                         </button>
                     );
                 })}
