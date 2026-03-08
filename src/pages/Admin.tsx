@@ -261,11 +261,12 @@ const Admin = () => {
 
       {/* ─── Mobile Bottom Tab Bar ─── */}
       <div
-        className="md:hidden flex-shrink-0 flex items-center overflow-x-auto"
+        className="md:hidden flex-shrink-0 flex items-center justify-around"
         style={{
           backgroundColor: '#000000',
           borderTop: '1px solid rgba(212, 175, 55, 0.2)',
           paddingBottom: 'env(safe-area-inset-bottom)',
+          overflowX: 'hidden',
         }}
       >
         {ADMIN_SECTIONS.map((section) => {
@@ -274,15 +275,17 @@ const Admin = () => {
             <button
               key={section.id}
               onClick={() => setActiveSection(section.id)}
-              className="flex flex-col items-center justify-center gap-0.5 py-2 flex-1 min-w-[52px] transition-all duration-150"
+              className="flex flex-col items-center justify-center gap-0.5 py-2 transition-all duration-150"
               style={{
+                flex: '1 1 0%',
+                minWidth: 0,
                 color: isActive ? section.color : '#666666',
                 borderTop: isActive ? `2px solid ${section.color}` : '2px solid transparent',
                 backgroundColor: isActive ? `${section.color}08` : 'transparent',
               }}
             >
               <section.icon className="h-4 w-4" />
-              <span className="text-[9px] font-medium leading-none truncate max-w-[48px]">
+              <span className="text-[9px] font-medium leading-none truncate w-full text-center px-0.5">
                 {section.label}
               </span>
             </button>
