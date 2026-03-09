@@ -22,9 +22,16 @@
     border-color: var(--border);
   }
 
-  html,
-  body {
+  html {
+    overflow: hidden;
+    height: 100%;
     overscroll-behavior: none;
+  }
+
+  body {
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior-y: none;
     -webkit-overflow-scrolling: touch;
   }
 
