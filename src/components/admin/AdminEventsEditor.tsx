@@ -201,7 +201,7 @@ const AdminEventsEditor = () => {
                                             <Trash2 className="h-3 w-3" />
                                         </button>
                                     </div>
-                                    <div className="grid grid-cols-3 gap-3">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                         <div>
                                             <Label className="text-[10px]">Date</Label>
                                             <Input
