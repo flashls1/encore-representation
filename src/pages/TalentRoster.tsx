@@ -31,8 +31,9 @@ const RosterCard = ({ talent, index }: { talent: Talent; index: number }) => {
                         <img
                             src={talent.headshot_url}
                             alt={talent.name}
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            className="absolute inset-0 w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                             loading="lazy"
+                            style={{ backgroundColor: '#0A0A0A' }}
                         />
                     ) : (
                         <div

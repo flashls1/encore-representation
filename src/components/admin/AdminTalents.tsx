@@ -684,7 +684,9 @@ const AdminTalents = () => {
 
     const startCreate = () => {
         resetForm();
-        setSortOrder(talents?.length || 0);
+        // Auto-assign next sort position (end of list)
+        const maxSort = talents?.reduce((max, t) => Math.max(max, t.sort_order), -1) ?? -1;
+        setSortOrder(maxSort + 1);
         setIsCreating(true);
     };
 
@@ -699,6 +701,17 @@ const AdminTalents = () => {
         setRoles(talent.talent_roles || []);
     };
 
+    // Helper: recompact all sort_order values to 0..N-1
+    const recompactSortOrders = async () => {
+        const { data: all } = await supabase.from('talents').select('id, sort_order').order('sort_order');
+        if (!all) return;
+        for (let i = 0; i < all.length; i++) {
+            if (all[i].sort_order !== i) {
+                await supabase.from('talents').update({ sort_order: i }).eq('id', all[i].id);
+            }
+        }
+    };
+
     const handleSave = async () => {
         if (!talentName.trim()) {
             toast({ title: 'Name is required', variant: 'destructive' });
@@ -710,7 +723,43 @@ const AdminTalents = () => {
             const slug = slugify(talentName.trim());
 
             if (editingTalent) {
-                // Update talent
+                const oldSort = editingTalent.sort_order;
+                const newSort = sortOrder;
+
+                // If sort position changed, shift other talent to make room
+                if (oldSort !== newSort) {
+                    if (newSort < oldSort) {
+                        // Moving up: shift everything in [newSort, oldSort-1] down by 1
+                        const { data: toShift } = await supabase
+                            .from('talents')
+                            .select('id, sort_order')
+                            .gte('sort_order', newSort)
+                            .lt('sort_order', oldSort)
+                            .neq('id', editingTalent.id)
+                            .order('sort_order', { ascending: false });
+                        if (toShift) {
+                            for (const t of toShift) {
+                                await supabase.from('talents').update({ sort_order: t.sort_order + 1 }).eq('id', t.id);
+                            }
+                        }
+                    } else {
+                        // Moving down: shift everything in [oldSort+1, newSort] up by 1
+                        const { data: toShift } = await supabase
+                            .from('talents')
+                            .select('id, sort_order')
+                            .gt('sort_order', oldSort)
+                            .lte('sort_order', newSort)
+                            .neq('id', editingTalent.id)
+                            .order('sort_order', { ascending: true });
+                        if (toShift) {
+                            for (const t of toShift) {
+                                await supabase.from('talents').update({ sort_order: t.sort_order - 1 }).eq('id', t.id);
+                            }
+                        }
+                    }
+                }
+
+                // Update the talent itself
                 const { error } = await supabase
                     .from('talents')
                     .update({
@@ -719,7 +768,7 @@ const AdminTalents = () => {
                         bio: bio || null,
                         headshot_url: headshotUrl || null,
                         featured,
-                        sort_order: sortOrder,
+                        sort_order: newSort,
                     })
                     .eq('id', editingTalent.id);
 
@@ -744,9 +793,11 @@ const AdminTalents = () => {
                     if (rolesError) throw rolesError;
                 }
 
+                // Recompact to ensure no gaps
+                await recompactSortOrders();
                 toast({ title: `${talentName} updated` });
             } else {
-                // Create talent
+                // Create talent — use assigned sortOrder (end of list)
                 const { data, error } = await supabase
                     .from('talents')
                     .insert({
@@ -817,6 +868,9 @@ const AdminTalents = () => {
                     }
                 } catch { /* best-effort storage cleanup */ }
             }
+
+            // Auto-compact sort orders to fill the gap
+            await recompactSortOrders();
 
             toast({ title: `${talent.name} deleted` });
             queryClient.invalidateQueries({ queryKey: ['talents'] });
@@ -991,8 +1045,26 @@ const AdminTalents = () => {
                     {/* Sort Order */}
                     <div className="mb-4">
                         <div className="flex items-center gap-2 mb-2">
-                            <label className="text-sm" style={{ color: 'var(--text-muted)' }}>Sort Order:</label>
-                            <input type="number" value={sortOrder} onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)} className="theme-input w-20 text-sm text-center" />
+                            <label className="text-sm" style={{ color: 'var(--text-muted)' }}>Position:</label>
+                            <select
+                                value={sortOrder}
+                                onChange={(e) => setSortOrder(parseInt(e.target.value))}
+                                className="theme-input text-sm px-3 py-1.5 rounded-lg"
+                                style={{ minWidth: '220px' }}
+                            >
+                                {(() => {
+                                    const sorted = talents ? [...talents].sort((a, b) => a.sort_order - b.sort_order) : [];
+                                    const total = isCreating ? sorted.length + 1 : sorted.length;
+                                    return Array.from({ length: total }, (_, i) => {
+                                        const occupant = sorted.find(t => t.sort_order === i);
+                                        const isSelf = editingTalent?.id === occupant?.id;
+                                        const label = occupant
+                                            ? `#${i} — ${occupant.name}${isSelf ? ' (current)' : ''}`
+                                            : `#${i} — (new position)`;
+                                        return <option key={i} value={i}>{label}</option>;
+                                    });
+                                })()}
+                            </select>
                         </div>
                         {/* Current Roster Order reference */}
                         {talents && talents.length > 0 && (
