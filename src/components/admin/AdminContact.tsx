@@ -1,9 +1,79 @@
 import { useState, useEffect } from 'react';
 import { useContactSubmissions, useContactSettings } from '@/hooks/useData';
 import { supabase } from '@/integrations/supabase/client';
-import { useQueryClient } from '@tanstack/react-query';
-import { Mail, Trash2, Settings, Save, MessageSquare, Eye, EyeOff } from 'lucide-react';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { Mail, Trash2, Settings, Save, MessageSquare, Eye, EyeOff, Paperclip, Download, ExternalLink, Image as ImageIcon, File as FileIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
+interface Attachment {
+  id: string;
+  file_name: string;
+  file_size: number;
+  file_type: string | null;
+  storage_path: string;
+  public_url: string;
+  uploaded_at: string;
+}
+
+const formatSize = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const AttachmentList = ({ submissionId, submissionType }: { submissionId: string; submissionType: 'contact' | 'booking' }) => {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  const { data: attachments } = useQuery({
+    queryKey: ['attachments', submissionType, submissionId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('contact_attachments')
+        .select('*')
+        .eq('submission_type', submissionType)
+        .eq('submission_id', submissionId)
+        .order('uploaded_at');
+      if (error) throw error;
+      return (data || []) as Attachment[];
+    },
+  });
+
+  const handleDelete = async (att: Attachment) => {
+    if (!confirm(`Delete ${att.file_name}?`)) return;
+    await supabase.storage.from('contact-uploads').remove([att.storage_path]);
+    await supabase.from('contact_attachments').delete().eq('id', att.id);
+    qc.invalidateQueries({ queryKey: ['attachments', submissionType, submissionId] });
+    toast({ title: 'Attachment deleted' });
+  };
+
+  if (!attachments?.length) return null;
+
+  return (
+    <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
+      <p className="text-[10px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1" style={{ color: 'var(--accent)' }}>
+        <Paperclip className="h-3 w-3" /> {attachments.length} Attachment{attachments.length !== 1 ? 's' : ''}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {attachments.map(att => (
+          <div key={att.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px]" style={{ backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
+            {att.file_type?.startsWith('image/')
+              ? <ImageIcon className="h-3 w-3 flex-shrink-0" style={{ color: 'var(--accent)' }} />
+              : <FileIcon className="h-3 w-3 flex-shrink-0" style={{ color: 'var(--accent)' }} />
+            }
+            <span className="truncate max-w-[100px]" style={{ color: 'var(--text-secondary)' }}>{att.file_name}</span>
+            <span style={{ color: 'var(--text-muted)' }}>{formatSize(att.file_size)}</span>
+            <a href={att.public_url} target="_blank" rel="noopener noreferrer" className="p-0.5 rounded hover:opacity-70" title="Download">
+              <Download className="h-3 w-3" style={{ color: 'var(--accent)' }} />
+            </a>
+            <button onClick={() => handleDelete(att)} className="p-0.5 rounded hover:opacity-70" title="Delete">
+              <Trash2 className="h-3 w-3" style={{ color: '#ef4444' }} />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const AdminContact = () => {
   const { data: submissions, isLoading: loadingSubs } = useContactSubmissions();
@@ -118,6 +188,7 @@ const AdminContact = () => {
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
+                  <AttachmentList submissionId={sub.id} submissionType="contact" />
                 </div>
               ))}
             </div>

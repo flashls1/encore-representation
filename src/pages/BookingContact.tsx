@@ -1,11 +1,136 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useTalents, useSiteSettings, useSubmitContactForm } from "@/hooks/useData";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Calendar, MapPin, Users, DollarSign, FileText, Mail, Phone, Building } from "lucide-react";
+import { Send, Calendar, MapPin, Users, DollarSign, FileText, Mail, Phone, Building, Upload, X, Paperclip, Image as ImageIcon, File as FileIcon } from "lucide-react";
+
+const MAX_FILES = 5;
+const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+
+/** Upload files to storage and track in contact_attachments */
+const uploadAttachments = async (
+    files: File[],
+    submissionType: 'contact' | 'booking',
+    submissionId: string,
+) => {
+    const results: string[] = [];
+    for (const file of files) {
+        const timestamp = Date.now();
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const path = `${submissionType}/${submissionId}/${timestamp}_${safeName}`;
+
+        const { error: uploadErr } = await supabase.storage
+            .from('contact-uploads')
+            .upload(path, file, { cacheControl: '3600', upsert: false });
+        if (uploadErr) throw uploadErr;
+
+        const { data: urlData } = supabase.storage
+            .from('contact-uploads')
+            .getPublicUrl(path);
+
+        await supabase.from('contact_attachments').insert({
+            submission_type: submissionType,
+            submission_id: submissionId,
+            file_name: file.name,
+            file_size: file.size,
+            file_type: file.type || null,
+            storage_path: path,
+            public_url: urlData.publicUrl,
+        });
+        results.push(urlData.publicUrl);
+    }
+    return results;
+};
+
+const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const isImageFile = (type: string) => type.startsWith('image/');
+
+// ─── File Uploader Component ────────────────────────────────────────────────────
+const FileUploader = ({ files, setFiles, toast }: { files: File[]; setFiles: (f: File[]) => void; toast: any }) => {
+    const [dragOver, setDragOver] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const addFiles = useCallback((newFiles: FileList | File[]) => {
+        const incoming = Array.from(newFiles);
+        const valid: File[] = [];
+        for (const f of incoming) {
+            if (files.length + valid.length >= MAX_FILES) {
+                toast({ title: `Max ${MAX_FILES} files allowed`, variant: 'destructive' });
+                break;
+            }
+            if (f.size > MAX_FILE_SIZE) {
+                toast({ title: `${f.name} exceeds 25MB limit`, variant: 'destructive' });
+                continue;
+            }
+            valid.push(f);
+        }
+        if (valid.length) setFiles([...files, ...valid]);
+    }, [files, setFiles, toast]);
+
+    const removeFile = (idx: number) => setFiles(files.filter((_, i) => i !== idx));
+
+    return (
+        <div className="space-y-3">
+            <label className="text-xs font-medium uppercase tracking-wider mb-1.5 flex items-center gap-1.5" style={{ color: '#999' }}>
+                <Paperclip className="h-3 w-3" /> Attachments <span style={{ color: '#666' }}>(max 5 files, 25MB each)</span>
+            </label>
+            {/* Drop zone */}
+            <div
+                onClick={() => inputRef.current?.click()}
+                onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={e => { e.preventDefault(); setDragOver(false); addFiles(e.dataTransfer.files); }}
+                className="relative flex flex-col items-center justify-center gap-2 py-6 rounded-xl cursor-pointer transition-all duration-200"
+                style={{
+                    border: `2px dashed ${dragOver ? '#D4AF37' : '#333'}`,
+                    backgroundColor: dragOver ? 'rgba(212, 175, 55, 0.05)' : '#0a0a0a',
+                }}
+            >
+                <Upload className="h-6 w-6" style={{ color: dragOver ? '#D4AF37' : '#555' }} />
+                <p className="text-xs" style={{ color: '#888' }}>
+                    {dragOver ? 'Drop files here' : 'Drag & drop files or click to browse'}
+                </p>
+                <input
+                    ref={inputRef}
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={e => { if (e.target.files) addFiles(e.target.files); e.target.value = ''; }}
+                />
+            </div>
+            {/* File previews */}
+            {files.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                    {files.map((f, i) => (
+                        <div
+                            key={`${f.name}-${i}`}
+                            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs"
+                            style={{ backgroundColor: '#111', border: '1px solid #222' }}
+                        >
+                            {isImageFile(f.type)
+                                ? <ImageIcon className="h-3.5 w-3.5 flex-shrink-0" style={{ color: '#D4AF37' }} />
+                                : <FileIcon className="h-3.5 w-3.5 flex-shrink-0" style={{ color: '#D4AF37' }} />
+                            }
+                            <span className="truncate max-w-[120px]" style={{ color: '#ccc' }}>{f.name}</span>
+                            <span style={{ color: '#666' }}>{formatFileSize(f.size)}</span>
+                            <button type="button" onClick={e => { e.stopPropagation(); removeFile(i); }} className="ml-1 p-0.5 rounded hover:bg-red-500/20">
+                                <X className="h-3 w-3" style={{ color: '#ef4444' }} />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
 
 // ─── Booking Form ───────────────────────────────────────────────────────────────
 const BookingForm = () => {
@@ -13,6 +138,7 @@ const BookingForm = () => {
     const { toast } = useToast();
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [files, setFiles] = useState<File[]>([]);
 
     const [form, setForm] = useState({
         client_name: '',
@@ -41,7 +167,7 @@ const BookingForm = () => {
 
         setSubmitting(true);
         try {
-            const { error } = await supabase.from('booking_requests').insert({
+            const { data, error } = await supabase.from('booking_requests').insert({
                 client_name: form.client_name,
                 client_email: form.client_email,
                 client_phone: form.client_phone || null,
@@ -54,10 +180,16 @@ const BookingForm = () => {
                 talent_requested: form.talent_requested || null,
                 budget_range: form.budget_range || null,
                 additional_details: form.additional_details || null,
-            });
+            }).select('id').single();
             if (error) throw error;
 
+            // Upload attachments
+            if (files.length > 0 && data?.id) {
+                await uploadAttachments(files, 'booking', data.id);
+            }
+
             setSubmitted(true);
+            setFiles([]);
             toast({ title: 'Booking request submitted!' });
         } catch (err: any) {
             toast({ title: 'Error submitting booking', description: err.message, variant: 'destructive' });
@@ -81,7 +213,7 @@ const BookingForm = () => {
                     We'll review your request and get back to you within 24-48 hours.
                 </p>
                 <button
-                    onClick={() => { setSubmitted(false); setForm({ client_name: '', client_email: '', client_phone: '', company_organization: '', event_type: '', event_date: '', event_location: '', event_duration: '', estimated_audience_size: '', talent_requested: '', budget_range: '', additional_details: '' }); }}
+                    onClick={() => { setSubmitted(false); setFiles([]); setForm({ client_name: '', client_email: '', client_phone: '', company_organization: '', event_type: '', event_date: '', event_location: '', event_duration: '', estimated_audience_size: '', talent_requested: '', budget_range: '', additional_details: '' }); }}
                     className="text-sm font-medium px-4 py-2 rounded-lg"
                     style={{ border: '1px solid rgba(212, 175, 55, 0.3)', color: '#D4AF37' }}
                 >
@@ -202,6 +334,9 @@ const BookingForm = () => {
                 <textarea value={form.additional_details} onChange={e => update('additional_details', e.target.value)} placeholder="Tell us more about your event, specific requirements, or any questions..." rows={4} className={inputClass + " resize-none"} style={inputStyle} onFocus={e => Object.assign(e.target.style, focusStyle)} onBlur={e => e.target.style.borderColor = '#222'} />
             </div>
 
+            {/* File Attachments */}
+            <FileUploader files={files} setFiles={setFiles} toast={toast} />
+
             <button
                 type="submit"
                 disabled={submitting}
@@ -221,6 +356,7 @@ const ContactForm = () => {
     const submitContact = useSubmitContactForm();
     const [submitted, setSubmitted] = useState(false);
     const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+    const [files, setFiles] = useState<File[]>([]);
 
     const update = (field: string, value: string) =>
         setForm(prev => ({ ...prev, [field]: value }));
@@ -233,13 +369,20 @@ const ContactForm = () => {
         }
 
         try {
-            await submitContact.mutateAsync({
+            const result = await submitContact.mutateAsync({
                 name: form.name,
                 email: form.email,
                 subject: form.subject || null,
                 message: form.message,
             });
+
+            // Upload attachments
+            if (files.length > 0 && result?.id) {
+                await uploadAttachments(files, 'contact', result.id);
+            }
+
             setSubmitted(true);
+            setFiles([]);
             toast({ title: 'Message sent!' });
         } catch (err: any) {
             toast({ title: 'Error sending message', description: err.message, variant: 'destructive' });
@@ -259,7 +402,7 @@ const ContactForm = () => {
                 <h3 className="text-lg font-bold mb-1" style={{ color: '#fff' }}>Message Sent</h3>
                 <p className="text-sm" style={{ color: '#999' }}>We'll get back to you shortly.</p>
                 <button
-                    onClick={() => { setSubmitted(false); setForm({ name: '', email: '', subject: '', message: '' }); }}
+                    onClick={() => { setSubmitted(false); setFiles([]); setForm({ name: '', email: '', subject: '', message: '' }); }}
                     className="text-sm font-medium px-4 py-2 rounded-lg mt-3"
                     style={{ border: '1px solid rgba(212, 175, 55, 0.3)', color: '#D4AF37' }}
                 >
@@ -293,6 +436,9 @@ const ContactForm = () => {
                 <label className="text-xs font-medium uppercase tracking-wider mb-1.5 block" style={{ color: '#999' }}>Message *</label>
                 <textarea required value={form.message} onChange={e => update('message', e.target.value)} placeholder="Tell us how we can help..." rows={4} className={inputClass + " resize-none"} style={inputStyle} onFocus={e => Object.assign(e.target.style, focusStyle)} onBlur={e => e.target.style.borderColor = '#222'} />
             </div>
+
+            {/* File Attachments */}
+            <FileUploader files={files} setFiles={setFiles} toast={toast} />
             <button
                 type="submit"
                 disabled={submitContact.isPending}

@@ -583,6 +583,42 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_attachments: {
+        Row: {
+          id: string
+          submission_type: string
+          submission_id: string
+          file_name: string
+          file_size: number
+          file_type: string | null
+          storage_path: string
+          public_url: string
+          uploaded_at: string
+        }
+        Insert: {
+          id?: string
+          submission_type: string
+          submission_id: string
+          file_name: string
+          file_size: number
+          file_type?: string | null
+          storage_path: string
+          public_url: string
+          uploaded_at?: string
+        }
+        Update: {
+          id?: string
+          submission_type?: string
+          submission_id?: string
+          file_name?: string
+          file_size?: number
+          file_type?: string | null
+          storage_path?: string
+          public_url?: string
+          uploaded_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {}
     Functions: {
