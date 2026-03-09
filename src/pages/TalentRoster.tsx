@@ -25,27 +25,24 @@ const RosterCard = ({ talent, index }: { talent: Talent; index: number }) => {
                 whileHover={{ scale: 1.04, borderColor: 'rgba(212, 175, 55, 0.4)' }}
                 whileTap={{ scale: 0.97 }}
             >
-                {/* Image — natural aspect ratio, no forced 1:1 */}
-                <div className="relative w-full overflow-hidden" style={{ aspectRatio: '5 / 3' }}>
-                    {talent.headshot_url ? (
-                        <img
-                            src={talent.headshot_url}
-                            alt={talent.name}
-                            className="absolute inset-0 w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                            loading="lazy"
-                            style={{ backgroundColor: '#0A0A0A' }}
-                        />
-                    ) : (
-                        <div
-                            className="absolute inset-0 flex items-center justify-center"
-                            style={{ backgroundColor: '#111' }}
-                        >
-                            <span className="text-2xl sm:text-3xl lg:text-4xl font-bold opacity-20" style={{ color: '#D4AF37' }}>
-                                {initials}
-                            </span>
-                        </div>
-                    )}
-                </div>
+                {/* Image — natural size, border hugs the image directly */}
+                {talent.headshot_url ? (
+                    <img
+                        src={talent.headshot_url}
+                        alt={talent.name}
+                        className="block w-full h-auto transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                    />
+                ) : (
+                    <div
+                        className="flex items-center justify-center"
+                        style={{ backgroundColor: '#111', aspectRatio: '5 / 3' }}
+                    >
+                        <span className="text-2xl sm:text-3xl lg:text-4xl font-bold opacity-20" style={{ color: '#D4AF37' }}>
+                            {initials}
+                        </span>
+                    </div>
+                )}
             </motion.div>
         </Link>
     );
@@ -95,7 +92,7 @@ const TalentRoster = () => {
                     {isLoading ? (
                         <div className={`grid ${gridClass} gap-2`}>
                             {Array.from({ length: 8 }).map((_, i) => (
-                                <div key={i} className="rounded-lg animate-pulse" style={{ backgroundColor: '#1a1a1a', aspectRatio: '5 / 3' }} />
+                                <div key={i} className="rounded-lg animate-pulse h-28 md:h-36" style={{ backgroundColor: '#1a1a1a' }} />
                             ))}
                         </div>
                     ) : talents && talents.length > 0 ? (
