@@ -149,23 +149,33 @@ const AdminSiteSettings = () => {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label>Instagram</Label>
+              <Label className="flex items-center gap-2 mb-1">
+                <img src="/social-icons/instagram.png" alt="Instagram" className="w-5 h-5 rounded" /> Instagram
+              </Label>
               <Input value={form.instagram_url} onChange={e => set('instagram_url', e.target.value)} placeholder="https://instagram.com/..." />
             </div>
             <div>
-              <Label>Facebook</Label>
+              <Label className="flex items-center gap-2 mb-1">
+                <img src="/social-icons/facebook.png" alt="Facebook" className="w-5 h-5 rounded" /> Facebook
+              </Label>
               <Input value={form.facebook_url} onChange={e => set('facebook_url', e.target.value)} placeholder="https://facebook.com/..." />
             </div>
             <div>
-              <Label>TikTok</Label>
+              <Label className="flex items-center gap-2 mb-1">
+                <img src="/social-icons/tiktok.png" alt="TikTok" className="w-5 h-5 rounded" /> TikTok
+              </Label>
               <Input value={form.tiktok_url} onChange={e => set('tiktok_url', e.target.value)} placeholder="https://tiktok.com/@..." />
             </div>
             <div>
-              <Label>X (Twitter)</Label>
+              <Label className="flex items-center gap-2 mb-1">
+                <img src="/social-icons/x.png" alt="X" className="w-5 h-5 rounded" /> X (Twitter)
+              </Label>
               <Input value={form.twitter_url} onChange={e => set('twitter_url', e.target.value)} placeholder="https://x.com/..." />
             </div>
             <div>
-              <Label>YouTube</Label>
+              <Label className="flex items-center gap-2 mb-1">
+                <img src="/social-icons/youtube.png" alt="YouTube" className="w-5 h-5 rounded" /> YouTube
+              </Label>
               <Input value={form.youtube_url} onChange={e => set('youtube_url', e.target.value)} placeholder="https://youtube.com/@..." />
             </div>
           </div>
