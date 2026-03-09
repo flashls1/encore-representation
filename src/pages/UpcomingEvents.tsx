@@ -21,39 +21,52 @@ const formatTime12 = (time: string): string => {
     return `${h12}:${String(m ?? 0).padStart(2, '0')} ${period}`;
 };
 
-/** Smart date/time formatting for events */
-const formatEventDateTime = (event: any): { dateLine: string; timeLine: string | null } => {
+/** Smart date/time formatting for events — supports new per-day schedule */
+const formatEventDateTime = (event: any): { lines: Array<{ datePart: string; timePart: string | null }> } => {
+    // New: per-day schedule
+    const sched = Array.isArray(event.event_schedule) ? event.event_schedule : [];
+    if (sched.length > 0) {
+        return {
+            lines: sched.map((day: any) => {
+                const d = day.date ? new Date(day.date + 'T00:00:00') : null;
+                const datePart = d
+                    ? d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+                    : '';
+                let timePart: string | null = null;
+                if (day.start_time) {
+                    timePart = formatTime12(day.start_time);
+                    if (day.end_time) timePart += ` – ${formatTime12(day.end_time)}`;
+                }
+                return { datePart, timePart };
+            }),
+        };
+    }
+
+    // Legacy fallback
     const start = event.event_date ? new Date(event.event_date + 'T00:00:00') : null;
     const end = event.event_end_date && event.event_end_date !== event.event_date
         ? new Date(event.event_end_date + 'T00:00:00') : null;
 
-    let dateLine = '';
+    let datePart = '';
     if (start && end) {
-        // Multi-day
         if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
-            // Same month: "March 18–20, 2026"
-            dateLine = `${start.toLocaleDateString('en-US', { month: 'long' })} ${start.getDate()}–${end.getDate()}, ${start.getFullYear()}`;
+            datePart = `${start.toLocaleDateString('en-US', { month: 'long' })} ${start.getDate()}–${end.getDate()}, ${start.getFullYear()}`;
         } else {
-            // Cross-month: "March 30 – April 2, 2026"
-            dateLine = `${start.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} – ${end.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+            datePart = `${start.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} – ${end.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
         }
     } else if (start) {
-        // Single day: "Saturday, March 18, 2026"
-        dateLine = start.toLocaleDateString('en-US', {
+        datePart = start.toLocaleDateString('en-US', {
             weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
         });
     }
 
-    // Time
-    let timeLine: string | null = null;
+    let timePart: string | null = null;
     if (event.event_time) {
-        timeLine = formatTime12(event.event_time);
-        if (event.event_end_time) {
-            timeLine += ` – ${formatTime12(event.event_end_time)}`;
-        }
+        timePart = formatTime12(event.event_time);
+        if (event.event_end_time) timePart += ` – ${formatTime12(event.event_end_time)}`;
     }
 
-    return { dateLine, timeLine };
+    return { lines: datePart ? [{ datePart, timePart }] : [] };
 };
 
 /** Ensures a URL has a proper protocol — fixes admin-entered URLs like "www.example.com" */
@@ -210,23 +223,25 @@ const TimelineNode = ({ event, index, isLast }: { event: any; index: number; isL
                             </p>
                         )}
 
-                        <div className="flex flex-wrap gap-3 text-xs" style={{ color: 'var(--text-muted)' }}>
-                            {event.event_date && (() => {
-                                const { dateLine, timeLine } = formatEventDateTime(event);
-                                return (
-                                    <>
-                                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.08)' }}>
-                                            <Calendar className="h-3 w-3" style={{ color: '#D4AF37' }} />
-                                            {dateLine}
-                                        </span>
-                                        {timeLine && (
+                        <div className="flex flex-col gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
+                            {(() => {
+                                const { lines } = formatEventDateTime(event);
+                                return lines.map((line, i) => (
+                                    <div key={i} className="flex flex-wrap gap-2">
+                                        {line.datePart && (
                                             <span className="flex items-center gap-1.5 px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.08)' }}>
-                                                <Clock className="h-3 w-3" style={{ color: '#D4AF37' }} />
-                                                {timeLine}
+                                                <Calendar className="h-3 w-3" style={{ color: '#D4AF37' }} />
+                                                {line.datePart}
                                             </span>
                                         )}
-                                    </>
-                                );
+                                        {line.timePart && (
+                                            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.08)' }}>
+                                                <Clock className="h-3 w-3" style={{ color: '#D4AF37' }} />
+                                                {line.timePart}
+                                            </span>
+                                        )}
+                                    </div>
+                                ));
                             })()}
                             {event.location && (
                                 <span className="flex items-center gap-1.5 px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(212, 175, 55, 0.08)' }}>

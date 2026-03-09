@@ -442,6 +442,7 @@ export type Database = {
           description: string | null
           event_date: string | null
           event_time: string | null
+          event_schedule: Json | null
           id: string
           image_url: string | null
           link_url: string | null
@@ -456,6 +457,7 @@ export type Database = {
           description?: string | null
           event_date?: string | null
           event_time?: string | null
+          event_schedule?: Json | null
           id?: string
           image_url?: string | null
           link_url?: string | null
@@ -470,6 +472,7 @@ export type Database = {
           description?: string | null
           event_date?: string | null
           event_time?: string | null
+          event_schedule?: Json | null
           id?: string
           image_url?: string | null
           link_url?: string | null

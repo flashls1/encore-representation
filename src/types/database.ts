@@ -140,6 +140,7 @@ export interface UpcomingEvent {
   event_end_date: string | null;
   event_time: string | null;
   event_end_time: string | null;
+  event_schedule: Array<{ date: string; start_time: string; end_time?: string | null }> | null;
   location: string | null;
   link_url: string | null;
   link_visible: boolean;

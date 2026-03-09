@@ -21,11 +21,24 @@ const EMPTY_EVENT: Partial<UpcomingEvent> = {
     event_end_date: null,
     event_time: '',
     event_end_time: '',
+    event_schedule: [],
     location: '',
     link_url: '',
     link_visible: true,
     sort_order: 0,
     visible: true,
+};
+
+interface ScheduleDay {
+    date: string;
+    start_time: string;
+    end_time: string;
+}
+
+const getDayOfWeek = (dateStr: string): string => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { weekday: 'long' });
 };
 
 /** Convert 24h time string (e.g. "14:00") to 12h display (e.g. "2:00 PM") */
@@ -145,48 +158,89 @@ const AdminEventsEditor = () => {
                             )}
                         </div>
 
-                        {/* Date & Time Section */}
+                        {/* Schedule — Dynamic Day Rows */}
                         <div className="rounded-lg p-4 space-y-4" style={{ backgroundColor: 'rgba(212, 175, 55, 0.03)', border: '1px solid rgba(212, 175, 55, 0.1)' }}>
-                            <h4 className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
-                                <CalendarDays className="h-3.5 w-3.5" /> Date & Time
-                            </h4>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <Label>Start Date</Label>
-                                    <Input
-                                        type="date"
-                                        value={editing.event_date || ''}
-                                        onChange={e => setEditing(p => ({ ...p, event_date: e.target.value || null }))}
-                                    />
-                                </div>
-                                <div>
-                                    <Label>End Date <span className="text-muted-foreground font-normal">(optional, for multi-day)</span></Label>
-                                    <Input
-                                        type="date"
-                                        value={editing.event_end_date || ''}
-                                        onChange={e => setEditing(p => ({ ...p, event_end_date: e.target.value || null }))}
-                                        min={editing.event_date || undefined}
-                                    />
-                                </div>
+                            <div className="flex items-center justify-between">
+                                <h4 className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
+                                    <CalendarDays className="h-3.5 w-3.5" /> Event Schedule
+                                </h4>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        const schedule = [...(editing.event_schedule as ScheduleDay[] || [])];
+                                        schedule.push({ date: '', start_time: '', end_time: '' });
+                                        setEditing(p => ({ ...p, event_schedule: schedule }));
+                                    }}
+                                >
+                                    <Plus className="h-3 w-3 mr-1" /> Add Day
+                                </Button>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <Label>Start Time</Label>
-                                    <Input
-                                        type="time"
-                                        value={editing.event_time || ''}
-                                        onChange={e => setEditing(p => ({ ...p, event_time: e.target.value }))}
-                                    />
+
+                            {(editing.event_schedule as ScheduleDay[] || []).length === 0 && (
+                                <p className="text-xs text-center py-4" style={{ color: 'var(--text-muted)' }}>
+                                    No days added yet. Click "Add Day" to set up the event schedule.
+                                </p>
+                            )}
+
+                            {(editing.event_schedule as ScheduleDay[] || []).map((day: ScheduleDay, idx: number) => (
+                                <div key={idx} className="rounded-lg p-3 space-y-2" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-bold" style={{ color: 'var(--accent)' }}>
+                                            {day.date ? getDayOfWeek(day.date) : `Day ${idx + 1}`}
+                                        </span>
+                                        <button
+                                            onClick={() => {
+                                                const schedule = [...(editing.event_schedule as ScheduleDay[] || [])];
+                                                schedule.splice(idx, 1);
+                                                setEditing(p => ({ ...p, event_schedule: schedule }));
+                                            }}
+                                            className="p-1 rounded hover:opacity-70"
+                                            style={{ color: 'var(--error)' }}
+                                        >
+                                            <Trash2 className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <div>
+                                            <Label className="text-[10px]">Date</Label>
+                                            <Input
+                                                type="date"
+                                                value={day.date}
+                                                onChange={e => {
+                                                    const schedule = [...(editing.event_schedule as ScheduleDay[] || [])];
+                                                    schedule[idx] = { ...schedule[idx], date: e.target.value };
+                                                    setEditing(p => ({ ...p, event_schedule: schedule }));
+                                                }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label className="text-[10px]">Start Time</Label>
+                                            <Input
+                                                type="time"
+                                                value={day.start_time}
+                                                onChange={e => {
+                                                    const schedule = [...(editing.event_schedule as ScheduleDay[] || [])];
+                                                    schedule[idx] = { ...schedule[idx], start_time: e.target.value };
+                                                    setEditing(p => ({ ...p, event_schedule: schedule }));
+                                                }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label className="text-[10px]">End Time <span className="font-normal" style={{ color: 'var(--text-muted)' }}>(opt)</span></Label>
+                                            <Input
+                                                type="time"
+                                                value={day.end_time || ''}
+                                                onChange={e => {
+                                                    const schedule = [...(editing.event_schedule as ScheduleDay[] || [])];
+                                                    schedule[idx] = { ...schedule[idx], end_time: e.target.value };
+                                                    setEditing(p => ({ ...p, event_schedule: schedule }));
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <Label>End Time <span className="text-muted-foreground font-normal">(optional)</span></Label>
-                                    <Input
-                                        type="time"
-                                        value={editing.event_end_time || ''}
-                                        onChange={e => setEditing(p => ({ ...p, event_end_time: e.target.value }))}
-                                    />
-                                </div>
-                            </div>
+                            ))}
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -376,16 +430,28 @@ const AdminEventsEditor = () => {
                             <h4 className="font-bold text-sm line-clamp-1" style={{ color: 'var(--text-primary)' }}>
                                 {event.title}
                             </h4>
-                            {event.event_date && (
-                                <p className="text-xs text-muted-foreground">
-                                    {new Date(event.event_date + 'T00:00:00').toLocaleDateString()}
-                                    {event.event_end_date && event.event_end_date !== event.event_date && (
-                                        <> – {new Date(event.event_end_date + 'T00:00:00').toLocaleDateString()}</>
-                                    )}
-                                    {event.event_time && ` · ${formatTime12(event.event_time)}`}
-                                    {event.event_end_time && `–${formatTime12(event.event_end_time)}`}
-                                </p>
-                            )}
+                            {(() => {
+                                const sched = (event.event_schedule as ScheduleDay[] || []);
+                                if (sched.length > 0) {
+                                    return (
+                                        <p className="text-xs text-muted-foreground">
+                                            {sched.map((d, i) => {
+                                                const dayStr = d.date ? `${getDayOfWeek(d.date).slice(0, 3)} ${new Date(d.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : '';
+                                                const timeStr = d.start_time ? formatTime12(d.start_time) + (d.end_time ? `–${formatTime12(d.end_time)}` : '') : '';
+                                                return <span key={i}>{i > 0 ? ' · ' : ''}{dayStr}{timeStr ? ` ${timeStr}` : ''}</span>;
+                                            })}
+                                        </p>
+                                    );
+                                } else if (event.event_date) {
+                                    return (
+                                        <p className="text-xs text-muted-foreground">
+                                            {new Date(event.event_date + 'T00:00:00').toLocaleDateString()}
+                                            {event.event_time && ` · ${formatTime12(event.event_time)}`}
+                                        </p>
+                                    );
+                                }
+                                return null;
+                            })()}
                             <div className="flex gap-2 pt-1">
                                 <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => setEditing(event)}>
                                     <Edit className="h-3 w-3 mr-1" /> Edit
