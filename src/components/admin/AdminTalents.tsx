@@ -960,7 +960,7 @@ const AdminTalents = () => {
                     {/* Headshot */}
                     <div className="mb-4">
                         <label className="text-sm font-medium mb-1 block" style={{ color: 'var(--text-primary)' }}>
-                            Headshot (1:1 square recommended)
+                            Headshot
                         </label>
                         <div className="flex items-center gap-4">
                             {headshotUrl && (
@@ -989,11 +989,34 @@ const AdminTalents = () => {
                     </div>
 
                     {/* Sort Order */}
-                    <div className="flex items-center gap-6 mb-4">
-                        <div className="flex items-center gap-2">
+                    <div className="mb-4">
+                        <div className="flex items-center gap-2 mb-2">
                             <label className="text-sm" style={{ color: 'var(--text-muted)' }}>Sort Order:</label>
                             <input type="number" value={sortOrder} onChange={(e) => setSortOrder(parseInt(e.target.value) || 0)} className="theme-input w-20 text-sm text-center" />
                         </div>
+                        {/* Current Roster Order reference */}
+                        {talents && talents.length > 0 && (
+                            <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
+                                <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>Current Roster Order</p>
+                                <div className="space-y-1 max-h-40 overflow-y-auto">
+                                    {[...talents].sort((a, b) => a.sort_order - b.sort_order).map((t) => (
+                                        <div
+                                            key={t.id}
+                                            className="flex items-center gap-2 px-2 py-1 rounded text-xs"
+                                            style={{
+                                                backgroundColor: (editingTalent?.id === t.id) ? 'rgba(212,175,55,0.15)' : 'transparent',
+                                                border: (editingTalent?.id === t.id) ? '1px solid rgba(212,175,55,0.4)' : '1px solid transparent',
+                                                color: (editingTalent?.id === t.id) ? '#D4AF37' : 'var(--text-secondary)',
+                                            }}
+                                        >
+                                            <span className="font-mono font-bold w-5 text-center" style={{ color: 'var(--accent)' }}>{t.sort_order}</span>
+                                            <span className="truncate">{t.name}</span>
+                                            {editingTalent?.id === t.id && <span className="ml-auto text-[10px] opacity-60">← editing</span>}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Roles Manager */}
@@ -1058,6 +1081,14 @@ const AdminTalents = () => {
                                     </div>
                                 )}
                             </div>
+
+                            {/* Sort badge */}
+                            <span
+                                className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold"
+                                style={{ backgroundColor: 'rgba(212,175,55,0.15)', color: '#D4AF37', border: '1px solid rgba(212,175,55,0.3)' }}
+                            >
+                                {talent.sort_order}
+                            </span>
 
                             {/* Name */}
                             <div className="flex-1 min-w-0">

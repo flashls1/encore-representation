@@ -25,8 +25,8 @@ const RosterCard = ({ talent, index }: { talent: Talent; index: number }) => {
                 whileHover={{ scale: 1.04, borderColor: 'rgba(212, 175, 55, 0.4)' }}
                 whileTap={{ scale: 0.97 }}
             >
-                {/* Square image — stretches to fill available space */}
-                <div className="relative w-full pb-[100%] overflow-hidden">
+                {/* Image — natural aspect ratio, no forced 1:1 */}
+                <div className="relative w-full overflow-hidden" style={{ aspectRatio: '5 / 3' }}>
                     {talent.headshot_url ? (
                         <img
                             src={talent.headshot_url}
@@ -44,7 +44,6 @@ const RosterCard = ({ talent, index }: { talent: Talent; index: number }) => {
                             </span>
                         </div>
                     )}
-                    {/* No overlay — images already contain talent name graphics */}
                 </div>
             </motion.div>
         </Link>
@@ -65,13 +64,13 @@ const TalentRoster = () => {
         );
     }, []);
 
-    // Dynamically choose column count to fit all talent in viewport
-    // For desktop: use more columns to compress grid so it fits in one screen
+    // Dynamic column count for banner-shaped (5:3) images
+    // More columns = smaller cards = more fit on one viewport
     const count = talents?.length || 0;
-    let gridClass = 'grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6';
-    if (count > 24) gridClass = 'grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10';
-    else if (count > 16) gridClass = 'grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8';
-    else if (count > 12) gridClass = 'grid-cols-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7';
+    let gridClass = 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4';
+    if (count > 16) gridClass = 'grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6';
+    else if (count > 12) gridClass = 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5';
+    else if (count > 8) gridClass = 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4';
 
     return (
         <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#0A0A0A' }}>
@@ -93,13 +92,13 @@ const TalentRoster = () => {
                     </div>
 
                     {isLoading ? (
-                        <div className={`grid ${gridClass} gap-2 sm:gap-3`}>
+                        <div className={`grid ${gridClass} gap-2`}>
                             {Array.from({ length: 8 }).map((_, i) => (
-                                <div key={i} className="pb-[100%] rounded-lg animate-pulse" style={{ backgroundColor: '#1a1a1a' }} />
+                                <div key={i} className="rounded-lg animate-pulse" style={{ backgroundColor: '#1a1a1a', aspectRatio: '5 / 3' }} />
                             ))}
                         </div>
                     ) : talents && talents.length > 0 ? (
-                        <div className={`grid ${gridClass} gap-2 sm:gap-3 flex-1`}>
+                        <div className={`grid ${gridClass} gap-2 flex-1`}>
                             {talents.map((talent, i) => (
                                 <RosterCard key={talent.id} talent={talent} index={i} />
                             ))}
