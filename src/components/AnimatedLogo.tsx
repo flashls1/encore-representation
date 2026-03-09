@@ -4,15 +4,17 @@ import { gsap } from 'gsap';
 /**
  * AnimatedLogo — Cinematic GSAP intro for the Encore Representation logo.
  *
- * Uses CSS clip-path on 3 copies of the same image to isolate:
- *   1. "ENCORE" (top)
- *   2. "REPRESENTATION" (middle)
- *   3. Reflection + separator (bottom)
+ * Architecture (separate high-res assets + CSS-generated elements):
+ *   1. "ENCORE" — /encore-text.png (drops from above)
+ *   2. Gold separator line with left-to-right shine sweep
+ *   3. "REPRESENTATION" — /representation-text.png (rises from below)
+ *   4. CSS reflection of REPRESENTATION (scaleY(-1) + gradient mask fade)
  *
  * Timeline:
- *   0% → 40%   ENCORE drops from above, REPRESENTATION rises from below
- *   40% → 55%  Lens-flare flash on the "R" area
- *   55% → 100% Reflection slides up + rotates into place
+ *   0% → 40%   ENCORE drops, REPRESENTATION rises (simultaneous)
+ *   35% → 55%  Gold separator line materializes with shine sweep
+ *   40% → 55%  Lens-flare flash at convergence point
+ *   55% → 85%  CSS reflection fades in below
  */
 
 interface AnimatedLogoProps {
@@ -21,28 +23,14 @@ interface AnimatedLogoProps {
     className?: string;
 }
 
-const LOGO_SRC = '/encore-logo-full.png';
-
-// Clip-path regions — pixel-measured from 1024×1024 PNG
-// ENCORE content: rows 211–517, REPRESENTATION: 528–591, Separator+Reflection: 596–655
-// Using generous 3-4% overlaps to eliminate subpixel rendering seams
-const CLIP_ENCORE = 'inset(18% 0% 46% 0%)';        // Shows ~18% to ~54% (extends 3% past REP start)
-const CLIP_REPRESENTATION = 'inset(49% 0% 38% 0%)'; // Shows ~49% to ~62% (overlaps both neighbors)
-const CLIP_REFLECTION = 'inset(56% 0% 34% 0%)';     // Shows ~56% to ~66% (overlaps REP by 6%)
-
-// Shared image style — preserves crisp quality at all sizes
-const IMG_STYLE: React.CSSProperties = {
-    width: '100%',
-    height: 'auto',
-    display: 'block',
-    imageRendering: 'auto',           // best quality downscale (browser default but explicit)
-    WebkitBackfaceVisibility: 'hidden',
-    backfaceVisibility: 'hidden',
-};
+const ENCORE_SRC = '/encore-text.png';
+const REPRESENTATION_SRC = '/representation-text.png';
 
 const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const encoreRef = useRef<HTMLDivElement>(null);
+    const separatorRef = useRef<HTMLDivElement>(null);
+    const shineRef = useRef<HTMLDivElement>(null);
     const repRef = useRef<HTMLDivElement>(null);
     const reflectionRef = useRef<HTMLDivElement>(null);
     const flareRef = useRef<HTMLDivElement>(null);
@@ -51,22 +39,39 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
         const ctx = gsap.context(() => {
             const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-            // Phase 1: ENCORE drops from top, REPRESENTATION rises from bottom
+            // Phase 1: ENCORE drops from top
             tl.fromTo(
                 encoreRef.current,
-                { y: '-150%', opacity: 0 },
+                { y: '-120%', opacity: 0 },
                 { y: '0%', opacity: 1, duration: duration * 0.4 },
                 0
             );
 
+            // Phase 1: REPRESENTATION rises from bottom (simultaneous)
             tl.fromTo(
                 repRef.current,
-                { y: '150%', opacity: 0 },
+                { y: '120%', opacity: 0 },
                 { y: '0%', opacity: 1, duration: duration * 0.4 },
                 0
             );
 
-            // Phase 2: Lens flare flash (starts when pieces meet)
+            // Phase 2: Gold separator line materializes
+            tl.fromTo(
+                separatorRef.current,
+                { scaleX: 0, opacity: 0 },
+                { scaleX: 1, opacity: 1, duration: duration * 0.25, ease: 'power2.inOut' },
+                duration * 0.32
+            );
+
+            // Phase 2: Shine sweep across the separator (left to right)
+            tl.fromTo(
+                shineRef.current,
+                { x: '-100%', opacity: 1 },
+                { x: '200%', opacity: 1, duration: duration * 0.35, ease: 'power1.inOut' },
+                duration * 0.4
+            );
+
+            // Phase 2: Lens flare flash at convergence
             tl.fromTo(
                 flareRef.current,
                 { scale: 0, opacity: 0 },
@@ -89,18 +94,17 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                 duration * 0.47
             );
 
-            // Phase 3: Reflection slides up + rotates in
+            // Phase 3: CSS reflection fades in
             tl.fromTo(
                 reflectionRef.current,
-                { y: '100%', opacity: 0, rotateX: 180 },
+                { opacity: 0, y: '10px' },
                 {
-                    y: '0%',
                     opacity: 1,
-                    rotateX: 0,
-                    duration: duration * 0.45,
+                    y: '0px',
+                    duration: duration * 0.35,
                     ease: 'power2.out',
                 },
-                duration * 0.5
+                duration * 0.55
             );
         }, containerRef);
 
@@ -110,103 +114,152 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
     return (
         <div
             ref={containerRef}
-            className={`relative select-none ${className}`}
+            className={`select-none ${className}`}
             style={{ perspective: '800px' }}
         >
-            {/* Master container — determines layout width, images scale naturally */}
-            <div className="relative w-full" style={{ maxWidth: '600px', margin: '0 auto' }}>
-                {/* Invisible sizing reference — sets natural height from the visible region */}
-                <img
-                    src={LOGO_SRC}
-                    alt=""
-                    style={{
-                        ...IMG_STYLE,
-                        clipPath: 'inset(18% 0% 34% 0%)',
-                        visibility: 'hidden',
-                    }}
-                    draggable={false}
-                />
-
+            {/* Master container — centers the logo stack */}
+            <div
+                style={{
+                    maxWidth: '600px',
+                    margin: '0 auto',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0px',
+                }}
+            >
                 {/* ENCORE — drops from top */}
                 <div
                     ref={encoreRef}
-                    className="absolute inset-0"
                     style={{
                         opacity: 0,
                         willChange: 'transform, opacity',
-                        transform: 'translateZ(0)',  // force GPU layer
+                        transform: 'translateZ(0)',
+                        width: '100%',
                     }}
                 >
                     <img
-                        src={LOGO_SRC}
+                        src={ENCORE_SRC}
                         alt="Encore"
-                        style={{
-                            ...IMG_STYLE,
-                            clipPath: CLIP_ENCORE,
-                        }}
                         draggable={false}
+                        style={{
+                            width: '100%',
+                            height: 'auto',
+                            display: 'block',
+                            imageRendering: 'auto',
+                            WebkitBackfaceVisibility: 'hidden',
+                            backfaceVisibility: 'hidden',
+                        }}
+                    />
+                </div>
+
+                {/* Gold separator line with shine effect */}
+                <div
+                    ref={separatorRef}
+                    style={{
+                        width: '85%',
+                        height: '2px',
+                        opacity: 0,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        transformOrigin: 'center center',
+                        willChange: 'transform, opacity',
+                        background: 'linear-gradient(90deg, transparent, #D4AF37 15%, #F4D57A 50%, #D4AF37 85%, transparent)',
+                        margin: '4px 0',
+                        borderRadius: '1px',
+                    }}
+                >
+                    {/* Shine sweep overlay */}
+                    <div
+                        ref={shineRef}
+                        style={{
+                            position: 'absolute',
+                            top: '-3px',
+                            left: 0,
+                            width: '40%',
+                            height: '8px',
+                            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.9) 40%, rgba(255,255,255,1) 50%, rgba(255,255,255,0.9) 60%, transparent)',
+                            filter: 'blur(1px)',
+                            pointerEvents: 'none',
+                        }}
                     />
                 </div>
 
                 {/* REPRESENTATION — rises from bottom */}
                 <div
                     ref={repRef}
-                    className="absolute inset-0"
                     style={{
                         opacity: 0,
                         willChange: 'transform, opacity',
                         transform: 'translateZ(0)',
+                        width: '100%',
                     }}
                 >
                     <img
-                        src={LOGO_SRC}
+                        src={REPRESENTATION_SRC}
                         alt="Representation"
-                        style={{
-                            ...IMG_STYLE,
-                            clipPath: CLIP_REPRESENTATION,
-                        }}
                         draggable={false}
+                        style={{
+                            width: '100%',
+                            height: 'auto',
+                            display: 'block',
+                            imageRendering: 'auto',
+                            WebkitBackfaceVisibility: 'hidden',
+                            backfaceVisibility: 'hidden',
+                        }}
                     />
                 </div>
 
-                {/* Lens flare flash — positioned near the "R" on ENCORE */}
-                <div
-                    ref={flareRef}
-                    className="absolute pointer-events-none"
-                    style={{
-                        top: '10%',
-                        right: '10%',
-                        width: '120px',
-                        height: '120px',
-                        opacity: 0,
-                        willChange: 'transform, opacity',
-                        background: 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(212,175,55,0.6) 30%, rgba(212,175,55,0) 70%)',
-                        borderRadius: '50%',
-                        filter: 'blur(2px)',
-                    }}
-                />
-
-                {/* Reflection + separator — spins in from bottom */}
+                {/* CSS Reflection — flipped REPRESENTATION with gradient mask */}
                 <div
                     ref={reflectionRef}
-                    className="absolute inset-0"
                     style={{
                         opacity: 0,
-                        willChange: 'transform, opacity',
-                        transformOrigin: 'center top',
-                        transform: 'translateZ(0)',
+                        willChange: 'opacity',
+                        width: '100%',
+                        marginTop: '2px',
+                        transform: 'scaleY(-1)',
+                        WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 40%, transparent 80%)',
+                        maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 40%, transparent 80%)',
+                        filter: 'blur(0.5px)',
+                        pointerEvents: 'none',
                     }}
                 >
                     <img
-                        src={LOGO_SRC}
+                        src={REPRESENTATION_SRC}
                         alt=""
-                        style={{
-                            ...IMG_STYLE,
-                            clipPath: CLIP_REFLECTION,
-                        }}
                         draggable={false}
+                        aria-hidden="true"
+                        style={{
+                            width: '100%',
+                            height: 'auto',
+                            display: 'block',
+                            imageRendering: 'auto',
+                        }}
                     />
                 </div>
+
+                {/* Lens flare flash — positioned at center convergence */}
+                <div
+                    ref={flareRef}
+                    style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        width: '120px',
+                        height: '120px',
+                        marginTop: '-60px',
+                        marginLeft: '-60px',
+                        opacity: 0,
+                        willChange: 'transform, opacity',
+                        background:
+                            'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(212,175,55,0.6) 30%, rgba(212,175,55,0) 70%)',
+                        borderRadius: '50%',
+                        filter: 'blur(2px)',
+                        pointerEvents: 'none',
+                        zIndex: 10,
+                    }}
+                />
             </div>
         </div>
     );
