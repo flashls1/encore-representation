@@ -12,6 +12,40 @@ import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
+import FontFamily from '@tiptap/extension-font-family';
+import { Extension } from '@tiptap/core';
+
+// ─── Custom FontSize Extension (uses TextStyle inline styles) ────────────────
+const FontSize = Extension.create({
+    name: 'fontSize',
+    addGlobalAttributes() {
+        return [
+            {
+                types: ['textStyle'],
+                attributes: {
+                    fontSize: {
+                        default: null,
+                        parseHTML: element => element.style.fontSize?.replace(/["']/g, '') || null,
+                        renderHTML: attributes => {
+                            if (!attributes.fontSize) return {};
+                            return { style: `font-size: ${attributes.fontSize}` };
+                        },
+                    },
+                },
+            },
+        ];
+    },
+    addCommands() {
+        return {
+            setFontSize: (size: string) => ({ chain }: any) => {
+                return chain().setMark('textStyle', { fontSize: size }).run();
+            },
+            unsetFontSize: () => ({ chain }: any) => {
+                return chain().setMark('textStyle', { fontSize: null }).removeEmptyTextStyle().run();
+            },
+        };
+    },
+});
 
 // ─── Text Color Presets ──────────────────────────────────────────────────────────
 const TEXT_COLORS = [
@@ -23,6 +57,32 @@ const TEXT_COLORS = [
     { label: 'Light Gray', value: '#cccccc' },
     { label: 'Orange', value: '#f97316' },
     { label: 'Purple', value: '#a855f7' },
+];
+
+// ─── Font Size Presets ───────────────────────────────────────────────────────
+const FONT_SIZES = [
+    { label: '12px', value: '12px' },
+    { label: '14px', value: '14px' },
+    { label: '16px', value: '16px' },
+    { label: '18px', value: '18px' },
+    { label: '20px', value: '20px' },
+    { label: '24px', value: '24px' },
+    { label: '28px', value: '28px' },
+    { label: '36px', value: '36px' },
+];
+
+// ─── Font Family Presets ─────────────────────────────────────────────────────
+const FONT_FAMILIES = [
+    { label: 'Inter', value: 'Inter, sans-serif' },
+    { label: 'Roboto', value: 'Roboto, sans-serif' },
+    { label: 'Open Sans', value: 'Open Sans, sans-serif' },
+    { label: 'Lato', value: 'Lato, sans-serif' },
+    { label: 'Montserrat', value: 'Montserrat, sans-serif' },
+    { label: 'Poppins', value: 'Poppins, sans-serif' },
+    { label: 'Playfair Display', value: 'Playfair Display, serif' },
+    { label: 'Georgia', value: 'Georgia, serif' },
+    { label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
+    { label: 'Times New Roman', value: 'Times New Roman, Times, serif' },
 ];
 
 // ─── Rich Text Editor (Tiptap) ───────────────────────────────────────────────────
@@ -52,6 +112,8 @@ const RichTextEditor = ({
             }),
             TextStyle,
             Color,
+            FontFamily,
+            FontSize,
         ],
         content: value || '',
         onUpdate: ({ editor: e }) => {
@@ -86,7 +148,7 @@ const RichTextEditor = ({
         >
             {/* Toolbar */}
             <div
-                className="flex items-center gap-1 px-2 py-1.5 border-b"
+                className="flex flex-wrap items-center gap-1 px-2 py-1.5 border-b"
                 style={{
                     backgroundColor: 'var(--bg-elevated)',
                     borderColor: 'var(--input-border)',
@@ -140,6 +202,49 @@ const RichTextEditor = ({
                 >
                     <LinkIcon className="h-4 w-4" />
                 </button>
+
+                {/* Divider */}
+                <div className="w-px h-5 mx-1" style={{ backgroundColor: 'var(--border)' }} />
+
+                {/* Font Size dropdown */}
+                <select
+                    value={editor.getAttributes('textStyle').fontSize || ''}
+                    onChange={e => {
+                        if (e.target.value) {
+                            (editor.chain().focus() as any).setFontSize(e.target.value).run();
+                        } else {
+                            (editor.chain().focus() as any).unsetFontSize().run();
+                        }
+                    }}
+                    className="h-7 px-1.5 rounded text-[11px] outline-none cursor-pointer"
+                    style={{ backgroundColor: '#111', border: '1px solid #333', color: '#ccc', minWidth: '65px' }}
+                    title="Font Size"
+                >
+                    <option value="">Size</option>
+                    {FONT_SIZES.map(s => (
+                        <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                </select>
+
+                {/* Font Family dropdown */}
+                <select
+                    value={editor.getAttributes('textStyle').fontFamily || ''}
+                    onChange={e => {
+                        if (e.target.value) {
+                            editor.chain().focus().setFontFamily(e.target.value).run();
+                        } else {
+                            editor.chain().focus().unsetFontFamily().run();
+                        }
+                    }}
+                    className="h-7 px-1.5 rounded text-[11px] outline-none cursor-pointer"
+                    style={{ backgroundColor: '#111', border: '1px solid #333', color: '#ccc', minWidth: '90px' }}
+                    title="Font Family"
+                >
+                    <option value="">Font</option>
+                    {FONT_FAMILIES.map(f => (
+                        <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>{f.label}</option>
+                    ))}
+                </select>
 
                 {/* Divider */}
                 <div className="w-px h-5 mx-1" style={{ backgroundColor: 'var(--border)' }} />
