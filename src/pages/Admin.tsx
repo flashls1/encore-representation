@@ -32,7 +32,11 @@ const ADMIN_SECTIONS = [
 // ─── Main Admin page ────────────────────────────────────────────────────────────
 const Admin = () => {
   const { user, signOut } = useAuth();
-  const [activeSection, setActiveSection] = useState("home");
+  const [activeSection, setActiveSection] = useState(() => {
+    // Restore last active section from sessionStorage
+    try { return sessionStorage.getItem('admin_active_section') || 'home'; }
+    catch { return 'home'; }
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Lock body scroll on iOS to prevent rubber-band bounce
@@ -64,6 +68,7 @@ const Admin = () => {
 
   const switchSection = (id: string) => {
     setActiveSection(id);
+    try { sessionStorage.setItem('admin_active_section', id); } catch { /* noop */ }
     setMobileMenuOpen(false);
   };
 
@@ -219,7 +224,7 @@ const Admin = () => {
               return (
                 <button
                   key={section.id}
-                  onClick={() => setActiveSection(section.id)}
+                  onClick={() => switchSection(section.id)}
                   className="group flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all duration-200 relative"
                   style={{
                     backgroundColor: isActive
@@ -299,7 +304,7 @@ const Admin = () => {
           return (
             <button
               key={section.id}
-              onClick={() => setActiveSection(section.id)}
+              onClick={() => switchSection(section.id)}
               className="flex flex-col items-center justify-center gap-0.5 py-2 transition-all duration-150"
               style={{
                 flex: '1 1 0%',
