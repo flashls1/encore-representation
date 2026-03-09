@@ -28,8 +28,8 @@ const SocialLink = ({ href, src, label }: { href: string; src: string; label: st
     <img
       src={src}
       alt={label}
-      className="block object-cover"
-      style={{ width: '115%', height: '115%', marginTop: '-7.5%', marginLeft: '-7.5%' }}
+      className="block"
+      style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 4 }}
       loading="lazy"
     />
   </motion.a>
