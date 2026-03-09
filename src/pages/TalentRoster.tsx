@@ -7,6 +7,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useTalents } from "@/hooks/useData";
 import type { Talent } from "@/types/database";
+import ShinyText from "@/ui-library/react-bits/effects/text-animations/shiny-text/ShinyText";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -82,9 +83,17 @@ const TalentRoster = () => {
                         <h1
                             ref={headingRef}
                             className="font-orbitron text-2xl sm:text-3xl md:text-4xl font-bold tracking-wider"
-                            style={{ color: '#D4AF37' }}
                         >
-                            Talent Roster
+                            <ShinyText
+                                text="Talent Roster"
+                                disabled={false}
+                                speed={3}
+                                color="#D4AF37"
+                                shineColor="#FFF8DC"
+                                spread={3}
+                                yoyo={false}
+                                direction="right"
+                            />
                         </h1>
                         <div className="w-12 h-[2px] mx-auto mt-2" style={{ backgroundColor: '#D4AF37' }} />
                     </div>
