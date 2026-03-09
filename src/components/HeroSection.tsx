@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { useHomeContent, useSiteSettings, useUIEffect } from "@/hooks/useData";
 import { supabase } from "@/integrations/supabase/client";
 import AnimatedLogo from "@/components/AnimatedLogo";
+import { CTAButtonsContainer } from "@/components/CTAButtons/CTAButtons";
 
 // ─── Kinetic gold flare background ──────────────────────────────────────────────
 const KineticFlares = () => (
@@ -157,13 +157,9 @@ const HeroSection = () => {
   const ctaSecondaryText = homeContent?.cta_secondary_text;
   const ctaSecondaryUrl = homeContent?.cta_secondary_url;
 
-  const isInternalUrl = (url: string) => url.startsWith('/') || url.startsWith('#');
-
-  const ctaMotion = {
-    whileHover: { scale: 1.06 },
-    whileTap: { scale: 0.97 },
-    transition: { type: 'spring', stiffness: 400, damping: 17 },
-  };
+  // CTA props for the reusable button system
+  const hasPrimary = !!(ctaPrimaryText && ctaPrimaryUrl);
+  const hasSecondary = !!(ctaSecondaryText && ctaSecondaryUrl);
 
   return (
     <section className="relative md:min-h-screen flex items-start md:items-center justify-center overflow-hidden pt-16 md:pt-0">
@@ -209,64 +205,23 @@ const HeroSection = () => {
           )}
         </div>
 
-        {/* Mobile CTA buttons — side by side below video */}
-        <motion.div
-          className="flex flex-row justify-center items-center gap-3 mt-5 mb-1 px-2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: logoDuration + 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {ctaPrimaryText && ctaPrimaryUrl && (
-            isInternalUrl(ctaPrimaryUrl) ? (
-              <Link
-                to={ctaPrimaryUrl}
-                className="px-5 py-2.5 text-sm font-bold rounded-lg glow-accent inline-block"
-                style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
-              >
-                {ctaPrimaryText}
-              </Link>
-            ) : (
-              <a
-                href={ctaPrimaryUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2.5 text-sm font-bold rounded-lg glow-accent inline-block"
-                style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
-              >
-                {ctaPrimaryText}
-              </a>
-            )
-          )}
-          {ctaSecondaryText && ctaSecondaryUrl && (
-            isInternalUrl(ctaSecondaryUrl) ? (
-              <Link
-                to={ctaSecondaryUrl}
-                className="px-5 py-2.5 text-sm font-bold rounded-lg inline-block"
-                style={{
-                  border: '2px solid var(--accent)',
-                  color: 'var(--accent)',
-                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                }}
-              >
-                {ctaSecondaryText}
-              </Link>
-            ) : (
-              <a
-                href={ctaSecondaryUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2.5 text-sm font-bold rounded-lg inline-block"
-                style={{
-                  border: '2px solid var(--accent)',
-                  color: 'var(--accent)',
-                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                }}
-              >
-                {ctaSecondaryText}
-              </a>
-            )
-          )}
-        </motion.div>
+        {/* Mobile CTA buttons */}
+        {hasPrimary && (
+          <motion.div
+            className="mt-5 mb-1 px-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: logoDuration + 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <CTAButtonsContainer
+              primaryLabel={ctaPrimaryText!}
+              primaryHref={ctaPrimaryUrl!}
+              secondaryLabel={ctaSecondaryText}
+              secondaryHref={ctaSecondaryUrl}
+              size="mobile"
+            />
+          </motion.div>
+        )}
       </div>
 
       {/* Desktop content overlay — unchanged */}
@@ -295,76 +250,23 @@ const HeroSection = () => {
           </div>
         )}
 
-        {/* CTA Buttons — Framer Motion spring hover */}
-        <motion.div
-          className="flex flex-row justify-center items-center gap-4"
-          style={ctaOffsetTop > 0 ? { marginTop: `${ctaOffsetTop}px` } : undefined}
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: logoDuration + 0.8, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {ctaPrimaryText && ctaPrimaryUrl && (
-            isInternalUrl(ctaPrimaryUrl) ? (
-              <motion.div {...ctaMotion}>
-                <Link
-                  to={ctaPrimaryUrl}
-                  className="px-10 py-4 text-lg sm:text-xl font-bold rounded-lg glow-accent inline-block"
-                  style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
-                >
-                  {ctaPrimaryText}
-                </Link>
-              </motion.div>
-            ) : (
-              <motion.div {...ctaMotion}>
-                <a
-                  href={ctaPrimaryUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-10 py-4 text-lg sm:text-xl font-bold rounded-lg glow-accent inline-block"
-                  style={{ backgroundColor: 'var(--button-bg)', color: 'var(--button-text)' }}
-                >
-                  {ctaPrimaryText}
-                </a>
-              </motion.div>
-            )
-          )}
-
-          {ctaSecondaryText && ctaSecondaryUrl && (
-            isInternalUrl(ctaSecondaryUrl) ? (
-              <motion.div {...ctaMotion}>
-                <Link
-                  to={ctaSecondaryUrl}
-                  className="px-10 py-4 text-lg sm:text-xl font-bold rounded-lg inline-block"
-                  style={{
-                    border: '2px solid var(--accent)',
-                    color: 'var(--accent)',
-                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                    backdropFilter: 'blur(4px)',
-                  }}
-                >
-                  {ctaSecondaryText}
-                </Link>
-              </motion.div>
-            ) : (
-              <motion.div {...ctaMotion}>
-                <a
-                  href={ctaSecondaryUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-10 py-4 text-lg sm:text-xl font-bold rounded-lg inline-block"
-                  style={{
-                    border: '2px solid var(--accent)',
-                    color: 'var(--accent)',
-                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                    backdropFilter: 'blur(4px)',
-                  }}
-                >
-                  {ctaSecondaryText}
-                </a>
-              </motion.div>
-            )
-          )}
-        </motion.div>
+        {/* CTA Buttons — Premium gradient + glassmorphism */}
+        {hasPrimary && (
+          <motion.div
+            style={ctaOffsetTop > 0 ? { marginTop: `${ctaOffsetTop}px` } : undefined}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: logoDuration + 0.8, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <CTAButtonsContainer
+              primaryLabel={ctaPrimaryText!}
+              primaryHref={ctaPrimaryUrl!}
+              secondaryLabel={ctaSecondaryText}
+              secondaryHref={ctaSecondaryUrl}
+              size="desktop"
+            />
+          </motion.div>
+        )}
       </div>
 
     </section>
