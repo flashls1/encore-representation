@@ -15,22 +15,23 @@ const SocialLink = ({ href, src, label }: { href: string; src: string; label: st
     target="_blank"
     rel="noopener noreferrer"
     title={label}
-    className="block overflow-hidden"
+    className="block"
     style={{
-      width: 40,
-      height: 40,
-      borderRadius: 10,
-      border: '1.5px solid #D4AF37',
+      width: 46,
+      height: 46,
+      padding: 2,
+      borderRadius: 12,
+      border: '2px solid #D4AF37',
+      backgroundColor: 'rgba(10, 10, 10, 0.6)',
     }}
-    whileHover={{ scale: 1.12, borderColor: 'rgba(212, 175, 55, 0.8)' }}
+    whileHover={{ scale: 1.12, borderColor: '#FFD700' }}
     whileTap={{ scale: 0.95 }}
   >
     <img
       src={src}
       alt={label}
-      width={40}
-      height={40}
       className="block w-full h-full object-cover"
+      style={{ borderRadius: 8 }}
       loading="lazy"
     />
   </motion.a>

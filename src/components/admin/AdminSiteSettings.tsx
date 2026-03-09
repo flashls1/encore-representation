@@ -147,34 +147,34 @@ const AdminSiteSettings = () => {
           <p className="text-xs text-muted-foreground mb-4">
             Add your social media URLs. Icons will automatically appear in the site footer when a URL is set.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <Label className="flex items-center gap-2 mb-1">
-                <img src="/social-icons/instagram.png" alt="Instagram" className="w-5 h-5 rounded" /> Instagram
+              <Label className="flex items-center gap-3 mb-2">
+                <img src="/social-icons/instagram.png" alt="Instagram" className="w-6 h-6 object-cover" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }} /> Instagram
               </Label>
               <Input value={form.instagram_url} onChange={e => set('instagram_url', e.target.value)} placeholder="https://instagram.com/..." />
             </div>
             <div>
-              <Label className="flex items-center gap-2 mb-1">
-                <img src="/social-icons/facebook.png" alt="Facebook" className="w-5 h-5 rounded" /> Facebook
+              <Label className="flex items-center gap-3 mb-2">
+                <img src="/social-icons/facebook.png" alt="Facebook" className="w-6 h-6 object-cover" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }} /> Facebook
               </Label>
               <Input value={form.facebook_url} onChange={e => set('facebook_url', e.target.value)} placeholder="https://facebook.com/..." />
             </div>
             <div>
-              <Label className="flex items-center gap-2 mb-1">
-                <img src="/social-icons/tiktok.png" alt="TikTok" className="w-5 h-5 rounded" /> TikTok
+              <Label className="flex items-center gap-3 mb-2">
+                <img src="/social-icons/tiktok.png" alt="TikTok" className="w-6 h-6 object-cover" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }} /> TikTok
               </Label>
               <Input value={form.tiktok_url} onChange={e => set('tiktok_url', e.target.value)} placeholder="https://tiktok.com/@..." />
             </div>
             <div>
-              <Label className="flex items-center gap-2 mb-1">
-                <img src="/social-icons/x.png" alt="X" className="w-5 h-5 rounded" /> X (Twitter)
+              <Label className="flex items-center gap-3 mb-2">
+                <img src="/social-icons/x.png" alt="X" className="w-6 h-6 object-cover" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }} /> X (Twitter)
               </Label>
               <Input value={form.twitter_url} onChange={e => set('twitter_url', e.target.value)} placeholder="https://x.com/..." />
             </div>
             <div>
-              <Label className="flex items-center gap-2 mb-1">
-                <img src="/social-icons/youtube.png" alt="YouTube" className="w-5 h-5 rounded" /> YouTube
+              <Label className="flex items-center gap-3 mb-2">
+                <img src="/social-icons/youtube.png" alt="YouTube" className="w-6 h-6 object-cover" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }} /> YouTube
               </Label>
               <Input value={form.youtube_url} onChange={e => set('youtube_url', e.target.value)} placeholder="https://youtube.com/@..." />
             </div>
