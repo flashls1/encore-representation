@@ -12,7 +12,7 @@ import { useHomeContent, useUIEffect } from '@/hooks/useData';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-import { Home, Image, Video, ExternalLink, Save, Loader2, X, Timer, ImagePlus, Eye, ArrowDown, Sparkles } from 'lucide-react';
+import { Home, Image, Video, ExternalLink, Save, Loader2, X, Timer, ImagePlus, Eye, ArrowDown, Sparkles, Upload } from 'lucide-react';
 
 /** Check if a URL points to a video file by extension */
 const isVideoUrl = (url: string): boolean => {
@@ -34,6 +34,8 @@ const AdminHomeContent = () => {
     hero_title: '',
     hero_subtitle: '',
     hero_subtitle_image_url: '',
+    hero_subtitle_font: 'Allura',
+    hero_subtitle_size: 28,
     hero_image_url: '',
     hero_video_url: '',
     countdown_enabled: true,
@@ -47,12 +49,45 @@ const AdminHomeContent = () => {
     cta_offset_top: '0',
   });
 
+  // Built-in site fonts
+  const SITE_FONTS = [
+    'Allura', 'Orbitron', 'Inter', 'Bangers', 'Cinzel', 'Roboto',
+    'Open Sans', 'Lato', 'Montserrat', 'Poppins', 'Playfair Display',
+  ];
+
+  // Custom uploaded fonts
+  const [customFonts, setCustomFonts] = useState<{ id: string; name: string; file_url: string }[]>([]);
+  const [uploadingFont, setUploadingFont] = useState(false);
+
+  // Fetch custom fonts
+  useEffect(() => {
+    const fetchFonts = async () => {
+      const { data } = await supabase.from('custom_fonts' as any).select('*').order('name');
+      if (data) {
+        setCustomFonts(data as any);
+        // Register @font-face for each custom font
+        (data as any[]).forEach((f: any) => {
+          const existing = document.querySelector(`style[data-font="${f.name}"]`);
+          if (!existing) {
+            const style = document.createElement('style');
+            style.dataset.font = f.name;
+            style.textContent = `@font-face { font-family: '${f.name}'; src: url('${f.file_url}'); font-display: swap; }`;
+            document.head.appendChild(style);
+          }
+        });
+      }
+    };
+    fetchFonts();
+  }, []);
+
   useEffect(() => {
     if (homeContent) {
       setForm({
         hero_title: homeContent.hero_title || '',
         hero_subtitle: homeContent.hero_subtitle || '',
         hero_subtitle_image_url: (homeContent as any).hero_subtitle_image_url || '',
+        hero_subtitle_font: (homeContent as any).hero_subtitle_font || 'Allura',
+        hero_subtitle_size: (homeContent as any).hero_subtitle_size || 28,
         hero_image_url: homeContent.hero_image_url || '',
         hero_video_url: homeContent.hero_video_url || '',
         countdown_enabled: homeContent.countdown_enabled ?? true,
@@ -75,7 +110,7 @@ const AdminHomeContent = () => {
     }
   }, [logoAnimConfig]);
 
-  const set = (field: string, value: string | boolean) => setForm(p => ({ ...p, [field]: value }));
+  const set = (field: string, value: string | boolean | number) => setForm(p => ({ ...p, [field]: value }));
 
   /** When user picks a file from the library, auto-detect type and store in the right field */
   const handleHeroMediaSelect = (url: string) => {
@@ -203,23 +238,129 @@ const AdminHomeContent = () => {
 
           <div>
             <Label>Hero Subtitle</Label>
-            <div
-              contentEditable
-              suppressContentEditableWarning
-              onInput={(e) => set('hero_subtitle', (e.target as HTMLDivElement).innerHTML)}
-              dangerouslySetInnerHTML={{ __html: form.hero_subtitle }}
-              className="min-h-[60px] px-3 py-2 rounded-md text-sm outline-none focus:ring-2 focus:ring-ring"
-              style={{
-                backgroundColor: 'hsl(var(--input))',
-                border: '1px solid hsl(var(--border))',
-                color: 'hsl(var(--foreground))',
-                overflowWrap: 'break-word',
-                wordBreak: 'break-word',
-              }}
+            <Input
+              value={form.hero_subtitle}
+              onChange={e => set('hero_subtitle', e.target.value)}
+              placeholder="Your tagline here"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Paste styled text here (fonts, colors, etc. will be preserved). Used only if no subtitle image is set below.
+              Text displayed below the hero logo. Used only if no subtitle image is set below.
             </p>
+          </div>
+
+          {/* Font & Size Controls */}
+          <div className="p-3 rounded-lg border border-border bg-muted/30 space-y-3">
+            <Label className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" /> Subtitle Font & Size
+            </Label>
+            <div className="flex flex-wrap gap-3">
+              {/* Font dropdown */}
+              <div className="flex-1 min-w-[180px]">
+                <label className="text-xs text-muted-foreground block mb-1">Font Family</label>
+                <select
+                  value={form.hero_subtitle_font}
+                  onChange={e => set('hero_subtitle_font', e.target.value)}
+                  className="w-full px-3 py-2 rounded-md text-sm border"
+                  style={{
+                    backgroundColor: 'hsl(var(--input))',
+                    borderColor: 'hsl(var(--border))',
+                    color: 'hsl(var(--foreground))',
+                  }}
+                >
+                  <optgroup label="Site Fonts">
+                    {SITE_FONTS.map(f => (
+                      <option key={f} value={f} style={{ fontFamily: f }}>{f}</option>
+                    ))}
+                  </optgroup>
+                  {customFonts.length > 0 && (
+                    <optgroup label="Uploaded Fonts">
+                      {customFonts.map(f => (
+                        <option key={f.id} value={f.name} style={{ fontFamily: f.name }}>{f.name}</option>
+                      ))}
+                    </optgroup>
+                  )}
+                </select>
+              </div>
+              {/* Size dropdown */}
+              <div className="w-[120px]">
+                <label className="text-xs text-muted-foreground block mb-1">Size (px)</label>
+                <select
+                  value={form.hero_subtitle_size}
+                  onChange={e => set('hero_subtitle_size', parseInt(e.target.value))}
+                  className="w-full px-3 py-2 rounded-md text-sm border"
+                  style={{
+                    backgroundColor: 'hsl(var(--input))',
+                    borderColor: 'hsl(var(--border))',
+                    color: 'hsl(var(--foreground))',
+                  }}
+                >
+                  {[14, 16, 18, 20, 22, 24, 26, 28, 32, 36, 40, 44, 48, 56, 64, 72].map(s => (
+                    <option key={s} value={s}>{s}px</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Font upload */}
+            <div className="flex items-center gap-3">
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept=".ttf,.otf,.woff,.woff2"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setUploadingFont(true);
+                    try {
+                      const fontName = file.name.replace(/\.(ttf|otf|woff2?)$/i, '').replace(/[-_]/g, ' ');
+                      const safeName = `fonts/${Date.now()}_${file.name}`;
+                      const { error: uploadErr } = await supabase.storage.from('talent-media').upload(safeName, file, { contentType: file.type });
+                      if (uploadErr) throw uploadErr;
+                      const { data: urlData } = supabase.storage.from('talent-media').getPublicUrl(safeName);
+                      const fileUrl = urlData.publicUrl;
+
+                      // Register in DB
+                      const { error: dbErr } = await supabase.from('custom_fonts' as any).insert({ name: fontName, file_url: fileUrl } as any);
+                      if (dbErr) throw dbErr;
+
+                      // Register @font-face immediately
+                      const style = document.createElement('style');
+                      style.dataset.font = fontName;
+                      style.textContent = `@font-face { font-family: '${fontName}'; src: url('${fileUrl}'); font-display: swap; }`;
+                      document.head.appendChild(style);
+
+                      setCustomFonts(prev => [...prev, { id: crypto.randomUUID(), name: fontName, file_url: fileUrl }]);
+                      set('hero_subtitle_font', fontName);
+                      toast({ title: `Font "${fontName}" uploaded` });
+                    } catch (err: any) {
+                      toast({ title: 'Font upload failed', description: err.message, variant: 'destructive' });
+                    }
+                    setUploadingFont(false);
+                    e.target.value = '';
+                  }}
+                />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border cursor-pointer hover:bg-muted/50 transition-colors" style={{ borderColor: 'hsl(var(--border))', color: 'hsl(var(--foreground))' }}>
+                  {uploadingFont ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+                  Upload Font (.ttf, .otf, .woff, .woff2)
+                </span>
+              </label>
+            </div>
+
+            {/* Live preview */}
+            {form.hero_subtitle && (
+              <div className="mt-2 p-4 rounded-lg text-center" style={{ backgroundColor: '#0A0A0A', border: '1px solid rgba(212,175,55,0.3)' }}>
+                <p className="text-[10px] uppercase tracking-wider mb-2" style={{ color: '#888' }}>Live Preview</p>
+                <p style={{
+                  fontFamily: `'${form.hero_subtitle_font}', cursive, serif, sans-serif`,
+                  fontSize: `${form.hero_subtitle_size}px`,
+                  color: 'rgba(255, 255, 255, 0.92)',
+                  lineHeight: 1.3,
+                }}>
+                  {form.hero_subtitle}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Subtitle Image — optional image override */}

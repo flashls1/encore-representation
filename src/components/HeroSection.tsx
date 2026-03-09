@@ -119,6 +119,24 @@ const HeroSection = () => {
 
   const logoDuration = Number(logoAnimConfig?.duration) || 2.5;
 
+  // Load any custom uploaded fonts
+  useEffect(() => {
+    const loadCustomFonts = async () => {
+      const { data } = await supabase.from('custom_fonts' as any).select('name, file_url');
+      if (data) {
+        (data as any[]).forEach((f: any) => {
+          if (!document.querySelector(`style[data-font="${f.name}"]`)) {
+            const style = document.createElement('style');
+            style.dataset.font = f.name;
+            style.textContent = `@font-face { font-family: '${f.name}'; src: url('${f.file_url}'); font-display: swap; }`;
+            document.head.appendChild(style);
+          }
+        });
+      }
+    };
+    loadCustomFonts();
+  }, []);
+
   // Realtime updates
   useEffect(() => {
     const channel = supabase
@@ -151,6 +169,8 @@ const HeroSection = () => {
   const heroTitle = homeContent?.hero_title || "ENCORE REPRESENTATION";
   const heroSubtitle = homeContent?.hero_subtitle || "Premier Talent Representation";
   const heroSubtitleImageUrl = (homeContent as any)?.hero_subtitle_image_url || '';
+  const heroSubtitleFont = (homeContent as any)?.hero_subtitle_font || 'Allura';
+  const heroSubtitleSize = (homeContent as any)?.hero_subtitle_size || 28;
   const heroTextVisible = homeContent?.hero_text_visible ?? true;
   const ctaOffsetTop = parseInt(homeContent?.cta_offset_top || '0') || 0;
   const ctaPrimaryText = homeContent?.cta_primary_text;
@@ -235,11 +255,14 @@ const HeroSection = () => {
         {heroTextVisible && (
           <div
             ref={subtitleRef}
-            className="text-base sm:text-lg md:text-xl lg:text-2xl mb-10 max-w-3xl mx-auto leading-relaxed font-medium"
+            className="mb-10 max-w-3xl mx-auto leading-relaxed"
             style={{
               color: 'rgba(255, 255, 255, 0.92)',
               textShadow: heroSubtitleImageUrl ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 3px rgba(0, 0, 0, 0.6)',
               opacity: 0,
+              fontFamily: heroSubtitleImageUrl ? undefined : `'${heroSubtitleFont}', cursive, serif, sans-serif`,
+              fontSize: heroSubtitleImageUrl ? undefined : `${heroSubtitleSize}px`,
+              textAlign: 'center' as const,
             }}
           >
             {heroSubtitleImageUrl ? (
@@ -257,7 +280,7 @@ const HeroSection = () => {
                 }}
               />
             ) : (
-              <div dangerouslySetInnerHTML={{ __html: heroSubtitle }} />
+              heroSubtitle
             )}
           </div>
         )}
