@@ -144,6 +144,7 @@ export type Database = {
           hero_image_url: string | null
           hero_mode: string | null
           hero_subtitle: string | null
+          hero_subtitle_image_url: string | null
           hero_text_visible: boolean
           hero_title: string
           hero_video_url: string | null
@@ -164,6 +165,7 @@ export type Database = {
           hero_image_url?: string | null
           hero_mode?: string | null
           hero_subtitle?: string | null
+          hero_subtitle_image_url?: string | null
           hero_text_visible?: boolean
           hero_title?: string
           hero_video_url?: string | null
@@ -184,6 +186,7 @@ export type Database = {
           hero_image_url?: string | null
           hero_mode?: string | null
           hero_subtitle?: string | null
+          hero_subtitle_image_url?: string | null
           hero_text_visible?: boolean
           hero_title?: string
           hero_video_url?: string | null

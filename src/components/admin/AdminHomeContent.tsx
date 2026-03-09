@@ -27,11 +27,13 @@ const AdminHomeContent = () => {
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [showSubtitlePicker, setShowSubtitlePicker] = useState(false);
   const [logoAnimDuration, setLogoAnimDuration] = useState(2.5);
 
   const [form, setForm] = useState({
     hero_title: '',
     hero_subtitle: '',
+    hero_subtitle_image_url: '',
     hero_image_url: '',
     hero_video_url: '',
     countdown_enabled: true,
@@ -50,6 +52,7 @@ const AdminHomeContent = () => {
       setForm({
         hero_title: homeContent.hero_title || '',
         hero_subtitle: homeContent.hero_subtitle || '',
+        hero_subtitle_image_url: (homeContent as any).hero_subtitle_image_url || '',
         hero_image_url: homeContent.hero_image_url || '',
         hero_video_url: homeContent.hero_video_url || '',
         countdown_enabled: homeContent.countdown_enabled ?? true,
@@ -201,6 +204,40 @@ const AdminHomeContent = () => {
           <div>
             <Label>Hero Subtitle</Label>
             <Textarea value={form.hero_subtitle} onChange={e => set('hero_subtitle', e.target.value)} rows={2} placeholder="Your tagline here" />
+            <p className="text-xs text-muted-foreground mt-1">
+              Text fallback — used only if no subtitle image is set below.
+            </p>
+          </div>
+
+          {/* Subtitle Image — optional image override */}
+          <div className="p-3 rounded-lg border border-border bg-muted/30">
+            <Label className="flex items-center gap-2 mb-2">
+              <ImagePlus className="h-4 w-4" /> Hero Subtitle Image (optional)
+            </Label>
+            <p className="text-xs text-muted-foreground mb-3">
+              Upload a styled subtitle image (any font/design). When set, this replaces the text subtitle above.
+            </p>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={() => setShowSubtitlePicker(true)} className="gap-2">
+                <ImagePlus className="h-4 w-4" /> Choose from Media Library
+              </Button>
+              {form.hero_subtitle_image_url && (
+                <Button variant="ghost" size="sm" onClick={() => set('hero_subtitle_image_url', '')}>
+                  <X className="h-4 w-4 mr-1" /> Remove
+                </Button>
+              )}
+            </div>
+            {form.hero_subtitle_image_url && (
+              <div className="mt-3 rounded-lg overflow-hidden border border-border max-w-sm bg-black/50 p-4">
+                <img src={form.hero_subtitle_image_url} alt="Subtitle preview" className="w-full h-auto" />
+              </div>
+            )}
+            <MediaPicker
+              open={showSubtitlePicker}
+              onClose={() => setShowSubtitlePicker(false)}
+              onSelect={(url: string) => set('hero_subtitle_image_url', url)}
+              accept="image"
+            />
           </div>
 
           {/* CTA vertical offset */}

@@ -150,6 +150,7 @@ const HeroSection = () => {
 
   const heroTitle = homeContent?.hero_title || "ENCORE REPRESENTATION";
   const heroSubtitle = homeContent?.hero_subtitle || "Premier Talent Representation";
+  const heroSubtitleImageUrl = (homeContent as any)?.hero_subtitle_image_url || '';
   const heroTextVisible = homeContent?.hero_text_visible ?? true;
   const ctaOffsetTop = parseInt(homeContent?.cta_offset_top || '0') || 0;
   const ctaPrimaryText = homeContent?.cta_primary_text;
@@ -237,16 +238,32 @@ const HeroSection = () => {
             className="text-base sm:text-lg md:text-xl lg:text-2xl mb-10 max-w-3xl mx-auto leading-relaxed font-medium"
             style={{
               color: 'rgba(255, 255, 255, 0.92)',
-              textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 3px rgba(0, 0, 0, 0.6)',
+              textShadow: heroSubtitleImageUrl ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 3px rgba(0, 0, 0, 0.6)',
               opacity: 0,
             }}
           >
-            {heroSubtitle.split('\n').map((line, i) => (
-              <span key={i}>
-                {i > 0 && <br />}
-                {line}
-              </span>
-            ))}
+            {heroSubtitleImageUrl ? (
+              <img
+                src={heroSubtitleImageUrl}
+                alt={heroSubtitle}
+                draggable={false}
+                style={{
+                  maxWidth: '500px',
+                  width: '100%',
+                  height: 'auto',
+                  margin: '0 auto',
+                  display: 'block',
+                  filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6))',
+                }}
+              />
+            ) : (
+              heroSubtitle.split('\n').map((line, i) => (
+                <span key={i}>
+                  {i > 0 && <br />}
+                  {line}
+                </span>
+              ))
+            )}
           </div>
         )}
 

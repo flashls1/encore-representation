@@ -23,6 +23,7 @@ export interface HomeContent {
   id: string;
   hero_title: string;
   hero_subtitle: string | null;
+  hero_subtitle_image_url: string | null;
   hero_image_url: string | null;
   hero_video_url: string | null;
   hero_mode: string | null;
