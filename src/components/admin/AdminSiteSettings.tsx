@@ -150,31 +150,41 @@ const AdminSiteSettings = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <Label className="flex items-center gap-3 mb-2">
-                <img src="/social-icons/instagram.png" alt="Instagram" className="w-6 h-6 object-cover" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }} /> Instagram
+                <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }}>
+                  <img src="/social-icons/instagram.png" alt="Instagram" className="block object-cover" style={{ width: '115%', height: '115%', marginTop: '-7.5%', marginLeft: '-7.5%' }} />
+                </span> Instagram
               </Label>
               <Input value={form.instagram_url} onChange={e => set('instagram_url', e.target.value)} placeholder="https://instagram.com/..." />
             </div>
             <div>
               <Label className="flex items-center gap-3 mb-2">
-                <img src="/social-icons/facebook.png" alt="Facebook" className="w-6 h-6 object-cover" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }} /> Facebook
+                <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }}>
+                  <img src="/social-icons/facebook.png" alt="Facebook" className="block object-cover" style={{ width: '115%', height: '115%', marginTop: '-7.5%', marginLeft: '-7.5%' }} />
+                </span> Facebook
               </Label>
               <Input value={form.facebook_url} onChange={e => set('facebook_url', e.target.value)} placeholder="https://facebook.com/..." />
             </div>
             <div>
               <Label className="flex items-center gap-3 mb-2">
-                <img src="/social-icons/tiktok.png" alt="TikTok" className="w-6 h-6 object-cover" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }} /> TikTok
+                <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }}>
+                  <img src="/social-icons/tiktok.png" alt="TikTok" className="block object-cover" style={{ width: '115%', height: '115%', marginTop: '-7.5%', marginLeft: '-7.5%' }} />
+                </span> TikTok
               </Label>
               <Input value={form.tiktok_url} onChange={e => set('tiktok_url', e.target.value)} placeholder="https://tiktok.com/@..." />
             </div>
             <div>
               <Label className="flex items-center gap-3 mb-2">
-                <img src="/social-icons/x.png" alt="X" className="w-6 h-6 object-cover" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }} /> X (Twitter)
+                <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }}>
+                  <img src="/social-icons/x.png" alt="X" className="block object-cover" style={{ width: '115%', height: '115%', marginTop: '-7.5%', marginLeft: '-7.5%' }} />
+                </span> X (Twitter)
               </Label>
               <Input value={form.twitter_url} onChange={e => set('twitter_url', e.target.value)} placeholder="https://x.com/..." />
             </div>
             <div>
               <Label className="flex items-center gap-3 mb-2">
-                <img src="/social-icons/youtube.png" alt="YouTube" className="w-6 h-6 object-cover" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }} /> YouTube
+                <span className="inline-block w-6 h-6 overflow-hidden flex-shrink-0" style={{ borderRadius: 5, border: '1.5px solid #D4AF37' }}>
+                  <img src="/social-icons/youtube.png" alt="YouTube" className="block object-cover" style={{ width: '115%', height: '115%', marginTop: '-7.5%', marginLeft: '-7.5%' }} />
+                </span> YouTube
               </Label>
               <Input value={form.youtube_url} onChange={e => set('youtube_url', e.target.value)} placeholder="https://youtube.com/@..." />
             </div>
