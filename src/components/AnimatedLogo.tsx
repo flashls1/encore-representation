@@ -208,7 +208,7 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                         style={{
                             position: 'absolute',
                             top: '35%',
-                            left: '73%',
+                            left: '79%',
                             width: '80px',
                             height: '80px',
                             opacity: 0,
