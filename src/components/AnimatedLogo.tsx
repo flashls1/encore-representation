@@ -202,13 +202,13 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                     />
 
                     {/* ── Starburst flare on the 'R' design element ───────────────────── */}
-                    {/* Positioned at the sparkle point on top of the R (~78% left, ~12% top) */}
+                    {/* Centered in the inner corner hole of the R letter */}
                     <div
                         ref={flareRef}
                         style={{
                             position: 'absolute',
-                            top: '12%',
-                            left: '78%',
+                            top: '35%',
+                            left: '73%',
                             width: '80px',
                             height: '80px',
                             opacity: 0,
