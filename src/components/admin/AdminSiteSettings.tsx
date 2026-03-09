@@ -114,33 +114,35 @@ const AdminSiteSettings = () => {
         </Button>
       </div>
 
-      {/* Theme Selector */}
-      <Card className="bg-card/50 border-primary/30">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Palette className="h-5 w-5" /> Theme
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Label>Site Theme</Label>
-          <Select value={form.theme} onValueChange={v => set('theme', v)}>
-            <SelectTrigger className="w-full mt-1">
-              <SelectValue placeholder="Select theme" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover border border-border">
-              {THEME_OPTIONS.map(t => (
-                <SelectItem key={t.value} value={t.value}>
-                  <span className="flex flex-col">
-                    <span>{t.label}</span>
-                    <span className="text-xs text-muted-foreground">{t.description}</span>
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <p className="text-xs text-muted-foreground mt-2">Changes apply site-wide immediately after saving.</p>
-        </CardContent>
-      </Card>
+      {/* Theme Selector — hidden (keeping code intact to avoid cascading issues) */}
+      <div style={{ display: 'none' }}>
+        <Card className="bg-card/50 border-primary/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Palette className="h-5 w-5" /> Theme
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Label>Site Theme</Label>
+            <Select value={form.theme} onValueChange={v => set('theme', v)}>
+              <SelectTrigger className="w-full mt-1">
+                <SelectValue placeholder="Select theme" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border border-border">
+                {THEME_OPTIONS.map(t => (
+                  <SelectItem key={t.value} value={t.value}>
+                    <span className="flex flex-col">
+                      <span>{t.label}</span>
+                      <span className="text-xs text-muted-foreground">{t.description}</span>
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground mt-2">Changes apply site-wide immediately after saving.</p>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* General Info */}
       <Card className="bg-card/50 border-primary/30">

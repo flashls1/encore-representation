@@ -556,7 +556,9 @@
 
 /* ── Buttons — Primary (Gold) ── */
 /* shadcn <Button> default variant: bg-primary text-primary-foreground */
-.admin-dark-theme .bg-primary {
+.admin-dark-theme .bg-primary,
+.admin-dark-theme .bg-primary\/90,
+.admin-dark-theme [class*="bg-primary"] {
   background-color: #d4af37 !important;
   color: #000000 !important;
 }
@@ -568,12 +570,22 @@
 /*
  * CONTRAST RULE: Any element with a gold/yellow/accent background
  * MUST have black (#000) text. Never white on gold.
- * This applies to inline styles using var(--accent), var(--button-bg),
- * and var(--text-on-accent) which is set to #000000.
+ * Catches: inline styles, var(--accent), var(--button-bg), hover states.
  */
-
-.admin-dark-theme .bg-primary:hover {
+.admin-dark-theme .bg-primary:hover,
+.admin-dark-theme .bg-primary\/90:hover,
+.admin-dark-theme [class*="bg-primary"]:hover {
   background-color: #f5d060 !important;
+  color: #000000 !important;
+}
+
+/* Catch buttons/links with inline gold backgrounds */
+.admin-dark-theme button[style*="d4af37"],
+.admin-dark-theme button[style*="D4AF37"],
+.admin-dark-theme a[style*="d4af37"],
+.admin-dark-theme a[style*="D4AF37"],
+.admin-dark-theme button[style*="button-bg"],
+.admin-dark-theme a[style*="button-bg"] {
   color: #000000 !important;
 }
 
