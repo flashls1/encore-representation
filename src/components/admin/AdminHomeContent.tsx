@@ -203,9 +203,22 @@ const AdminHomeContent = () => {
 
           <div>
             <Label>Hero Subtitle</Label>
-            <Textarea value={form.hero_subtitle} onChange={e => set('hero_subtitle', e.target.value)} rows={2} placeholder="Your tagline here" />
+            <div
+              contentEditable
+              suppressContentEditableWarning
+              onInput={(e) => set('hero_subtitle', (e.target as HTMLDivElement).innerHTML)}
+              dangerouslySetInnerHTML={{ __html: form.hero_subtitle }}
+              className="min-h-[60px] px-3 py-2 rounded-md text-sm outline-none focus:ring-2 focus:ring-ring"
+              style={{
+                backgroundColor: 'hsl(var(--input))',
+                border: '1px solid hsl(var(--border))',
+                color: 'hsl(var(--foreground))',
+                overflowWrap: 'break-word',
+                wordBreak: 'break-word',
+              }}
+            />
             <p className="text-xs text-muted-foreground mt-1">
-              Text fallback — used only if no subtitle image is set below.
+              Paste styled text here (fonts, colors, etc. will be preserved). Used only if no subtitle image is set below.
             </p>
           </div>
 

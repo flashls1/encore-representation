@@ -257,12 +257,7 @@ const HeroSection = () => {
                 }}
               />
             ) : (
-              heroSubtitle.split('\n').map((line, i) => (
-                <span key={i}>
-                  {i > 0 && <br />}
-                  {line}
-                </span>
-              ))
+              <div dangerouslySetInnerHTML={{ __html: heroSubtitle }} />
             )}
           </div>
         )}
