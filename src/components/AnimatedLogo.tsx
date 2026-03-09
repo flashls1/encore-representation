@@ -207,8 +207,8 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                         ref={flareRef}
                         style={{
                             position: 'absolute',
-                            top: '35%',
-                            left: '79%',
+                            top: '30%',
+                            left: '76%',
                             width: '80px',
                             height: '80px',
                             opacity: 0,
