@@ -196,6 +196,7 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                             height: 'auto',
                             display: 'block',
                             imageRendering: 'auto',
+                            mixBlendMode: 'multiply',
                             WebkitBackfaceVisibility: 'hidden',
                             backfaceVisibility: 'hidden',
                         }}
@@ -360,6 +361,7 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                             height: 'auto',
                             display: 'block',
                             imageRendering: 'auto',
+                            mixBlendMode: 'multiply',
                             WebkitBackfaceVisibility: 'hidden',
                             backfaceVisibility: 'hidden',
                         }}
@@ -391,6 +393,7 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                             height: 'auto',
                             display: 'block',
                             imageRendering: 'auto',
+                            mixBlendMode: 'multiply',
                         }}
                     />
                 </div>
