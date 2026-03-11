@@ -119,8 +119,8 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                     opacity: 0,
                 },
                 {
-                    top: '5%',
-                    left: '52%',
+                    top: '-5%',
+                    left: '62%',
                     scale: 0.5,
                     opacity: 0.6,
                     duration: duration * 0.35,
@@ -286,36 +286,6 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                                 />
                             ))}
                         </div>
-
-                        {/* Bright white center point */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                width: '8px',
-                                height: '8px',
-                                borderRadius: '50%',
-                                background: 'radial-gradient(circle, #FFFFFF 0%, rgba(255,255,255,0.95) 50%, rgba(244,213,122,0.4) 100%)',
-                                transform: 'translate(-50%, -50%)',
-                                boxShadow: '0 0 6px 2px rgba(255,255,255,0.8), 0 0 15px 5px rgba(244,213,122,0.4)',
-                            }}
-                        />
-
-                        {/* Soft outer glow halo */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                width: '40px',
-                                height: '40px',
-                                borderRadius: '50%',
-                                background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(212,175,55,0.08) 50%, transparent 100%)',
-                                transform: 'translate(-50%, -50%)',
-                                filter: 'blur(3px)',
-                            }}
-                        />
                     </div>
                 </div>
 
