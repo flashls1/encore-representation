@@ -149,19 +149,14 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                 duration * 0.40
             );
 
-            // Phase 2b: Settle into idle size
+            // Phase 2b: Stay static at burst peak
             tl.to(
                 sparkleRef.current,
                 {
-                    scale: 1,
-                    opacity: 0.8,
-                    duration: duration * 0.2,
-                    ease: 'power2.inOut',
-                    onComplete: () => {
-                        if (sparkleRef.current) {
-                            sparkleRef.current.style.animation = 'starTwinkle 4s ease-in-out infinite';
-                        }
-                    },
+                    scale: 1.2,
+                    opacity: 0.9,
+                    duration: duration * 0.15,
+                    ease: 'power2.out',
                 },
                 duration * 0.52
             );
