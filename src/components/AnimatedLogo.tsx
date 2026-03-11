@@ -128,7 +128,7 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                 },
                 {
                     top: isMobile ? '-7%' : '-1%',
-                    left: isMobile ? '58%' : '59%',
+                    left: isMobile ? '58%' : '60%',
                     scale: isMobile ? 0.4 : 0.5,
                     opacity: 0.6,
                     duration: duration * 0.35,
