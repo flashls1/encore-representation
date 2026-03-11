@@ -109,19 +109,27 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                 0
             );
 
-            // Phase 1b: Star sparkle drops from top-right to N/C spike
+            // Responsive sparkle positioning
+            const isMobile = window.innerWidth < 768;
+            const sparkleSize = isMobile ? 60 : 120;
+            if (sparkleRef.current) {
+                sparkleRef.current.style.width = `${sparkleSize}px`;
+                sparkleRef.current.style.height = `${sparkleSize}px`;
+            }
+
+            // Phase 1b: Star sparkle drops from top-right
             tl.fromTo(
                 sparkleRef.current,
                 {
                     top: '-40%',
-                    left: '80%',
+                    left: isMobile ? '60%' : '80%',
                     scale: 0.3,
                     opacity: 0,
                 },
                 {
-                    top: '-1%',
-                    left: '59%',
-                    scale: 0.5,
+                    top: isMobile ? '-8%' : '-1%',
+                    left: isMobile ? '48%' : '59%',
+                    scale: isMobile ? 0.4 : 0.5,
                     opacity: 0.6,
                     duration: duration * 0.35,
                     ease: 'power2.in',

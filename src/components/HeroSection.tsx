@@ -200,7 +200,7 @@ const HeroSection = () => {
             <video
               src={effectiveVideoUrl}
               autoPlay muted loop playsInline
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
               style={{ backgroundColor: '#0A0A0A' }}
               onError={(e) => { (e.currentTarget as HTMLVideoElement).style.display = 'none'; }}
             />
@@ -208,7 +208,7 @@ const HeroSection = () => {
             <img
               src={effectiveImageUrl}
               alt="Encore Representation"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
               style={{ backgroundColor: '#0A0A0A' }}
               loading="eager"
             />
