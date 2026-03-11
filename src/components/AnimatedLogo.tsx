@@ -6,15 +6,16 @@ import { gsap } from 'gsap';
  *
  * Architecture (separate high-res assets + CSS-generated elements):
  *   1. "ENCORE" — /encore-text.png (drops from above)
- *      • Starburst flare on the 'R' letter design element
+ *      • Dynamic star sparkle drops from top-right, lands on R/E junction, then twinkles
  *   2. Gold separator line with continuous left→right shimmer
  *   3. "REPRESENTATION" — /representation-text.png (rises from below)
  *   4. CSS reflection of REPRESENTATION (scaleY(-1) + gradient mask fade)
  *
  * Timeline:
  *   0% → 40%   ENCORE drops, REPRESENTATION rises (simultaneous)
+ *   15% → 40%  Star sparkle drops from top-right, lands on R/E junction
  *   32% → 55%  Gold separator line materializes → continuous shimmer begins
- *   35% → 55%  Starburst flare on the R letter
+ *   40% → 55%  Star sparkle burst on landing → idle twinkle loop
  *   55% → 85%  CSS reflection fades in below
  */
 
@@ -26,6 +27,20 @@ interface AnimatedLogoProps {
 
 const ENCORE_SRC = '/encore-text.png';
 const REPRESENTATION_SRC = '/representation-text.png';
+
+/* ─── Ray config for the star sparkle ──────────────────────────────────────── */
+const STAR_RAYS = [
+    { angle: 0, length: 55, width: 2 },
+    { angle: 36, length: 35, width: 1 },
+    { angle: 72, length: 50, width: 1.5 },
+    { angle: 108, length: 35, width: 1 },
+    { angle: 144, length: 55, width: 2 },
+    { angle: 180, length: 55, width: 2 },
+    { angle: 216, length: 35, width: 1 },
+    { angle: 252, length: 50, width: 1.5 },
+    { angle: 288, length: 35, width: 1 },
+    { angle: 324, length: 55, width: 2 },
+];
 
 /* ─── CSS keyframes injected once ──────────────────────────────────────────── */
 const STYLE_ID = 'animated-logo-keyframes';
@@ -44,16 +59,18 @@ const injectKeyframes = () => {
       100% { left: 110%; opacity: 0; }
     }
 
-    /* Starburst rays rotating subtly */
-    @keyframes starburstPulse {
-      0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-      50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.15) rotate(8deg); }
+    /* Idle twinkle: gentle scale pulse for the star sparkle */
+    @keyframes starTwinkle {
+      0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.75; }
+      25%      { transform: scale(1.08) rotate(4deg); opacity: 0.9; }
+      50%      { transform: scale(0.92) rotate(-2deg); opacity: 0.65; }
+      75%      { transform: scale(1.05) rotate(3deg); opacity: 0.85; }
     }
 
-    /* Starburst core glow pulse */
-    @keyframes coreGlow {
-      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-      50%      { opacity: 0.9; transform: translate(-50%, -50%) scale(1.2); }
+    /* Slow continuous rotation for the ray container */
+    @keyframes starRotate {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   `;
     document.head.appendChild(style);
@@ -66,7 +83,7 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
     const shimmerRef = useRef<HTMLDivElement>(null);
     const repRef = useRef<HTMLDivElement>(null);
     const reflectionRef = useRef<HTMLDivElement>(null);
-    const flareRef = useRef<HTMLDivElement>(null);
+    const sparkleRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         injectKeyframes();
@@ -92,6 +109,55 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                 0
             );
 
+            // Phase 1b: Star sparkle drops from top-right to R/E junction
+            tl.fromTo(
+                sparkleRef.current,
+                {
+                    top: '-30%',
+                    left: '95%',
+                    scale: 0.3,
+                    opacity: 0,
+                },
+                {
+                    top: '18%',
+                    left: '76%',
+                    scale: 0.5,
+                    opacity: 0.6,
+                    duration: duration * 0.35,
+                    ease: 'power2.in',
+                },
+                duration * 0.05
+            );
+
+            // Phase 2a: Star sparkle burst on landing
+            tl.to(
+                sparkleRef.current,
+                {
+                    scale: 1.4,
+                    opacity: 1,
+                    duration: duration * 0.12,
+                    ease: 'power4.out',
+                },
+                duration * 0.40
+            );
+
+            // Phase 2b: Settle into idle size
+            tl.to(
+                sparkleRef.current,
+                {
+                    scale: 1,
+                    opacity: 0.8,
+                    duration: duration * 0.2,
+                    ease: 'power2.inOut',
+                    onComplete: () => {
+                        if (sparkleRef.current) {
+                            sparkleRef.current.style.animation = 'starTwinkle 4s ease-in-out infinite';
+                        }
+                    },
+                },
+                duration * 0.52
+            );
+
             // Phase 2: Gold separator line materializes
             tl.fromTo(
                 separatorRef.current,
@@ -108,37 +174,12 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                     opacity: 1,
                     duration: 0.01,
                     onComplete: () => {
-                        // Enable the CSS animation loop
                         if (shimmerRef.current) {
                             shimmerRef.current.style.animation = 'separatorShimmer 2.5s ease-in-out 0.5s infinite';
                         }
                     },
                 },
                 duration * 0.55
-            );
-
-            // Phase 2: Starburst flare on the R letter — bursts out then settles into subtle idle
-            tl.fromTo(
-                flareRef.current,
-                { scale: 0, opacity: 0 },
-                {
-                    scale: 1.8,
-                    opacity: 1,
-                    duration: duration * 0.15,
-                    ease: 'power2.out',
-                },
-                duration * 0.35
-            );
-            // Settle down to a gentle idle glow
-            tl.to(
-                flareRef.current,
-                {
-                    scale: 1,
-                    opacity: 0.7,
-                    duration: duration * 0.25,
-                    ease: 'power2.inOut',
-                },
-                duration * 0.5
             );
 
             // Phase 3: CSS reflection fades in
@@ -202,107 +243,77 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                         }}
                     />
 
-                    {/* ── Starburst flare on the 'R' design element ───────────────────── */}
-                    {/* Centered in the inner corner hole of the R letter */}
+                    {/* ── Dynamic star sparkle — drops in then twinkles on R/E junction ── */}
                     <div
-                        ref={flareRef}
+                        ref={sparkleRef}
                         style={{
                             position: 'absolute',
-                            top: '30%',
-                            left: '76%',
-                            width: '80px',
-                            height: '80px',
+                            top: '-30%',
+                            left: '95%',
+                            width: '120px',
+                            height: '120px',
                             opacity: 0,
-                            willChange: 'transform, opacity',
+                            willChange: 'transform, opacity, top, left',
                             pointerEvents: 'none',
                             zIndex: 10,
                         }}
                     >
-                        {/* Core bright point */}
+                        {/* Rotating ray container */}
                         <div
                             style={{
                                 position: 'absolute',
                                 top: '50%',
                                 left: '50%',
-                                width: '12px',
-                                height: '12px',
+                                width: '100%',
+                                height: '100%',
+                                transform: 'translate(-50%, -50%)',
+                                animation: 'starRotate 10s linear infinite',
+                            }}
+                        >
+                            {STAR_RAYS.map((ray, i) => (
+                                <div
+                                    key={i}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        width: `${ray.length}px`,
+                                        height: `${ray.width}px`,
+                                        background: `linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(244,213,122,0.6) 40%, transparent 100%)`,
+                                        transformOrigin: '0% 50%',
+                                        transform: `translate(0%, -50%) rotate(${ray.angle}deg)`,
+                                    }}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Bright white center point */}
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                width: '8px',
+                                height: '8px',
                                 borderRadius: '50%',
-                                background: 'radial-gradient(circle, #FFFFFF 0%, rgba(255,255,255,0.9) 40%, rgba(244,213,122,0.6) 70%, transparent 100%)',
+                                background: 'radial-gradient(circle, #FFFFFF 0%, rgba(255,255,255,0.95) 50%, rgba(244,213,122,0.4) 100%)',
                                 transform: 'translate(-50%, -50%)',
-                                animation: 'coreGlow 3s ease-in-out infinite',
-                                filter: 'blur(0.5px)',
+                                boxShadow: '0 0 6px 2px rgba(255,255,255,0.8), 0 0 15px 5px rgba(244,213,122,0.4)',
                             }}
                         />
 
-                        {/* Radial glow halo */}
+                        {/* Soft outer glow halo */}
                         <div
                             style={{
                                 position: 'absolute',
                                 top: '50%',
                                 left: '50%',
-                                width: '50px',
-                                height: '50px',
+                                width: '40px',
+                                height: '40px',
                                 borderRadius: '50%',
-                                background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(212,175,55,0.15) 40%, transparent 70%)',
+                                background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(212,175,55,0.08) 50%, transparent 100%)',
                                 transform: 'translate(-50%, -50%)',
-                                animation: 'starburstPulse 4s ease-in-out infinite',
-                                filter: 'blur(2px)',
-                            }}
-                        />
-
-                        {/* Cross-shaped light rays — horizontal */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                width: '70px',
-                                height: '2px',
-                                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.5) 45%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.5) 55%, rgba(255,255,255,0.1) 80%, transparent 100%)',
-                                transform: 'translate(-50%, -50%)',
-                                animation: 'starburstPulse 4s ease-in-out infinite',
-                            }}
-                        />
-
-                        {/* Cross-shaped light rays — vertical */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                width: '2px',
-                                height: '50px',
-                                background: 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.5) 45%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.5) 55%, rgba(255,255,255,0.1) 80%, transparent 100%)',
-                                transform: 'translate(-50%, -50%)',
-                                animation: 'starburstPulse 4s ease-in-out 0.5s infinite',
-                            }}
-                        />
-
-                        {/* Diagonal ray — 45deg */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                width: '45px',
-                                height: '1px',
-                                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 40%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.3) 60%, transparent 100%)',
-                                transform: 'translate(-50%, -50%) rotate(45deg)',
-                                animation: 'starburstPulse 4s ease-in-out 0.3s infinite',
-                            }}
-                        />
-
-                        {/* Diagonal ray — -45deg */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                width: '45px',
-                                height: '1px',
-                                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 40%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.3) 60%, transparent 100%)',
-                                transform: 'translate(-50%, -50%) rotate(-45deg)',
-                                animation: 'starburstPulse 4s ease-in-out 0.7s infinite',
+                                filter: 'blur(3px)',
                             }}
                         />
                     </div>
