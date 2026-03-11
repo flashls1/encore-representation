@@ -109,18 +109,18 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                 0
             );
 
-            // Phase 1b: Star sparkle drops from top-right to R/E junction
+            // Phase 1b: Star sparkle drops from top-right to N/C spike
             tl.fromTo(
                 sparkleRef.current,
                 {
-                    top: '-30%',
-                    left: '95%',
+                    top: '-40%',
+                    left: '80%',
                     scale: 0.3,
                     opacity: 0,
                 },
                 {
-                    top: '18%',
-                    left: '76%',
+                    top: '5%',
+                    left: '52%',
                     scale: 0.5,
                     opacity: 0.6,
                     duration: duration * 0.35,
@@ -243,13 +243,13 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                         }}
                     />
 
-                    {/* ── Dynamic star sparkle — drops in then twinkles on R/E junction ── */}
+                    {/* ── Dynamic star sparkle — drops in then twinkles on N/C spike ── */}
                     <div
                         ref={sparkleRef}
                         style={{
                             position: 'absolute',
-                            top: '-30%',
-                            left: '95%',
+                            top: '-40%',
+                            left: '80%',
                             width: '120px',
                             height: '120px',
                             opacity: 0,
