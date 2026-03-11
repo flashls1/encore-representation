@@ -25,7 +25,7 @@ interface AnimatedLogoProps {
     className?: string;
 }
 
-const ENCORE_SRC = '/encore-text.png';
+const ENCORE_SRC = '/encore-text.png?v=2';
 const REPRESENTATION_SRC = '/representation-text.png';
 
 /* ─── Ray config for the star sparkle ──────────────────────────────────────── */
