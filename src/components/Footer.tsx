@@ -53,11 +53,10 @@ const Footer = () => {
 
   // Build social links array from settings — only show icons that have URLs
   const socialLinks = [
-    settings?.instagram_url && { href: settings.instagram_url, src: '/social-icons/instagram.png', label: 'Instagram' },
-    settings?.facebook_url && { href: settings.facebook_url, src: '/social-icons/facebook.png', label: 'Facebook' },
-    settings?.tiktok_url && { href: settings.tiktok_url, src: '/social-icons/tiktok.png', label: 'TikTok' },
-    settings?.twitter_url && { href: settings.twitter_url, src: '/social-icons/x.png', label: 'X' },
-    (settings as any)?.youtube_url && { href: (settings as any).youtube_url, src: '/social-icons/youtube.png', label: 'YouTube' },
+    settings?.instagram_url && { href: settings.instagram_url, src: '/social-icons/instagram.jpg', label: 'Instagram' },
+    settings?.facebook_url && { href: settings.facebook_url, src: '/social-icons/facebook.jpg', label: 'Facebook' },
+    settings?.twitter_url && { href: settings.twitter_url, src: '/social-icons/x.jpg', label: 'X' },
+    (settings as any)?.youtube_url && { href: (settings as any).youtube_url, src: '/social-icons/youtube.jpg', label: 'YouTube' },
   ].filter(Boolean) as { href: string; src: string; label: string }[];
 
   return (

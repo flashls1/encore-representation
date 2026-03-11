@@ -119,8 +119,8 @@ const AnimatedLogo = ({ duration = 2.5, className = '' }: AnimatedLogoProps) => 
                     opacity: 0,
                 },
                 {
-                    top: '-5%',
-                    left: '62%',
+                    top: '-1%',
+                    left: '58%',
                     scale: 0.5,
                     opacity: 0.6,
                     duration: duration * 0.35,
