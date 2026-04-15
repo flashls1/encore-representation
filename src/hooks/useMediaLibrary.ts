@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { MediaLibraryItem } from '@/types/database';
 
 const BUCKET = 'media-library';
-const MAX_TOTAL_BYTES = 500 * 1024 * 1024; // 500 MB
+const MAX_TOTAL_BYTES = 1024 * 1024 * 1024; // 1 GB
 const MAX_FILE_BYTES = 200 * 1024 * 1024;  // 200 MB — accommodates raw .mov files before conversion
 
 const ALLOWED_TYPES = [
@@ -52,13 +52,13 @@ export const useUploadMedia = () => {
                 throw new Error(`Unsupported file type: ${file.type}`);
             }
             if (file.size > MAX_FILE_BYTES) {
-                throw new Error(`File too large. Max ${MAX_FILE_BYTES / 1024 / 1024} MB.`);
+                throw new Error(`File too large. Max ${formatBytesLabel(MAX_FILE_BYTES)}.`);
             }
             // Check total usage
             const { data: existing } = await supabase.from('media_library').select('file_size');
             const totalUsed = existing?.reduce((s, i) => s + i.file_size, 0) || 0;
             if (totalUsed + file.size > MAX_TOTAL_BYTES) {
-                throw new Error('Storage limit reached (500 MB). Delete some files first.');
+                throw new Error(`Storage limit reached (${formatBytesLabel(MAX_TOTAL_BYTES)}). Delete some files first.`);
             }
 
             // Upload to storage
@@ -139,6 +139,11 @@ function getImageDimensions(file: File): Promise<{ width: number; height: number
         img.onerror = reject;
         img.src = URL.createObjectURL(file);
     });
+}
+
+function formatBytesLabel(bytes: number): string {
+    if (bytes >= 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+    return `${(bytes / (1024 * 1024)).toFixed(0)} MB`;
 }
 
 export { MAX_FILE_BYTES, MAX_TOTAL_BYTES, ALLOWED_TYPES };
